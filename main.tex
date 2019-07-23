@@ -1,0 +1,111 @@
+% Credits : COLING 2018 style sheets
+% Contact: zhu2048@gmail.com & liuzy@tsinghua.edu.cn
+%% Based on the style files for COLING-2016, which were, in turn,
+%% Based on the style files for COLING-2014, which were, in turn,
+%% Based on the style files for ACL-2014, which were, in turn,
+%% Based on the style files for ACL-2013, which were, in turn,
+%% Based on the style files for ACL-2012, which were, in turn,
+%% based on the style files for ACL-2011, which were, in turn, 
+%% based on the style files for ACL-2010, which were, in turn, 
+%% based on the style files for ACL-IJCNLP-2009, which were, in turn,
+%% based on the style files for EACL-2009 and IJCNLP-2008...
+
+%% Based on the style files for EACL 2006 by 
+%%e.agirre@ehu.es or Sergi.Balari@uab.es
+%% and that of ACL 08 by Joakim Nivre and Noah Smith
+
+\documentclass[11pt]{article}
+\usepackage{coling2018}
+\usepackage{times}
+\usepackage{url}
+\usepackage{latexsym}
+\usepackage[utf8]{inputenc} 
+\usepackage[T1]{fontenc}
+\usepackage[french]{babel} 
+\usepackage{xcolor}
+\usepackage{graphicx}
+\usepackage{todonotes}
+\usepackage{verbatim}
+
+\usepackage{amssymb}
+\usepackage{hyperref}       % hyperlinks
+\usepackage{subcaption}
+
+\title{Rapport de stage : GAN}
+
+\author{Lucas Goareguer \\
+  Aix-Marseille Université \\
+  \texttt{Lucas.Goareguer@etu.univ-amu.fr   } \\\And
+   {\bf Laurent Perrinet} \\
+  Institut de Neurosciences de la Timone \\
+  {\tt Laurent.Perrinet@univ-amu.fr} \\}
+\date{}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+\maketitle
+\begin{abstract}
+Rapide résumer du cadre du stage et de ses objectifs.
+Ce papier à pour objectif de décrire le travail effectuer durant le stage terminal du Master Intelligence Artificielle et Apprentissage Automatique.
+Ce stage de 6 mois c'est dérouler à l'Institut de Neurosciences de la Timone et a était encadrer par Laurent Perrinet.
+Le principal objectif du stage était la compréhension des Generative Adverserials Networks (GAN) appliquer à la génération d'images.
+\end{abstract}
+
+\blfootnote{
+This work is licensed under a Creative Commons 
+Attribution 4.0 International License.
+License details:  \url{http://creativecommons.org/licenses/by/4.0/}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Motivation}
+
+\subsection{Adaptation d'un GAN à la génération de visages de Simpsons}
+\subsection{Compréhension des limites théoriques de ces modèle}
+\subsection{Adverserial Auto-Encoder}
+\subsection{Étude de l'espace latent}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Méthodes}
+
+\subsection{Simpsons Dataset}
+\subsection{Scan des paramètres}
+\subsection{Strange Attractor}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Résultats}
+
+\subsection{Simpsons Cohérent}
+\subsection{Évolution du loss de G (convergence, équilibre de Nash,..)}
+\subsection{Comparaison des espaces latent connu et générer}
+\subsection{Interpolation dans l'espace latent}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Conclusions et perspectives}
+
+\subsection{Apprentissage des GANs}
+\subsection{Découverte et prise en mains de nombreux outils}
+\subsection{Premier pas dans le monde professionnels}
+
+\newpage
+%{\bf Appendices}: Appendices, if any, directly follow the text and the references (but see above).  Letter them in sequence and provide an informative title: {\bf Appendix A. Title of Appendix}.
+%\section*{Acknowledgements}
+
+%The acknowledgements should go immediately before the references.  Do
+%not number the acknowledgements section. Do not include this section
+%when submitting your paper for review.
+
+\section*{Remerciements}
+Je tiens à remercier Laurent Perrinet pour m'avoir encadrés et guidés durant ce Stage.
+
+\bibliography{biblio}
+\bibliographystyle{acl}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
+\section*{Annexe 1. Description des données}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\end{document}
