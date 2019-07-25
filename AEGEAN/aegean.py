@@ -21,12 +21,6 @@ import matplotlib.pyplot as plt
 import time
 import datetime
 
-# # Particular import
-# depth = ""
-# if opt.depth == True:
-#     depth = "../"
-# sys.path.append(depth + "../")  # ../../GAN-SDPC/
-
 from .SimpsonsDataset import SimpsonsDataset, FastSimpsonsDataset
 from .utils import *
 from .plot import *
@@ -58,9 +52,10 @@ def learn(opt):
     discriminator = Discriminator(opt)
     encoder = Encoder(opt)
 
-    print_network(generator)
-    print_network(discriminator)
-    print_network(encoder)
+    if opt.verbose:
+        print_network(generator)
+        print_network(discriminator)
+        print_network(encoder)
 
     if cuda:
         #print("Nombre de GPU : ",torch.cuda.device_count())

@@ -8,6 +8,7 @@ def init():
                         help="Dossier de stockage des résultats sous la forme : Experience_names/parameters/")
     parser.add_argument("-e", "--n_epochs", type=int, default=300, help="number of epochs of training")
     parser.add_argument("-b", "--batch_size", type=int, default=16, help="size of the batches")
+    parser.add_argument("-c1", "--channel1", type=int, default=16, help="size of the channel 1")
     parser.add_argument("--lrE", type=float, default=0.00015, help="adam: learning rate for E")
     parser.add_argument("--lrD", type=float, default=0.00005, help="adam: learning rate for D")
     parser.add_argument("--lrG", type=float, default=0.00025, help="adam: learning rate for G")
