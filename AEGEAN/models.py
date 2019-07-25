@@ -15,9 +15,6 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch
 
-opts_conv = dict(kernel_size=9, stride=2, padding=4, padding_mode='zeros')
-channels = [64, 128, 256, 512]
-
 
 class Encoder(nn.Module):
     def __init__(self, opt):
@@ -25,6 +22,9 @@ class Encoder(nn.Module):
 
         self.opt = opt
         NL = nn.LeakyReLU(opt.lrelu, inplace=True)
+        opts_conv = dict(kernel_size=opt.kernel_size, stride=opt.stride, padding=opt.padding, padding_mode='zeros')
+        channels = [opt.channel0, opt.channel1, opt.channel2, opt.channel3]
+
 
         def encoder_block(in_filters, out_filters, bn=True):
             block = [nn.Conv2d(in_filters, out_filters, **opts_conv), NL]
@@ -69,6 +69,9 @@ class Generator(nn.Module):
     def __init__(self, opt):
         super(Generator, self).__init__()
         NL = nn.LeakyReLU(opt.lrelu, inplace=True)
+        opts_conv = dict(kernel_size=opt.kernel_size, stride=opt.stride, padding=opt.padding, padding_mode='zeros')
+        channels = [opt.channel0, opt.channel1, opt.channel2, opt.channel3]
+
 
         def generator_block(in_filters, out_filters):
             block = [nn.UpsamplingNearest2d(scale_factor=opts_conv['stride']), nn.Conv2d(in_filters, out_filters, kernel_size=opts_conv['kernel_size'], stride=1, padding=opts_conv['padding'], padding_mode=opts_conv['padding_mode']), nn.BatchNorm2d(out_filters, opt.eps), NL]
@@ -120,6 +123,9 @@ class Discriminator(nn.Module):
     def __init__(self, opt):
         super(Discriminator, self).__init__()
         NL = nn.LeakyReLU(opt.lrelu, inplace=True)
+        opts_conv = dict(kernel_size=opt.kernel_size, stride=opt.stride, padding=opt.padding, padding_mode='zeros')
+        channels = [opt.channel0, opt.channel1, opt.channel2, opt.channel3]
+
 
         def discriminator_block(in_filters, out_filters, bn=True):
             block = [nn.Conv2d(in_filters, out_filters, **opts_conv), NL]#, nn.Dropout2d(0.25)
