@@ -15,10 +15,10 @@ import time
 from itertools import product
 import os
 
-import sys
-sys.path.append("../")  # ../../GAN-SDPC/
+# import sys
+# sys.path.append("../")  # ../../GAN-SDPC/
 
-from SimpsonsDataset import *
+from .SimpsonsDataset import *
 
 
 def weights_init_normal(m, factor=1.0):
@@ -86,7 +86,7 @@ def load_model(model, optimizer, path):
     checkpoint = torch.load(path)
 
     model.load_state_dict(checkpoint['model_state_dict'])
-    
+
     if optimizer is not None:
         optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
 
@@ -200,7 +200,7 @@ def scan(exp_name, params, permutation=True, gpu_repart=False):
     else:
         perm = list(zip(*val_tab))
     #print(perm)
-    
+
     # Construction du noms de chaque test en fonction des paramètre qui la compose
     names = list()
     for values in perm:
@@ -221,7 +221,7 @@ def scan(exp_name, params, permutation=True, gpu_repart=False):
         print(com)
         commandes.append(com)
     print("Nombre de commande à lancer :", len(commandes))
-    
+
     # Demande de validation
     print("Valider ? (Y/N)")
     reponse = input()
@@ -229,7 +229,7 @@ def scan(exp_name, params, permutation=True, gpu_repart=False):
     if reponse == 'N':
         print("Annulation !")
         exit(0)
-    
+
     """# Répartition sur plusieurs GPU
     if torch.cuda.is_available():
         nb_gpu = torch.cuda.device_count()
@@ -248,14 +248,14 @@ def scan(exp_name, params, permutation=True, gpu_repart=False):
                     count_gpu = 0
             commandes = rep_commandes
     p = input()"""
-    
+
     # Appelle successif des script avec différents paramètres
     log = list()
     for com in commandes:
         print("Lancement de : ",com)
         ret = os.system(com)
         log.append(ret)
-        
+
     # Récapitulatif
     for idx,com in enumerate(commandes):
         print("Code retour : ",log[idx],"\t| Commandes ", com)

@@ -1,13 +1,13 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
- 
+
 from setuptools import setup, find_packages
- 
-import ANEMO
+
+import AEGEAN
 
 setup(
-    name='ANEMO',
-    version=ANEMO.__version__,
+    name='AEGEAN',
+    version=AEGEAN.__version__,
     packages=find_packages(),
     author="",
     author_email="",
