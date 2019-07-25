@@ -23,7 +23,7 @@ class Encoder(nn.Module):
         self.opt = opt
         NL = nn.LeakyReLU(opt.lrelu, inplace=True)
         opts_conv = dict(kernel_size=opt.kernel_size, stride=opt.stride, padding=opt.padding, padding_mode='zeros')
-        channels = [opt.channel0, opt.channel1, opt.channel2, opt.channel3]
+        self.channels = [opt.channel0, opt.channel1, opt.channel2, opt.channel3]
 
 
         def encoder_block(in_filters, out_filters, bn=True):
@@ -33,15 +33,15 @@ class Encoder(nn.Module):
             return block
 
         # use a different layer in the encoder using similarly max_filters
-        # channels[3] = 512
+        # self.channels[3] = 512
 
-        self.conv1 = nn.Sequential(*encoder_block(opt.channels, channels[0], bn=False),)
-        self.conv2 = nn.Sequential(*encoder_block(channels[0], channels[1]),)
-        self.conv3 = nn.Sequential(*encoder_block(channels[1], channels[2]),)
-        self.conv4 = nn.Sequential(*encoder_block(channels[2], channels[3]),)
+        self.conv1 = nn.Sequential(*encoder_block(opt.channels, self.channels[0], bn=False),)
+        self.conv2 = nn.Sequential(*encoder_block(self.channels[0], self.channels[1]),)
+        self.conv3 = nn.Sequential(*encoder_block(self.channels[1], self.channels[2]),)
+        self.conv4 = nn.Sequential(*encoder_block(self.channels[2], self.channels[3]),)
 
         self.init_size = opt.img_size // opts_conv['stride']**4
-        self.vector = nn.Linear(channels[3] * self.init_size ** 2, opt.latent_dim)
+        self.vector = nn.Linear(self.channels[3] * self.init_size ** 2, opt.latent_dim)
         # self.sigmoid = nn.Sequential(nn.Sigmoid(),)
 
     def forward(self, img):
@@ -70,7 +70,7 @@ class Generator(nn.Module):
         super(Generator, self).__init__()
         NL = nn.LeakyReLU(opt.lrelu, inplace=True)
         opts_conv = dict(kernel_size=opt.kernel_size, stride=opt.stride, padding=opt.padding, padding_mode='zeros')
-        channels = [opt.channel0, opt.channel1, opt.channel2, opt.channel3]
+        self.channels = [opt.channel0, opt.channel1, opt.channel2, opt.channel3]
 
 
         def generator_block(in_filters, out_filters):
@@ -80,14 +80,14 @@ class Generator(nn.Module):
 
         self.opt = opt
         self.init_size = opt.img_size // opts_conv['stride']**3
-        self.l1 = nn.Sequential(nn.Linear(opt.latent_dim, channels[3] * self.init_size ** 2), NL)
+        self.l1 = nn.Sequential(nn.Linear(opt.latent_dim, self.channels[3] * self.init_size ** 2), NL)
 
 
-        self.conv1 = nn.Sequential(*generator_block(channels[3], channels[2]),)
-        self.conv2 = nn.Sequential(*generator_block(channels[2], channels[1]),)
-        self.conv3 = nn.Sequential(*generator_block(channels[1], channels[0]),)
+        self.conv1 = nn.Sequential(*generator_block(self.channels[3], self.channels[2]),)
+        self.conv2 = nn.Sequential(*generator_block(self.channels[2], self.channels[1]),)
+        self.conv3 = nn.Sequential(*generator_block(self.channels[1], self.channels[0]),)
         self.conv_blocks = nn.Sequential(
-            nn.Conv2d(channels[0], opt.channels, 3, stride=1, padding=1),
+            nn.Conv2d(self.channels[0], opt.channels, 3, stride=1, padding=1),
             nn.Tanh(),
         )
 
@@ -96,18 +96,18 @@ class Generator(nn.Module):
         # Dim : opt.latent_dim
         out = self.l1(z)
         if self.opt.verbose: print("l1 out : ",out.shape)
-        out = out.view(out.shape[0], channels[3], self.init_size, self.init_size)
-        # Dim : (channels[3], opt.img_size/8, opt.img_size/8)
+        out = out.view(out.shape[0], self.channels[3], self.init_size, self.init_size)
+        # Dim : (self.channels[3], opt.img_size/8, opt.img_size/8)
         if self.opt.verbose: print("View out : ",out.shape)
 
         out = self.conv1(out)
-        # Dim : (channels[3]/2, opt.img_size/4, opt.img_size/4)
+        # Dim : (self.channels[3]/2, opt.img_size/4, opt.img_size/4)
         if self.opt.verbose: print("Conv1 out : ",out.shape)
         out = self.conv2(out)
-        # Dim : (channels[3]/4, opt.img_size/2, opt.img_size/2)
+        # Dim : (self.channels[3]/4, opt.img_size/2, opt.img_size/2)
         if self.opt.verbose: print("Conv2 out : ",out.shape)
         out = self.conv3(out)
-        # Dim : (channels[3]/8, opt.img_size, opt.img_size)
+        # Dim : (self.channels[3]/8, opt.img_size, opt.img_size)
         if self.opt.verbose: print("Conv3 out : ",out.shape)
 
         img = self.conv_blocks(out)
@@ -124,7 +124,7 @@ class Discriminator(nn.Module):
         super(Discriminator, self).__init__()
         NL = nn.LeakyReLU(opt.lrelu, inplace=True)
         opts_conv = dict(kernel_size=opt.kernel_size, stride=opt.stride, padding=opt.padding, padding_mode='zeros')
-        channels = [opt.channel0, opt.channel1, opt.channel2, opt.channel3]
+        self.channels = [opt.channel0, opt.channel1, opt.channel2, opt.channel3]
 
 
         def discriminator_block(in_filters, out_filters, bn=True):
@@ -135,14 +135,14 @@ class Discriminator(nn.Module):
 
         self.opt = opt
 
-        self.conv1 = nn.Sequential(*discriminator_block(opt.channels, channels[0], bn=False),)
-        self.conv2 = nn.Sequential(*discriminator_block(channels[0], channels[1]),)
-        self.conv3 = nn.Sequential(*discriminator_block(channels[1], channels[2]),)
-        self.conv4 = nn.Sequential(*discriminator_block(channels[2], channels[3]),)
+        self.conv1 = nn.Sequential(*discriminator_block(opt.channels, self.channels[0], bn=False),)
+        self.conv2 = nn.Sequential(*discriminator_block(self.channels[0], self.channels[1]),)
+        self.conv3 = nn.Sequential(*discriminator_block(self.channels[1], self.channels[2]),)
+        self.conv4 = nn.Sequential(*discriminator_block(self.channels[2], self.channels[3]),)
 
         # The height and width of downsampled image
         self.init_size = opt.img_size // opts_conv['stride']**4
-        self.adv_layer = nn.Sequential(nn.Linear(channels[3] * self.init_size ** 2, 1))#, nn.Sigmoid()
+        self.adv_layer = nn.Sequential(nn.Linear(self.channels[3] * self.init_size ** 2, 1))#, nn.Sigmoid()
 
     def forward(self, img):
         if self.opt.verbose:
@@ -164,13 +164,13 @@ class Discriminator(nn.Module):
         else:
             # Dim : (opt.chanels, opt.img_size, opt.img_size)
             out = self.conv1(img)
-            # Dim : (channels[3]/8, opt.img_size/2, opt.img_size/2)
+            # Dim : (self.channels[3]/8, opt.img_size/2, opt.img_size/2)
             out = self.conv2(out)
-            # Dim : (channels[3]/4, opt.img_size/4, opt.img_size/4)
+            # Dim : (self.channels[3]/4, opt.img_size/4, opt.img_size/4)
             out = self.conv3(out)
-            # Dim : (channels[3]/2, opt.img_size/4, opt.img_size/4)
+            # Dim : (self.channels[3]/2, opt.img_size/4, opt.img_size/4)
             out = self.conv4(out)
-            # Dim : (channels[3], opt.img_size/8, opt.img_size/8)
+            # Dim : (self.channels[3], opt.img_size/8, opt.img_size/8)
 
             out = out.view(out.shape[0], -1)
             validity = self.adv_layer(out)
