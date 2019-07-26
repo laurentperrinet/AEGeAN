@@ -4,7 +4,7 @@ import argparse
 
 def init():
     parser = argparse.ArgumentParser()
-    parser.add_argument("-r", "--runs_path", type=str, default='DCGAN_MAX/200e16i128b/',
+    parser.add_argument("-r", "--runs_path", type=str, default='vanilla',
                         help="Dossier de stockage des résultats sous la forme : Experience_names/parameters/")
     parser.add_argument("-e", "--n_epochs", type=int, default=300, help="number of epochs of training")
     parser.add_argument("-b", "--batch_size", type=int, default=16, help="size of the batches")

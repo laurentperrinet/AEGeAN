@@ -97,10 +97,10 @@ def learn(opt):
     # ----------
     #  Tensorboard
     # ----------
-    path_data1 = "../runs/" + opt.runs_path
-    path_data2 = "../runs/" + opt.runs_path + tag[:-1] + "/"
+    path_data1 = os.path.join(("./runs", opt.runs_path))
+    path_data2 = os.path.join(("./runs", opt.runs_path + tag[:-1] + "/"))
 
-    # Les runs sont sauvegarder dans un dossiers "runs" à la racine du projet, dans un sous dossiers opt.runs_path.
+    # Les runs sont sauvegardés dans un dossiers "runs" à la racine du projet, dans un sous dossiers opt.runs_path.
     os.makedirs(path_data1, exist_ok=True)
     os.makedirs(path_data2, exist_ok=True)
 
