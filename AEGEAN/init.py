@@ -26,6 +26,7 @@ def init():
     parser.add_argument("-i", "--img_size", type=int, default=128, help="size of each image dimension")
     parser.add_argument("--channels", type=int, default=3, help="number of image channels")
     parser.add_argument("-s", "--sample_interval", type=int, default=10, help="interval between image sampling")
+    parser.add_argument("--N_samples", type=int, default=25, help="number of samples to generate")
     parser.add_argument("--sample_path", type=str, default='images')
     parser.add_argument("-m", "--model_save_interval", type=int, default=150,
                         help="interval between image sampling. If model_save_interval > n_epochs : no save")

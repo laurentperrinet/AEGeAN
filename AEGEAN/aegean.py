@@ -119,8 +119,7 @@ def learn(opt):
     batch_on_save_dot = save_dot*len(dataloader)
 
     # Vecteur z fixe pour faire les samples
-    N_samples = 24
-    fixed_noise = Variable(Tensor(np.random.normal(0, 1, (N_samples, opt.latent_dim))))
+    fixed_noise = Variable(Tensor(np.random.normal(0, 1, (opt.N_samples, opt.latent_dim))))
 
     t_total = time.time()
     for j, epoch in enumerate(range(start_epoch, opt.n_epochs + 1)):
