@@ -29,7 +29,7 @@ class Encoder(nn.Module):
         def encoder_block(in_filters, out_filters, bn=True):
             block = [nn.Conv2d(in_filters, out_filters, **opts_conv), NL]
             if bn:
-                block.append(nn.BatchNorm2d(out_filters, opt.eps))
+                block.append(nn.BatchNorm2d(out_filters, eps=opt.bn_eps, momentum=opt.bn_momentum))
             return block
 
         # use a different layer in the encoder using similarly max_filters
@@ -74,7 +74,7 @@ class Generator(nn.Module):
 
 
         def generator_block(in_filters, out_filters):
-            block = [nn.UpsamplingNearest2d(scale_factor=opts_conv['stride']), nn.Conv2d(in_filters, out_filters, kernel_size=opts_conv['kernel_size'], stride=1, padding=opts_conv['padding'], padding_mode=opts_conv['padding_mode']), nn.BatchNorm2d(out_filters, opt.eps), NL]
+            block = [nn.UpsamplingNearest2d(scale_factor=opts_conv['stride']), nn.Conv2d(in_filters, out_filters, kernel_size=opts_conv['kernel_size'], stride=1, padding=opts_conv['padding'], padding_mode=opts_conv['padding_mode']), nn.BatchNorm2d(out_filters, eps=opt.bn_eps, momentum=opt.bn_momentum), NL]
 
             return block
 
@@ -130,7 +130,8 @@ class Discriminator(nn.Module):
         def discriminator_block(in_filters, out_filters, bn=True):
             block = [nn.Conv2d(in_filters, out_filters, **opts_conv), NL]#, nn.Dropout2d(0.25)
             if bn:
-                block.append(nn.BatchNorm2d(out_filters, opt.eps))
+                # https://pytorch.org/docs/stable/nn.html#torch.nn.BatchNorm2d
+                block.append(nn.BatchNorm2d(out_filters, eps=opt.bn_eps, momentum=opt.bn_momentum))
             return block
 
         self.opt = opt

@@ -102,9 +102,10 @@ def learn(opt):
 
     # Les runs sont sauvegardés dans un dossiers "runs" à la racine du projet, dans un sous dossiers opt.runs_path.
     os.makedirs(path_data1, exist_ok=True)
-    os.makedirs(path_data2, exist_ok=True)
 
-    if do_tensorboard: writer = SummaryWriter(log_dir=path_data2)
+    if do_tensorboard:
+        os.makedirs(path_data2, exist_ok=True)
+        writer = SummaryWriter(log_dir=path_data2)
 
     # ----------
     #  Training
@@ -240,7 +241,7 @@ def learn(opt):
         else:
             # Save samples opt.sample_path
             if epoch % opt.sample_interval == 0:
-                sampling(fixed_noise, generator, path_data2, epoch, tag)
+                sampling(fixed_noise, generator, path_data1, epoch, tag)
                 do_plot(hist, start_epoch, epoch, E_losses=True)
 
         # Save models
