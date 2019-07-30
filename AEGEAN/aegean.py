@@ -262,4 +262,4 @@ def learn(opt):
         save_model(generator, optimizer_G, epoch, opt.model_save_path + "/last_G.pt")
         save_model(encoder, optimizer_E, epoch, opt.model_save_path + "/last_E.pt")
 
-    writer.close()
+    if do_tensorboard: writer.close()
