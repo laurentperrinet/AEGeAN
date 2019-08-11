@@ -5,7 +5,11 @@ import itertools
 
 import torchvision.transforms as transforms
 from torchvision.utils import save_image
-from torch.utils.tensorboard import SummaryWriter
+try:
+    from torch.utils.tensorboard import SummaryWriter
+    do_tensorboard = True
+except: # ImportError:
+    do_tensorboard = False
 
 from torch.utils.data import DataLoader
 from torchvision import datasets
@@ -93,14 +97,15 @@ def learn(opt):
     # ----------
     #  Tensorboard
     # ----------
-    path_data1 = "../runs/" + opt.runs_path
-    path_data2 = "../runs/" + opt.runs_path + tag[:-1] + "/"
+    path_data1 = os.path.join("./runs", opt.runs_path)
+    path_data2 = os.path.join("./runs", opt.runs_path + '_' + tag[:-1])
 
-    # Les runs sont sauvegarder dans un dossiers "runs" à la racine du projet, dans un sous dossiers opt.runs_path.
+    # Les runs sont sauvegardés dans un dossiers "runs" à la racine du projet, dans un sous dossiers opt.runs_path.
     os.makedirs(path_data1, exist_ok=True)
-    os.makedirs(path_data2, exist_ok=True)
 
-    writer = SummaryWriter(log_dir=path_data2)
+    if do_tensorboard:
+        os.makedirs(path_data2, exist_ok=True)
+        writer = SummaryWriter(log_dir=path_data2)
 
     # ----------
     #  Training
@@ -115,8 +120,7 @@ def learn(opt):
     batch_on_save_dot = save_dot*len(dataloader)
 
     # Vecteur z fixe pour faire les samples
-    N_samples = 24
-    fixed_noise = Variable(Tensor(np.random.normal(0, 1, (N_samples, opt.latent_dim))))
+    fixed_noise = Variable(Tensor(np.random.normal(0, 1, (opt.N_samples, opt.latent_dim))))
 
     t_total = time.time()
     for j, epoch in enumerate(range(start_epoch, opt.n_epochs + 1)):
@@ -209,29 +213,36 @@ def learn(opt):
             # Save Losses and scores for Tensorboard
             save_hist_batch(hist, i, j, g_loss, d_loss, d_x, d_g_z)
 
-            # Tensorboard save
-            iteration = i + nb_batch * j
-            writer.add_scalar('e_loss', e_loss.item(), global_step=iteration)
-            writer.add_scalar('g_loss', g_loss.item(), global_step=iteration)
-            writer.add_scalar('d_loss', d_loss.item(), global_step=iteration)
+            if do_tensorboard:
+                # Tensorboard save
+                iteration = i + nb_batch * j
+                writer.add_scalar('e_loss', e_loss.item(), global_step=iteration)
+                writer.add_scalar('g_loss', g_loss.item(), global_step=iteration)
+                writer.add_scalar('d_loss', d_loss.item(), global_step=iteration)
 
-            writer.add_scalar('d_x_mean', hist["d_x_mean"][i], global_step=iteration)
-            writer.add_scalar('d_g_z_mean', hist["d_g_z_mean"][i], global_step=iteration)
+                writer.add_scalar('d_x_mean', hist["d_x_mean"][i], global_step=iteration)
+                writer.add_scalar('d_g_z_mean', hist["d_g_z_mean"][i], global_step=iteration)
 
-            writer.add_scalar('d_x_cv', hist["d_x_cv"][i], global_step=iteration)
-            writer.add_scalar('d_g_z_cv', hist["d_g_z_cv"][i], global_step=iteration)
+                writer.add_scalar('d_x_cv', hist["d_x_cv"][i], global_step=iteration)
+                writer.add_scalar('d_g_z_cv', hist["d_g_z_cv"][i], global_step=iteration)
 
-            writer.add_histogram('D(x)', d_x, global_step=iteration)
-            writer.add_histogram('D(G(z))', d_g_z, global_step=iteration)
+                writer.add_histogram('D(x)', d_x, global_step=iteration)
+                writer.add_histogram('D(G(z))', d_g_z, global_step=iteration)
 
-        writer.add_scalar('D_x_max', hist["D_x_max"][j], global_step=epoch)
-        writer.add_scalar('D_x_min', hist["D_x_min"][j], global_step=epoch)
-        writer.add_scalar('D_G_z_min', hist["D_G_z_min"][j], global_step=epoch)
-        writer.add_scalar('D_G_z_max', hist["D_G_z_max"][j], global_step=epoch)
+        if do_tensorboard:
+            writer.add_scalar('D_x_max', hist["D_x_max"][j], global_step=epoch)
+            writer.add_scalar('D_x_min', hist["D_x_min"][j], global_step=epoch)
+            writer.add_scalar('D_G_z_min', hist["D_G_z_min"][j], global_step=epoch)
+            writer.add_scalar('D_G_z_max', hist["D_G_z_max"][j], global_step=epoch)
 
-        # Save samples
-        if epoch % opt.sample_interval == 0:
-            tensorboard_sampling(fixed_noise, generator, writer, epoch)
+            # Save samples
+            if epoch % opt.sample_interval == 0:
+                tensorboard_sampling(fixed_noise, generator, writer, epoch)
+        else:
+            # Save samples opt.sample_path
+            if epoch % opt.sample_interval == 0:
+                sampling(fixed_noise, generator, path_data1, epoch, tag)
+                do_plot(hist, start_epoch, epoch, E_losses=True)
 
         # Save models
         if epoch % opt.model_save_interval == 0:
@@ -251,4 +262,4 @@ def learn(opt):
         save_model(generator, optimizer_G, epoch, opt.model_save_path + "/last_G.pt")
         save_model(encoder, optimizer_E, epoch, opt.model_save_path + "/last_E.pt")
 
-    writer.close()
+    if do_tensorboard: writer.close()

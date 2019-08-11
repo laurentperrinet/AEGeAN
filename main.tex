@@ -13,15 +13,14 @@
 %% Based on the style files for EACL 2006 by 
 %%e.agirre@ehu.es or Sergi.Balari@uab.es
 %% and that of ACL 08 by Joakim Nivre and Noah Smith
-
-\documentclass[11pt]{article}
+\documentclass[11pt,francais]{article}
 \usepackage{coling2018}
+\usepackage[utf8]{inputenc} 
+\usepackage[T1]{fontenc}
+\usepackage{babel} 
 \usepackage{times}
 \usepackage{url}
 \usepackage{latexsym}
-\usepackage[utf8]{inputenc} 
-\usepackage[T1]{fontenc}
-\usepackage[french]{babel} 
 \usepackage{xcolor}
 \usepackage{graphicx}
 \usepackage{todonotes}
@@ -35,10 +34,10 @@
 
 \author{Lucas Goareguer \\
   Aix-Marseille Université \\
-  \texttt{Lucas.Goareguer@etu.univ-amu.fr   } \\\And
+  {\small \texttt{Lucas.Goareguer@etu.univ-amu.fr}   } \\\And
    {\bf Supervision : Laurent Perrinet} \\
   Institut de Neurosciences de la Timone \\
-  {\tt Laurent.Perrinet@univ-amu.fr} \\}
+  {\small \tt Laurent.Perrinet@univ-amu.fr} \\}
 \date{}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -46,7 +45,7 @@
 \begin{document}
 \maketitle
 \begin{abstract}
-Rapide résumer du cadre du stage et de ses objectifs.
+Rapide résumé du cadre du stage et de ses objectifs.
 Ce papier à pour objectif de décrire le travail effectuer durant le stage terminal du Master Intelligence Artificielle et Apprentissage Automatique.
 Ce stage de 6 mois c'est dérouler à l'Institut de Neurosciences de la Timone et a était encadrer par Laurent Perrinet.
 Le principal objectif du stage était la compréhension des Generative Adverserials Networks (GAN) appliquer à la génération d'images.
@@ -61,32 +60,115 @@ License details:  \url{http://creativecommons.org/licenses/by/4.0/}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Motivation}
 
-\subsection{Adaptation d'un GAN à la génération de visages de Simpsons}
-\subsection{Compréhension des limites théoriques de ces modèle}
-\subsection{Adverserial Auto-Encoder}
+\subsection{Pourquoi les GANs}
+% https://stackoverflow.com/questions/50131068/producing-stacked-3d-blocks-using-tikz
+Les réseaux génératifs adversaires ou Generatif Adverserial Networks (GAN) en anglais sont des modèles qui permettent, par un apprentissage non superviser, de générer des données cohérentes par rapport a un dataset donnée. Ils on était décrit pour la première fois en 2014 dans l'article de I. Goodfellow (ref), depuis ils on connus un intérêt grandissant et de nombreux chercheur s'y sont intéresser (ref). 
+Le parallèle entre imagination et modèles génératifs est tentant et les travaux de (ref \url{https://www.crcv.ucf.edu/papers/iccv17/egpaper_for_review.pdf}) tendent notamment a montrer un lien entre la façon dont les images sont générer dans notre cerveaux et dans les GANs. 
+Cette technologie étant très intéressante à bien des égards la tâche qui ma était confier lors de mon stage à était d'étudier les GANs et de développer des outils permettant de les utilisées et de les paramétrées. 
+
+\subsection{Compréhension des limites théoriques de ces modèles}
+Mal grès l'importante quantité de travaux sur le sujet les GANs laisse encore planer de nombreuses questions.
+Durant nos recherche nous nous sommes confronter à de nombreuse barrières théoriques qui ne sont pas encore tombées. 
+L'une des principales faiblesse des GANs est l'absence de mesure de la qualité des résultats. En effet même si dans l'article (ref https://arxiv.org/pdf/1406.2661.pdf 4.2  Convergence of Algorithm 1) G est sensé converger vers un point ou il doit donner des résultats respectant les données sur lesquels il aura était appris, dans la pratique aucun point de convergence n'est atteint entre G et D. Ceci est dû notamment au fait que G n'apprend que par le biais de D, il n'a donc pas pour objectif de ce rapprocher des données du dataset mais de générer des donner qui trompe D. On ne peut donc pas ce fier au loss de G pour évaluer sont niveau d'apprentissage.
+( A re-écrire 
+A ce problème de mesure s'ajoute un problème d'équilibre.
+En effet comme G n'apprend que par ce que D juge son travail en le comparent au dataset, G ce retrouve systématiquement moins bon que D. Certes il n'exerce pas les même tâche mais G est moins bon dans le sens où sont objectif est de flouée D (cf. figure x : courbes de scores) 
+)
+
+\subsection{Generatif Adverserial Networks (GAN)}
+Les réseaux génératifs adversaires (GAN) sont des modèles qui permettent de générer des données approchant une lois de probabilités cible P données par un dataset.
+Ces modèles dans la version d'origine présenter par I. Goodfellow dans sont article (ref) ce présente sous la forme de deux réseaux distinct :
+  - Un générateur G qui prend en entrée un vecteur aléatoire Z de l'espace latent et produit en sortie une donnée qui, après l'entraînement, est cohérente par rapport à P;
+  - Un discriminateur D qui a pour objectif de déterminer si les données qui lui sont présenter en entrée suive la loi de probabilité P ou non. Autrement dit si elle appartiennent au dataset ou non.
+Ces deux réseaux vont être entraîner en parallèles par back propagation en utilisant les fonctions de pertes suivantes pour chacun des deux réseaux.
+
+lossD = min -log(D(x)) - log(1-D(G(z)))
+lossG = min -log(D(G(z)))
+Avec x les données du dataset.
+
+
+Pour entrainer les deux réseaux on suis l'algorithme suivant :
+
+L'entraînement est arrêter lorsque les images générer par G sont cohérente au yeux de l'observateur.
+
+\subsection{Adverserial Auto-Encoder (AAE)}
+% http://www.texample.net/tikz/examples/simple-flow-chart/
+On trouve dans la litterature differentes formes d'auto-encoder adversaires, comme par exemples la première version proposer (ref https://arxiv.org/pdf/1511.05644.pdf).
+Pour les expériences sur l'étude des espaces latent que nous détailleront par la suite nous avond choisis d'utiliser une architecture proche de celle présenter dans l'article (ref).
+Dans ce modèles on trouve dans un premier temps un auto-encoder standard (ref) avec un goulot d'étranglement ou espace latent de faible dimension au centre et à l'entrée un encoder E charger de réduire la dimension des données et en sortie un decoder D charger d'augmenter la dimension du vecteur latent jusqu'à la taille des données. On associe ce réseau à un discriminateur charger de déterminer si les images qui lui vienne du decoder ou du dataset.
+
+Les losses utiliser pour entraîner ce réseaux sont :
+lossD = min -log(D(x)) - log(1-D(G(z)))
+lossG = min -log(D(G(z)))
+lossEG = MSE_loss(x, G(E(x))) + MSE_loss(z_imgs, z_zeros) + MSE_loss(z_imgs^2, z_ones)^0.5
+
+On suis un algorithme d'entraînement légèrement diffèrent que pour les GANs que voici :
+
+L'intérêt d'un telle dispositif est qu'il permet d'avoir un accès direct à l'espace latent. Ainsi on pourras par la suite mener des expériences sur la façon dont est construit l'espace latent.
+
+
 \subsection{Étude de l'espace latent}
+lien avec VAE de Kingma https://arxiv.org/pdf/1312.6114.pdf
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Méthodes}
 
-\subsection{Strange Attractor}
+\subsection{Fractal Dream Dataset}
+Pour l'une des expériences que nous souhaitions mener (lien), nous avions besoin d'un dataset particulier.
+En effet il nous a fallut un dataset dont chaque images puisse être associer à un point dans l'espace de manière cohérentes.
+Pour ce faire nous avons décider de construire un nouveau dataset à partir d'un outils mathématique : les attracteur étrange (ref). Ces objets permettent notament de générer des figures varier à partir d'un nombre donnée de paramètres.
+Les Fractal Dream (ref) sont un type particuliers d'attracteur étrange que nous avons choisi pour notre dataset. A partir de 6 paramètres la formule ci-dessous permet de calculer de manière itérative (pour un nombre d'itération donner) un ensemble de points qui constitue la trajectoire de l'attracteur et qui placer dans un quadrillage de taille fini (128 par 128 dans notre cas) donne une images comme celle visible dans le figure x. Dans les images les nuances de couleurs des pixels correspondes aux nombres de fois ou l'attracteur est passer dans la case.
+Le dataset construit pour l'occasion ainsi que les codes utiliser on était mis à disposition sur le site kaggle (ref).
+
 \subsection{Simpsons Dataset}
+Pour certaine de nos expériences nous avons utiliser le dataset Simpsons Faces (ref : https://www.kaggle.com/kostastokis/simpsons-faces). Ce dataset contient 9877 images de visage des personnages des Simpsons extrait des épisodes de manières automatique. Ce processus  automatique à introduit un certain nombres d'erreur dans les données (aucun personnages sur l'images, des visages couper, ect...), pour cette raison j'ai effectuer une passe manuel pour retirer au maximum ces mauvaise image du dataset et nous avons finalement utiliser xxxx images pour nos expériences.
+Nous avons choisi d'utiliser des les images en taille 128 par 128 pixels.
+
 \subsection{Scan des paramètres}
+Le nombre important d'hyper-paramètres présent dans les GANs nous a pousser à développer un outils permettant de passer en revus un nombre important de paramètres pour un GANs donnée. Ainsi nous avons peut parcourir de manières efficace ces immenses espace de paramètres.
+Nous avons par la suite très largement utiliser cet outils pour réglé nos GANs durant toutes les expériences qui seront décrite par la suite. 
+
+\subsection{Simpsons Generator}
+La première partie du stage à consister en une exploration du monde des GANs. Nous nous somme donc fixé comme objectif la rechercher, l'étude et l'entraînement d'un modèle capable de générer des visages de personnages des simpson.
+Après avoir choisi le sujet de nos expériences nous avons explorer l'immense monde des GANs et nous avont rapidement dû faire des choix étant données la quantité astronomique d'article présentant des variantes de GAN (ref)
+Nous avons donc focalise notre attention sur les systèmes les plus éprouver afin de comprendre au mieux la théorie derrières ces modèles.
+Nous avons particulièrement utiliser les DCGAN (ref) qui sont notamment compose de couches de convolution très adapter au traitement des images. Puis dans un second temps nous nous sommes pencher sur les Adverserial Auto-Encoders (AAE) qui nous on servie par la suite pour l'expérience (ref)
+
+\subsection{Correspondances des espaces latent}
+La façon dont est construit l'espace latent du générateur des GANs nous à fait nous poser de nombreuse questions.
+Nous avons notamment voulus savoir si étant donnée un dataset D composer d'images, chacune associer à un vecteur V et répartie de manière cohérente dans un espace L de même dimension que V, un générateur G entraîner avec un AAE comme décris ci-dessus (ref) pourrait générer une image proche de celle de D pour un vecteur V associé. Autrement dit : le générateur serait-il capable de reconstruire par un entraînement adversaire la cohérence qui relis les images de D. 
+Pour mettre en place cette expériences nous avons entraîner un AAE avec le dataset FDD présenter ci-dessus (ref). Ensuite nous avons pu comparer les images de FDD au images générer par G avec les paramètres qui avait servie a calculer les images du dataset.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Résultats}
 
 \subsection{Simpsons Cohérent}
+Le balayage des hyper-paramètres ainsi que l'affinage des modèles au grès de nos recherche à permis d'obtenir de très bon résultats. Vous pouvez voir sur la figure x les résultats obtenus avec un DCGAN et sur la figure x les résultats obtenus avec un AAE.
+On constate ici et dans chacune de nos expériences que les images obtenus avec l'AAE présente un aspect flou. Ceci vient de l'AE qui du faite de sont goulots d'étranglement crée une perte d'information lors de son entraînement, ce qui impacte également G qui est le décoder de l'AE.
+
 \subsection{Évolution du loss de G (convergence, équilibre de Nash,..)}
 \subsection{Comparaison des espaces latent connu et générer}
+Vous pouvez voir dans la figure x des images extraite du dataset FDD.
+Après avoir entraîner 6 modèles a générer des images cohérentes par rapport a celle du dataset nous avons peut générer les images visible dans les figures x. 
+En comparant ces images avec la figure x on ne constate aucune correspondance entre les générer par G et celle construite en utilisant les formules Fractal Dream (ref).
+
+
 \subsection{Interpolation dans l'espace latent}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Conclusions et perspectives}
 
 \subsection{Apprentissage des GANs}
+L'apprentissage des GANs est une tâche hardue et nous avons eu besoin de beaucoup de test avant d'arriver a un résultats un tant soit peu convaincant. Le grand nombre d'hyper-paramètres ainsi que les vides théoriques présenter (section) pose de nombreuse difficulté. Néant moins les résultats obtenus, avec les Simpsons notamment sont tout a fait convaincant.
+
 \subsection{Découverte et prise en mains de nombreux outils}
+Durant le stage j'ai était amener a me former a de nombreuse technologies et outils.
+On peut cité parmi les plus importants Pytorch (ref) ou encore Tensorboard (ref), a ceci s'ajoute également un usage quotidien de Linux et de Python qui mon permis de découvrir de nombreux logiciels et bibliothèques.
+Ensemble ces outils s'agrège a ceux étudier lors de mon Master et me permettront, je l'espère, de commencer ma vie professionnel sereinement.
+
 \subsection{Premier pas dans le monde professionnels}
+Les laboratoires de recherche sont un monde particuliers que j'avais déjà peut approcher lors de mes études, ce stage ma permis de les découvrir en détails. J'ai pu apprendre tout ce qui fait le monde professionnel : horaires fixes, journée complètes, réunions de travail ect...
+Ces nouvelles expériences forme le début de mon parcours professionnel.
 
 \newpage
 %{\bf Appendices}: Appendices, if any, directly follow the text and the references (but see above).  Letter them in sequence and provide an informative title: {\bf Appendix A. Title of Appendix}.
