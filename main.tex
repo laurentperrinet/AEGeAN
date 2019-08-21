@@ -209,11 +209,19 @@ Nous avons par la suite très largement utiliser cet outils pour réglé nos GAN
 \subsection{Simpsons Dataset}
 \label{sec:SimpsonsDataset}
 
-\begin{figure}[p]
-  \centering
-  \includegraphics[width=0.6\linewidth]{{Figures/}}
-  \caption{Exemples d'images du dataset Simpsons Faces utiliser pour certaine expériences.}
-  \label{fig:fig1}
+\begin{figure}[!h]
+    \centering
+    \begin{subfigure}[b]{0.2\textwidth}
+        \includegraphics[width=\textwidth]{Figures/13.png}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.2\textwidth}
+        \includegraphics[width=\textwidth]{Figures/15.png}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.2\textwidth}
+        \includegraphics[width=\textwidth]{Figures/25.png}
+    \end{subfigure}
+    \caption{Exemples d'images du dataset Simpsons Faces utiliser pour certaine expériences.}
+    \label{fig:fig1}
 \end{figure}
 
 Pour certaine de nos expériences nous avons utiliser le dataset \href{https://www.kaggle.com/kostastokis/simpsons-faces}{Simpsons Faces} \footnote{\label{note2}Simpsons Faces : https://www.kaggle.com/kostastokis/simpsons-faces}. Ce dataset contient 9877 images de visage des personnages des Simpsons extrait des épisodes de manières automatique. Ce processus  automatique à introduit un certain nombres d'erreur dans les données (aucun personnages sur l'images, des visages couper, ect...), pour cette raison j'ai effectuer une passe manuel pour retirer au maximum ces mauvaise image du dataset et nous avons finalement utiliser 9629 images pour nos expériences. Vous pouvez voir quelques exemples d'images de ce dataset sur la figure \ref{fig:fig1}.\\
