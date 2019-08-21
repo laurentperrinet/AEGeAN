@@ -69,19 +69,17 @@ Cette technologie étant très intéressante à bien des égards la tâche qui m
 
 \subsection{Generatif Adverserial Networks (GAN)}
 \label{sec:GAN}
-
-\begin{figure}[!h]
+\begin{figure}[!b]
     \centering
-    \includegraphics[width=\textwidth]{Figures/resultats_simpsons/DCGAN_270.png}
-    \caption{Images générer avec le générateur d'un DCGAN après 270 epochs d'entraînement.}
-    \label{fig:fig3}
+    \includegraphics[width=\textwidth]{Figures/GAN/GAN_representation.png}
+    \caption{Architecture d'un GAN.}
+    \label{fig:fig9}
 \end{figure}
-
 Les réseaux génératifs adversaires (GAN) sont des modèles qui permettent de générer des données approchant une lois de probabilités cible \(P\) données par un dataset.
 Ces modèles dans la version d'origine présenter par I. Goodfellow \cite{NIPS2014_5423} ce présente sous la forme de deux réseaux distinct : \\
-  - Un générateur \(G\) qui prend en entrée un vecteur aléatoire \(z\) dans un l'espace latent de taille \(L\) et produit en sortie une donnée qui, après un entraînement réussi, doit être cohérente par rapport à \(P\). Les poids de \(G\) sont notés \(\theta_G\);\\
+  - Un générateur \(G\) qui prend en entrée un vecteur aléatoire \(z\) dans un l'espace latent de taille \(L\) et produit en sortie une donnée qui, après un entraînement réussi, doit être cohérente par rapport à \(P\). Les poids de \(G\) sont notés \(\theta_G\) (c.f. figure \ref{fig:fig9}) ;\\
   - Un discriminateur \(D\) qui a pour objectif de déterminer si les données qui lui sont présenter en entrée suive la loi de probabilité \(P\) ou non. Autrement dit si elle appartiennent au dataset ou non.
-  Les poids de \(D\) sont notés \(\theta_D\).\\
+  Les poids de \(D\) sont notés \(\theta_D\) (c.f. figure \ref{fig:fig9}) .\\
 Ces deux réseaux vont être entraîner en parallèles par backpropagation en minimisant les fonctions de pertes suivantes pour chacun des deux réseaux.\\
 \(lossD = -log(D(x)) - log(1-D(G(z))) \) \\
 \(lossG = -log(D(G(z))) \) \\
@@ -90,7 +88,7 @@ Ces deux losses ce rapportes dans notre cas à la fonction de Binary Cross Entro
 \[
 BCE(x, y) = -[y * log(x) + (1 - y) * log(1 - x)]
 \]
-Avec x les réponse données par D pour des images et y les réponse attendues pour ces images.
+Avec x les réponse données par \(D\) pour des images et y les réponse attendues pour ces images.
 
 Pour entrainer les deux réseaux on suis l'algorithme suivant :
 \begin{table}[hb]
@@ -136,12 +134,19 @@ Ces questions seront discutée dans la section \ref{sec:LossG_et_Convergeance}.
 
 \subsection{Adverserial Auto-Encoder (AAE)}
 \label{sec:AAE}
-% http://www.texample.net/tikz/examples/simple-flow-chart/
-On trouve dans la litterature differentes formes d'auto-encoder adversaires, comme par exemples cette version qui est la plus répandue \cite{makhzani2015adversarial}.
-Pour les expériences sur l'étude des espaces latent que nous détailleront par la suite nous avons choisis d'utiliser une architecture proche de celle présenter dans l'article \cite{GADAE}.
-Dans ce modèles on trouve dans un premier temps un auto-encoder standard avec un goulot d'étranglement, ou espace latent de faible dimension \(L\), au centre et à l'entrée un encoder \(E\), avec pour poids \(\theta_E\), charger de réduire la dimension des données et en sortie un decoder \(G\) charger d'augmenter la dimension du vecteur latent jusqu'à la taille des données et qui sert également de générateur. On associe ce réseau à un discriminateur \(D\) charger de déterminer si les images qui lui sont présenter viennent du decoder ou du dataset.
+\begin{figure}[!h]
+    \centering
+    \includegraphics[width=\textwidth]{Figures/GAN/AAE_representation.png}
+    \caption{Architecture d'un AAE. Le vecteur \(v\) représente une entrée direct de \(G\) sans passer par \(E\).}
+    \label{fig:fig10}
+\end{figure}
 
-Les losses utiliser pour entraîner ce réseaux sont :
+% http://www.texample.net/tikz/examples/simple-flow-chart/
+On trouve dans la littérature différentes formes d'auto-encoder adversaires, comme par exemples cette version qui est la plus répandue \cite{makhzani2015adversarial}.
+Pour les expériences sur l'étude des espaces latent que nous détailleront par la suite nous avons choisis d'utiliser une architecture proche de celle présenter dans l'article \cite{GADAE}.
+Dans ce modèles on trouve dans un premier temps un auto-encoder standard avec un goulot d'étranglement, ou espace latent de faible dimension \(L\), au centre et à l'entrée un encoder \(E\), avec pour poids \(\theta_E\), charger de réduire la dimension des données et en sortie un décoder \(G\) charger d'augmenter la dimension du vecteur latent jusqu'à la taille des données et qui sert également de générateur. On associe ce réseau à un discriminateur \(D\) charger de déterminer si les images qui lui sont présenter viennent du décoder ou du dataset.
+
+Les fonctions de pertes utiliser pour entraîner ce réseaux sont :
 \[
 lossD = -log(D(x)) - log(1-D(G(z)))
 \]
@@ -154,8 +159,8 @@ lossEG = MSE(x, G(E(x))) + MSE(z_{imgs}, z_{zeros}) + MSE(z_{imgs}^2, z_{ones})^
 Avec MSE définie comme l'erreur quadratique moyenne.
 Le \(lossEG\) sera détaillais dans la sous section suivante \ref{sec:LatentSpace}.
 
-On suis un algorithme d'entraînement légèrement diffèrent que pour les GANs standard que voici :
-\begin{table}[hb]
+On suis un algorithme d'entraînement légèrement diffèrent que pour les GANs standard que voici :\\
+\begin{table}[!h]
   \begin{tabular}{l}
   \hline
   Algorithme 2: Entraînement d'un AAE\tabularnewline
@@ -276,8 +281,16 @@ Le dataset construit pour l'occasion ainsi que les codes utiliser on était mis 
 \subsection{Correspondances des espaces latent}
 \label{sec:CorrespondancesLS}
 La façon dont est construit l'espace latent du générateur des GANs nous à fait nous poser de nombreuse questions.
-Nous avons notamment voulus savoir si étant donnée un dataset \(data\) composer d'images \(x\), chacune associer à un unique vecteur \(V\), de dimension \(L\), répartie de manière cohérente dans l'espace. Un générateur \(G\) entraîner avec un AAE, comme décris dans la section \ref{sec:AAE}, pourrait-il générer une image proche de celle d'un \(x\) pris au hasard dans \(data\) pour un même vecteur \(V\). Autrement dit : le générateur serait-il capable de reconstruire par un entraînement adversaire la cohérence qui relis les images de \(data\) au vecteur \(V\) qui leurs est associer. 
-Pour mettre en place cette expériences nous avons entraîner un AAE avec le dataset FDD présenter dans la section \ref{sec:FDD}. Ensuite nous avons pu comparer les images de FDD au images générer par \(G\) pour un même vecteur \(V\).
+Nous avons notamment voulus savoir si étant donnée un dataset \(data\) composer d'images \(x\), chacune associer à un unique vecteur \(v\), de dimension \(L\), répartie de manière cohérente dans l'espace. Un générateur \(G\) entraîner avec un AAE (comme décris dans la section \ref{sec:AAE}), pourrait-il générer une image \(x'\) proche de celle d'un \(x\) pris au hasard dans \(data\) pour un même vecteur \(v\). Autrement dit : le générateur serait-il capable de reconstruire par un entraînement adversaire la cohérence qui relis les images de \(data\) au vecteur \(v\) qui leurs est associer. 
+Pour mettre en place cette expériences nous avons entraîner un AAE avec le dataset FDD présenter dans la section \ref{sec:FDD}. Ensuite nous avons pu comparer les images de FDD au images générer par \(G\) pour un même vecteur \(v\).
+
+\begin{figure}[!h]
+    \centering
+    \includegraphics[width=\textwidth]{Figures/GAN/AAE_representation.png}
+    \caption{Architecture d'un AAE. Le vecteur \(v\) représente une entrée direct de \(G\) sans passer par \(E\).}
+    \label{fig:fig10}
+\end{figure}
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Résultats}
