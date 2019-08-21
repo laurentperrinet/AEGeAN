@@ -69,11 +69,19 @@ Cette technologie étant très intéressante à bien des égards la tâche qui m
 
 \subsection{Generatif Adverserial Networks (GAN)}
 \label{sec:GAN}
+
+\begin{figure}[!h]
+    \centering
+    \includegraphics[width=\textwidth]{Figures/resultats_simpsons/DCGAN_270.png}
+    \caption{Images générer avec le générateur d'un DCGAN après 270 epochs d'entraînement.}
+    \label{fig:fig3}
+\end{figure}
+
 Les réseaux génératifs adversaires (GAN) sont des modèles qui permettent de générer des données approchant une lois de probabilités cible \(P\) données par un dataset.
 Ces modèles dans la version d'origine présenter par I. Goodfellow \cite{NIPS2014_5423} ce présente sous la forme de deux réseaux distinct : \\
-  - Un générateur \(G\) qui prend en entrée un vecteur aléatoire \(z\) dans un l'espace latent de taille \(L\) et produit en sortie une donnée qui, après un entraînement réussi, doit être cohérente par rapport à \(P\). Les poids de G sont notés \(\theta_G\);\\
-  - Un discriminateur \(D\) qui a pour objectif de déterminer si les données qui lui sont présenter en entrée suive la loi de probabilité P ou non. Autrement dit si elle appartiennent au dataset ou non.
-  Les poids de D sont notés \(\theta_D\).\\
+  - Un générateur \(G\) qui prend en entrée un vecteur aléatoire \(z\) dans un l'espace latent de taille \(L\) et produit en sortie une donnée qui, après un entraînement réussi, doit être cohérente par rapport à \(P\). Les poids de \(G\) sont notés \(\theta_G\);\\
+  - Un discriminateur \(D\) qui a pour objectif de déterminer si les données qui lui sont présenter en entrée suive la loi de probabilité \(P\) ou non. Autrement dit si elle appartiennent au dataset ou non.
+  Les poids de \(D\) sont notés \(\theta_D\).\\
 Ces deux réseaux vont être entraîner en parallèles par backpropagation en minimisant les fonctions de pertes suivantes pour chacun des deux réseaux.\\
 \(lossD = -log(D(x)) - log(1-D(G(z))) \) \\
 \(lossG = -log(D(G(z))) \) \\
@@ -331,11 +339,28 @@ Ces résultats avait déjà pu être observer dans d'autres articles t-elle que 
 
 \subsection{Comparaison des espaces latent connu et générer}
 \label{sec:ComparaisonLS}
-Vous pouvez voir sure la figure x des images extraite du dataset FDD.
+Vous pouvez voir sur la figure x des images extraite du dataset FDD.
 Après avoir entraîner et paramétrer différents modèles a générer des images cohérentes par rapport a celles du dataset nous avons pu générer les images visible dans les figures x. 
 En comparant ces images avec la figure x on ne constate aucune correspondance entre celles générer par G et celles construite en utilisant les formules Fractal Dream \ref{sec:FDD}.
 Ce résultats tendes a montrer que l'espace latent de G n'a pas développer de correspondance avec l'espace des paramètres de FDD durant sont entraînement. 
 
+\begin{figure}[!h]
+    \centering
+    \begin{subfigure}[b]{0.32\textwidth}
+        \includegraphics[width=\textwidth]{Figures/ComparaisonLS/dataset_sample.png}
+        \caption{Des éléments extrait du dataset Fractal Dream Dataset.}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.32\textwidth}
+        \includegraphics[width=\textwidth]{Figures/ComparaisonLS/scan7_eps0,1_lrelu0,01_0.png}
+        \caption{Des images générer par un générateur entraîner par un AAE.}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.32\textwidth}
+        \includegraphics[width=\textwidth]{Figures/ComparaisonLS/scan8_eps0,1_lrelu1e06_0.png}
+        \caption{Des images générer par un autre générateur entraîner par un AAE.}
+    \end{subfigure}
+    \caption{Les images générer l'on était en utilisant un vecteur latent correspondant au paramètres utiliser pour calculer les images extraite du dataset visible a droite.}
+    \label{fig:fig8}
+\end{figure}
 %\subsection{Interpolation dans l'espace latent}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -343,7 +368,7 @@ Ce résultats tendes a montrer que l'espace latent de G n'a pas développer de c
 \label{sec:Conclusion}
 
 \subsection{Apprentissage des GANs}
-L'apprentissage des GANs est une tâche ardue et nous avons eu besoin de beaucoup de test avant d'arriver a un résultats un tant soit peu convaincant. Le grand nombre d'hyper-paramètres ainsi que les vides théoriques présenter section \ref{sec:CompEtLimites} pose de nombreuse difficulté. Néant moins les résultats obtenus, avec les Simpsons notamment sont tout a fait convaincant.
+L'apprentissage des GANs est une tâche ardue et nous avons eu besoin de beaucoup de test avant d'arriver a un résultats un tant soit peu convaincant. Le grand nombre d'hyper-paramètres ainsi que les vides théoriques présenter section \ref{sec:CompEtLimites} pose de nombreuse difficultés. Néant moins les résultats obtenus, avec les Simpsons notamment sont tout a fait convaincant.
 
 \subsection{Découverte et prise en mains de nombreux outils}
 Durant le stage j'ai était amener à me former a de nombreuse technologies et outils.
@@ -351,7 +376,7 @@ On peut cité parmi les plus importants Pytorch \cite{paszke2017automatic} ou en
 Ensemble ces outils s'agrège a ceux étudier lors de mon Master et me permettront, je l'espère, de commencer ma vie professionnel sure de bonnes bases.
 
 \subsection{Premier pas dans le monde professionnels}
-Les laboratoires de recherche sont un monde particuliers que j'avais déjà peut approcher lors de mes études, ce stage ma permis de les découvrir en détails. J'ai pu apprendre tout ce qui fait le monde professionnel : horaires fixes, journée complètes, réunions de travail ect...
+Les laboratoires de recherche sont un monde particuliers que j'avais déjà pu approcher lors de mes études, ce stage ma permis de les découvrir en détails. J'ai pu apprendre tout ce qui fait le monde professionnel : horaires fixes, journée complètes, réunions de travail ect...
 Ces nouvelles expériences forme le début de mon parcours professionnel.
 
 \newpage
