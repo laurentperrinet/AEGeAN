@@ -211,14 +211,20 @@ Nous avons par la suite très largement utiliser cet outils pour réglé nos GAN
 
 \begin{figure}[!h]
     \centering
-    \begin{subfigure}[b]{0.2\textwidth}
-        \includegraphics[width=\textwidth]{Figures/13.png}
+    \begin{subfigure}[b]{0.19\textwidth}
+        \includegraphics[width=\textwidth]{Figures/Simpsons_Dataset/13.png}
     \end{subfigure}
-    \begin{subfigure}[b]{0.2\textwidth}
-        \includegraphics[width=\textwidth]{Figures/15.png}
+    \begin{subfigure}[b]{0.19\textwidth}
+        \includegraphics[width=\textwidth]{Figures/Simpsons_Dataset/15.png}
     \end{subfigure}
-    \begin{subfigure}[b]{0.2\textwidth}
-        \includegraphics[width=\textwidth]{Figures/25.png}
+    \begin{subfigure}[b]{0.19\textwidth}
+        \includegraphics[width=\textwidth]{Figures/Simpsons_Dataset/25.png}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.19\textwidth}
+        \includegraphics[width=\textwidth]{Figures/Simpsons_Dataset/8.png}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.19\textwidth}
+        \includegraphics[width=\textwidth]{Figures/Simpsons_Dataset/18.png}
     \end{subfigure}
     \caption{Exemples d'images du dataset Simpsons Faces utiliser pour certaine expériences.}
     \label{fig:fig1}
@@ -230,16 +236,31 @@ Nous avons choisi d'utiliser ces images en taille 128 par 128 pixels pour nos ex
 \subsection{Simpsons Generator}
 \label{sec:SimpsonsGenerator}
 La première partie du stage à consister en une exploration du monde des GANs. Nous nous somme donc fixé comme objectif la rechercher, l'étude et l'entraînement d'un modèle capable de générer des visages de personnages des Simpson.
-Après avoir choisi le sujet de nos expériences nous avons explorer l'immense monde des GANs et nous avons rapidement dû faire des choix étant données la quantité astronomique d'article présentant des variantes de GAN (c.f. \href{https://github.com/hindupuravinash/the-gan-zoo}{The Gan Zoo} [\ref{note1}]).
+Après avoir choisi le sujet de nos expériences nous avons explorer l'immense monde des GANs et nous avons rapidement dû faire des choix étant données la quantité astronomique d'article présentant des variantes de GAN (c.f. \href{https://github.com/hindupuravinash/the-gan-zoo}{The Gan Zoo} \ref{note1}).
 Nous avons donc focaliser notre attention sur les systèmes les plus éprouver afin de comprendre au mieux la théorie derrières ces modèles.\\
 Nous avons particulièrement utiliser les DCGAN \cite{radford2015unsupervised} qui sont notamment composer de couches de convolution très adapter au traitement des images. Puis dans un second temps nous nous sommes pencher sur les Adverserial Auto-Encoders (AAE)  qui nous on servie par la suite pour l'expérience présenter en section \ref{sec:CorrespondancesLS}.
 
 \subsection{Fractal Dream Dataset}
 \label{sec:FDD}
+\begin{figure}[!h]
+    \centering
+    \begin{subfigure}[b]{0.19\textwidth}
+        \includegraphics[width=\textwidth]{Figures/13.png}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.19\textwidth}
+        \includegraphics[width=\textwidth]{Figures/15.png}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.19\textwidth}
+        \includegraphics[width=\textwidth]{Figures/25.png}
+    \end{subfigure}
+    \caption{Exemples d'images du dataset Simpsons Faces utiliser pour certaine expériences.}
+    \label{fig:fig1}
+\end{figure}
+
 Pour l'une des expériences que nous souhaitions mener (c.f. section \ref{sec:CorrespondancesLS}), nous avions besoin d'un dataset particulier.
 En effet il nous fallait un dataset dont chaque images puisse être associer à un point dans l'espace de manière cohérentes.
 Pour ce faire nous avons décider de construire un nouveau dataset à partir d'un outils mathématique : les attracteur étrange \cite{Pickover}. Ces objets permettent notamment de générer des figures varier à partir d'un nombre donnée de paramètres.
-Les Fractal Dream \cite{Pickover} sont un type particuliers d'attracteur étrange que nous avons choisi pour notre dataset. A partir de 6 paramètres, la formule disponibles en annexes \ref{tab:tab3} permet de calculer de manière itérative (pour un nombre d'itération donner) un ensemble de points qui constitue la trajectoire de l'attracteur et qui placer dans un quadrillage de taille fini (128 par 128 dans notre cas) donne une images comme celles visibles dans la figure x. Dans les images les nuances de couleurs des pixels correspondes aux nombres de fois ou l'attracteur est passer dans la case.
+Les Fractal Dream \cite{Pickover} sont un type particuliers d'attracteur étrange que nous avons choisi pour notre dataset. A partir de 6 paramètres, la formule disponibles en annexes \ref{tab:tab3} permet de calculer de manière itérative (pour un nombre d'itération donner) un ensemble de points qui constitue la trajectoire de l'attracteur et qui placer dans un quadrillage de taille fini (128 par 128 dans notre cas) donne une images comme celles visibles dans la figure \ref{fig:fig2}. Dans les images les nuances de couleurs des pixels correspondes aux nombres de fois ou l'attracteur est passer dans la case.
 Le dataset construit pour l'occasion ainsi que les codes utiliser on était mis à disposition sur le site Kaggle (ref).
 
 \subsection{Correspondances des espaces latent}
