@@ -30,6 +30,7 @@
 \usepackage{hyperref}       % hyperlinks
 \usepackage{subcaption}
 \usepackage{appendix}
+\usepackage[export]{adjustbox}
 
 \title{Rapport de stage : GAN}
 
@@ -116,7 +117,6 @@ Pour entrainer les deux réseaux on suis l'algorithme suivant :
 \end{table}
 
 L'algorithme utiliser pour effectuer les descentes de gradient lors de nos expériences est \href{https://arxiv.org/pdf/1412.6980.pdf}{ADAM} \cite{kingma2014adam}.\\
-
 L'entraînement est arrêter lorsque le nombres d'étapes choisi est atteint hors les images générer par G ne sont pas forcement cohérente au yeux de l'observateur. C'est l'un des problèmes qui entoure les GANs et que nous allons introduire dans la section suivantes.
 
 \subsection{Compréhension des limites théoriques de ces modèles}
@@ -245,13 +245,13 @@ Nous avons particulièrement utiliser les DCGAN \cite{radford2015unsupervised} q
 \label{sec:FDD}
 \begin{figure}[!h]
     \centering
-    \begin{subfigure}[b]{0.19\textwidth}
+    \begin{subfigure}[b]{0.20\textwidth}
         \includegraphics[width=\textwidth]{Figures/FDD/-0,00545687187361743_-0,5312304575586382_1,8197494653032407_2,422111729355857_1,4944898296889655_2,487490210145214.png}
     \end{subfigure}
-    \begin{subfigure}[b]{0.19\textwidth}
+    \begin{subfigure}[b]{0.20\textwidth}
         \includegraphics[width=\textwidth]{Figures/FDD/-0,319459804135373_-0,0981842500805612_0,42291442353441633_1,7253282321258185_1,4272325555244099_1,3701336149016234.png}
     \end{subfigure}
-    \begin{subfigure}[b]{0.19\textwidth}
+    \begin{subfigure}[b]{0.20\textwidth}
         \includegraphics[width=\textwidth]{Figures/FDD/-0,9333646250089_-0,3698044331245828_-1,9514116449042127_-0,376713271698188_-1,1759178511809651_-1,7157801385982319.png}
     \end{subfigure}
     \caption{Exemples d'images du dataset Fractal Dream Dataset utiliser pour certaine expériences. Vous pourrez trouver la liste des paramètres utiliser pour générer ces trois figures en annexes \ref{appendix:annexe1}}
@@ -274,29 +274,48 @@ Pour mettre en place cette expériences nous avons entraîner un AAE avec le dat
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Résultats}
 
-\subsection{Simpsons Cohérent}
-\label{sec:SimpsonsCoherent}
 \begin{figure}[!h]
     \centering
-    \includegraphics[width=\textwidth]{Figures/}
+    \begin{subfigure}[b]{0.20\textwidth}
+        \includegraphics[width=\textwidth]{Figures/FDD/}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.20\textwidth}
+        \includegraphics[width=\textwidth]{Figures/FDD/}
+    \end{subfigure}
     \caption{}
-    \label{fig:fig3}
+    \label{fig:fig5}
 \end{figure}
 
-Le balayage des hyper-paramètres ainsi que l'affinage des modèles au grès de nos recherche à permis d'obtenir de très bon résultats. Vous pouvez voir sur la figure x les résultats obtenus avec un DCGAN et sur la figure x les résultats obtenus avec un AAE.
+Le balayage des hyper-paramètres ainsi que l'affinage des modèles au grès de nos recherche à permis d'obtenir de très bon résultats. Vous pouvez voir sur la figure \ref{fig:fig3} les résultats obtenus avec un DCGAN et sur la figure \ref{fig:fig4} les résultats obtenus avec un AAE.
 On constate ici et dans chacune de nos expériences que les images obtenus avec l'AAE présente un aspect flou. Ceci vient de l'AE qui du faite de sont goulots d'étranglement crée une perte d'information lors de son entraînement, ce qui impacte également G qui est le décoder de l'AE.
 
 \subsection{Évolution du loss de G (convergence, équilibre de Nash,..)}
 \label{sec:LossG_et_Convergeance}
+
+\begin{figure}[!h]
+    \centering
+    \includegraphics[width=\textwidth]{Figures/resultats_simpsons/DCGAN_270.png}
+    \caption{Images générer avec le générateur d'un DCGAN après 270 epochs d'entraînement.}
+    \label{fig:fig5}
+\end{figure}
+
+\begin{figure}[!h]
+    \centering
+    \includegraphics[width=\textwidth]{Figures/resultats_simpsons/AAE_300.png}
+    \caption{Images générer avec le générateur d'un AAE après 300 epochs d'entraînement.}
+    \label{fig:fig6}
+\end{figure}
+
+
 Mal grès l'importante quantité de travaux sur le sujet, les GANs laisse encore planer de nombreuses questions.
 Durant nos expériences nous nous sommes confronter à de nombreuse barrières théoriques qui ne sont pas encore tombées. 
-L'une des principales faiblesse des GANs est l'absence de mesure de la qualité des résultats. En effet même si dans la section 4.2 de l'article \cite{NIPS2014_5423} G est sensé converger vers un point où les données qu'il générer suive la lois de probabilités du dataset, dans la pratique aucun point de convergence n'est atteint entre G et D. Ceci est dû notamment au fait que G n'apprend que par le biais de D, il n'a donc pas pour objectif de ce rapprocher des données du dataset mais de générer des donner qui trompe D. On ne peut donc pas ce fier au loss de G pour évaluer sont niveau d'apprentissage.
+L'une des principales faiblesse des GANs est l'absence de mesure de la qualité des résultats. En effet même si dans la section 4.2 de l'article \cite{NIPS2014_5423} \(G\) est sensé converger vers un point où les données qu'il générer suive la lois de probabilités du dataset, dans la pratique aucun point de convergence n'est atteint entre \(G\) et \(D\). Ceci est dû notamment au fait que \(G\) n'apprend que par le biais de \(D\), il n'a donc pas pour objectif de ce rapprocher des données du dataset mais de générer des donner qui trompe \(D\). On ne peut donc pas ce fier au loss de \(G\) pour évaluer sont niveau d'apprentissage.
 Certain article ce sont focaliser sur la recherche d'une métrique adapter au GANs comme dans \cite{salimans2016improved} qui utilise ce qu'il appellent l'Inception score pour évaluer les images ou encore \cite{berthelot2017began} qui introduit une nouvelle architecture de GAN ainsi qu'une métrique associer.\\
 A ce problème de mesure s'ajoute un problème d'équilibre.
-En effet on peut voir l'apprentissage de notre réseaux comme un jeu a somme nul dans lequel ce que G gagne D le perd et inversement.\\
+En effet on peut voir l'apprentissage de notre réseaux comme un jeu a somme nul dans lequel ce que \(G\) gagne \(D\) le perd et inversement.\\
 L'objectif de ce jeu est donc d'atteindre le points d'équilibre t-elle que \(G\) produit un résultats égale à \(P(data)\). Dans ce cas \(D\) devient incapable de différencier les images générer par \(G\) des images du dataset. Ici l'entraînement est terminer et \(G\) produit les images attendue.
 Malheureusement ce que nos expériences nous on apprises c'est que cet états d'équilibres, si il existent, n'est jamais atteint (dans le cadre de nos expériences en tout cas).\\
-Comme vous pouvez le voir sur la figure x le pourcentage de bonne réponse du discriminateur pour les images réel et pour les images générer tant vers un point où \(D\) ne fait presque plus aucune erreur. Étant donnée que \(G\) apprend via les réponse de \(D\) on constate que le loss de \(G\) devient de plus en plus proche de l'infinie ce qui a tendances à crée une forte instabilité dans l'apprentissage. 
+Comme vous pouvez le voir sur la figure x la moyenne des réponses du discriminateur pour les images réel et pour les images générer tant vers un point où \(D\) ne fait presque plus aucune erreur. Étant donnée que \(G\) apprend via les réponse de \(D\) on constate que le loss de \(G\) devient de plus en plus proche de l'infinie ce qui a tendances à crée une forte instabilité dans l'apprentissage. 
 En effet \(G\) a besoin que \(D\) réussisse à discriminer les images générées pour pouvoir ce corriger et s'adapter mais plus \(D\) devient bon plus \(G\) obtient un loss important qui le pousse au déséquilibre et a ce que l'on appelle dans le monde des GANs un collapse (effondrement en anglais). Vous pouvez voir sur la figure x un exemples d'images générer lors du collapse d'un générateur. On constate que la diversité des images devient pauvres et totalement incohérente. Ce phénomène s'explique car \(D\) devenue trop douée pousse \(G\) a ce focaliser sur les quelques images qui réussissent un peut a tromper \(D\).\\ 
 Ces résultats avait déjà pu être observer dans d'autres articles t-elle que \cite{NIPS2014_5423}.
 
