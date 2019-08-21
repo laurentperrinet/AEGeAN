@@ -29,6 +29,7 @@
 \usepackage{amssymb}
 \usepackage{hyperref}       % hyperlinks
 \usepackage{subcaption}
+\usepackage{appendix}
 
 \title{Rapport de stage : GAN}
 
@@ -245,35 +246,43 @@ Nous avons particulièrement utiliser les DCGAN \cite{radford2015unsupervised} q
 \begin{figure}[!h]
     \centering
     \begin{subfigure}[b]{0.19\textwidth}
-        \includegraphics[width=\textwidth]{Figures/13.png}
+        \includegraphics[width=\textwidth]{Figures/FDD/-0,00545687187361743_-0,5312304575586382_1,8197494653032407_2,422111729355857_1,4944898296889655_2,487490210145214.png}
     \end{subfigure}
     \begin{subfigure}[b]{0.19\textwidth}
-        \includegraphics[width=\textwidth]{Figures/15.png}
+        \includegraphics[width=\textwidth]{Figures/FDD/-0,319459804135373_-0,0981842500805612_0,42291442353441633_1,7253282321258185_1,4272325555244099_1,3701336149016234.png}
     \end{subfigure}
     \begin{subfigure}[b]{0.19\textwidth}
-        \includegraphics[width=\textwidth]{Figures/25.png}
+        \includegraphics[width=\textwidth]{Figures/FDD/-0,9333646250089_-0,3698044331245828_-1,9514116449042127_-0,376713271698188_-1,1759178511809651_-1,7157801385982319.png}
     \end{subfigure}
-    \caption{Exemples d'images du dataset Simpsons Faces utiliser pour certaine expériences.}
-    \label{fig:fig1}
+    \caption{Exemples d'images du dataset Fractal Dream Dataset utiliser pour certaine expériences. Vous pourrez trouver la liste des paramètres utiliser pour générer ces trois figures en annexes \ref{appendix:annexe1}}
+    \label{fig:fig2}
 \end{figure}
 
 Pour l'une des expériences que nous souhaitions mener (c.f. section \ref{sec:CorrespondancesLS}), nous avions besoin d'un dataset particulier.
 En effet il nous fallait un dataset dont chaque images puisse être associer à un point dans l'espace de manière cohérentes.
 Pour ce faire nous avons décider de construire un nouveau dataset à partir d'un outils mathématique : les attracteur étrange \cite{Pickover}. Ces objets permettent notamment de générer des figures varier à partir d'un nombre donnée de paramètres.
-Les Fractal Dream \cite{Pickover} sont un type particuliers d'attracteur étrange que nous avons choisi pour notre dataset. A partir de 6 paramètres, la formule disponibles en annexes \ref{tab:tab3} permet de calculer de manière itérative (pour un nombre d'itération donner) un ensemble de points qui constitue la trajectoire de l'attracteur et qui placer dans un quadrillage de taille fini (128 par 128 dans notre cas) donne une images comme celles visibles dans la figure \ref{fig:fig2}. Dans les images les nuances de couleurs des pixels correspondes aux nombres de fois ou l'attracteur est passer dans la case.
+Les Fractal Dream \cite{Pickover} sont un type particuliers d'attracteur étrange que nous avons choisi pour notre dataset. A partir de 6 paramètres, la formule disponibles en annexes \ref{appendix:annexe1} permet de calculer de manière itérative (pour un nombre d'itération donner) un ensemble de points qui constitue la trajectoire de l'attracteur et qui placer dans un quadrillage de taille fini (128 par 128 dans notre cas) donne une images comme celles visibles dans la figure \ref{fig:fig2}. Dans les images les nuances de couleurs des pixels correspondes aux nombres de fois ou l'attracteur est passer dans la case.
+Le dataset est constituer de trois classes d'images correspondant aux trois palettes de couleurs choisi (bleu, orange et vert), pour nos expériences nous n'avons utiliser qu'une seul de ces trois palettes pour faciliter l'entraînement.
 Le dataset construit pour l'occasion ainsi que les codes utiliser on était mis à disposition sur le site Kaggle (ref).
 
 \subsection{Correspondances des espaces latent}
 \label{sec:CorrespondancesLS}
 La façon dont est construit l'espace latent du générateur des GANs nous à fait nous poser de nombreuse questions.
-Nous avons notamment voulus savoir si étant donnée un dataset \(data\) composer d'images, chacune associer à un vecteur \(V\), de dimension \(L\), répartie de manière cohérente dans l'espace. Un générateur \(G\) entraîner avec un AAE comme décris dans la section \ref{sec:AAE} pourrait-il générer une image proche de celle de \(data\) pour un vecteur \(V\) associé. Autrement dit : le générateur serait-il capable de reconstruire par un entraînement adversaire la cohérence qui relis les images de \(data\). 
-Pour mettre en place cette expériences nous avons entraîner un AAE avec le dataset FDD présenter dans la section \ref{sec:FDD}. Ensuite nous avons pu comparer les images de FDD au images générer par \(G\) avec les paramètres qui avait servie a calculer les images du dataset.
+Nous avons notamment voulus savoir si étant donnée un dataset \(data\) composer d'images \(x\), chacune associer à un unique vecteur \(V\), de dimension \(L\), répartie de manière cohérente dans l'espace. Un générateur \(G\) entraîner avec un AAE, comme décris dans la section \ref{sec:AAE}, pourrait-il générer une image proche de celle d'un \(x\) pris au hasard dans \(data\) pour un même vecteur \(V\). Autrement dit : le générateur serait-il capable de reconstruire par un entraînement adversaire la cohérence qui relis les images de \(data\) au vecteur \(V\) qui leurs est associer. 
+Pour mettre en place cette expériences nous avons entraîner un AAE avec le dataset FDD présenter dans la section \ref{sec:FDD}. Ensuite nous avons pu comparer les images de FDD au images générer par \(G\) pour un même vecteur \(V\).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Résultats}
 
 \subsection{Simpsons Cohérent}
 \label{sec:SimpsonsCoherent}
+\begin{figure}[!h]
+    \centering
+    \includegraphics[width=\textwidth]{Figures/}
+    \caption{}
+    \label{fig:fig3}
+\end{figure}
+
 Le balayage des hyper-paramètres ainsi que l'affinage des modèles au grès de nos recherche à permis d'obtenir de très bon résultats. Vous pouvez voir sur la figure x les résultats obtenus avec un DCGAN et sur la figure x les résultats obtenus avec un AAE.
 On constate ici et dans chacune de nos expériences que les images obtenus avec l'AAE présente un aspect flou. Ceci vient de l'AE qui du faite de sont goulots d'étranglement crée une perte d'information lors de son entraînement, ce qui impacte également G qui est le décoder de l'AE.
 
@@ -331,27 +340,37 @@ Je tiens à remercier Laurent Perrinet pour m'avoir encadrés et guidés durant 
 \bibliographystyle{acl}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \newpage
-\section*{Annexe 1. Formule des Fractal Dream}
-\label{sec:annexe1}
+
+\section{Annexes}
+\begin{appendix}
+\section{-  Formule des Fractal Dream}
+\label{appendix:annexe1}
 La formule ci-dessous permet de calculer le point suivant d'un attracteur de type Fractal Dream a partir des coordonnées du point actuel et de 4 paramètre données.
 En utilisant cette formule successivement un grand nombre de fois on peut calculer l'image correspondant a l'attracteur pour des paramètres et un point de départ choisi.  
 
-\begin{table}[hb]
-  \begin{tabular}{l}
-  \hline
-  Algorithme 3: Calcul du point suivant d'un Fractal Dream\tabularnewline
-  \hline
-  Entrées: \((x, y)\) coordonnées du point courant, \((a, b, c, d)\) paramètres de l'attracteur \tabularnewline
-  Sortie: \((x', y')\) les coordonnées du point suivant\tabularnewline
-  \hline
-  \(x' \leftarrow sin(y*b)+c*sin(x*b)\)\tabularnewline
-  \(y' \leftarrow sin(x*a)+d*sin(y*a)\)\tabularnewline
-  \tabularnewline
-  return \((x', y')\);\tabularnewline
-  \hline
-  \end{tabular}
-  \label{tab:tab3}
-\end{table}
+    \begin{table}[hb]
+      \begin{tabular}{l}
+      \hline
+      Algorithme 3: Calcul du point suivant d'un Fractal Dream\tabularnewline
+      \hline
+      Entrées: \((x, y)\) coordonnées du point courant, \((a, b, c, d)\) paramètres de l'attracteur \tabularnewline
+      Sortie: \((x', y')\) les coordonnées du point suivant\tabularnewline
+      \hline
+      \(x' \leftarrow sin(y*b)+c*sin(x*b)\)\tabularnewline
+      \(y' \leftarrow sin(x*a)+d*sin(y*a)\)\tabularnewline
+      \tabularnewline
+      return \((x', y')\);\tabularnewline
+      \hline
+      \end{tabular}
+      \label{tab:tab3}
+    \end{table}
+    
+Pour l'exemple les paramètres utiliser pour générer les trois images de la figure \ref{fig:fig2} sont respectivement :\\
+ 1 : \(x = -0,00545687187361743 ~y = -0,5312304575586382 ~a = 1,8197494653032407 ~b = 2,422111729355857 ~c = 1,4944898296889655 ~d = 2,487490210145214\)\\
+ 2 : \( ~x = -0,319459804135373 ~y = -0,0981842500805612 ~a = 0,42291442353441633 ~b = 1,7253282321258185 ~c = 1,4272325555244099 ~d = 1,3701336149016234\)\\
+ 3 :  \(~x = -0,9333646250089 ~y = -0,3698044331245828 ~a = -1,9514116449042127 ~b = -0,376713271698188 ~c = -1,1759178511809651 ~d = -1,7157801385982319\)
+
+\end{appendix}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
