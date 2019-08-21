@@ -274,16 +274,20 @@ Pour mettre en place cette expériences nous avons entraîner un AAE avec le dat
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Résultats}
 
+\subsection{Simpsons Cohérent}
+\label{sec:SimpsonsCoherent}
 \begin{figure}[!h]
     \centering
-    \begin{subfigure}[b]{0.20\textwidth}
-        \includegraphics[width=\textwidth]{Figures/FDD/}
-    \end{subfigure}
-    \begin{subfigure}[b]{0.20\textwidth}
-        \includegraphics[width=\textwidth]{Figures/FDD/}
-    \end{subfigure}
-    \caption{}
-    \label{fig:fig5}
+    \includegraphics[width=\textwidth]{Figures/resultats_simpsons/DCGAN_270.png}
+    \caption{Images générer avec le générateur d'un DCGAN après 270 epochs d'entraînement.}
+    \label{fig:fig3}
+\end{figure}
+
+\begin{figure}[!h]
+    \centering
+    \includegraphics[width=\textwidth]{Figures/resultats_simpsons/AAE_300.png}
+    \caption{Images générer avec le générateur d'un AAE après 300 epochs d'entraînement.}
+    \label{fig:fig4}
 \end{figure}
 
 Le balayage des hyper-paramètres ainsi que l'affinage des modèles au grès de nos recherche à permis d'obtenir de très bon résultats. Vous pouvez voir sur la figure \ref{fig:fig3} les résultats obtenus avec un DCGAN et sur la figure \ref{fig:fig4} les résultats obtenus avec un AAE.
@@ -291,21 +295,6 @@ On constate ici et dans chacune de nos expériences que les images obtenus avec 
 
 \subsection{Évolution du loss de G (convergence, équilibre de Nash,..)}
 \label{sec:LossG_et_Convergeance}
-
-\begin{figure}[!h]
-    \centering
-    \includegraphics[width=\textwidth]{Figures/resultats_simpsons/DCGAN_270.png}
-    \caption{Images générer avec le générateur d'un DCGAN après 270 epochs d'entraînement.}
-    \label{fig:fig5}
-\end{figure}
-
-\begin{figure}[!h]
-    \centering
-    \includegraphics[width=\textwidth]{Figures/resultats_simpsons/AAE_300.png}
-    \caption{Images générer avec le générateur d'un AAE après 300 epochs d'entraînement.}
-    \label{fig:fig6}
-\end{figure}
-
 
 Mal grès l'importante quantité de travaux sur le sujet, les GANs laisse encore planer de nombreuses questions.
 Durant nos expériences nous nous sommes confronter à de nombreuse barrières théoriques qui ne sont pas encore tombées. 
@@ -315,15 +304,36 @@ A ce problème de mesure s'ajoute un problème d'équilibre.
 En effet on peut voir l'apprentissage de notre réseaux comme un jeu a somme nul dans lequel ce que \(G\) gagne \(D\) le perd et inversement.\\
 L'objectif de ce jeu est donc d'atteindre le points d'équilibre t-elle que \(G\) produit un résultats égale à \(P(data)\). Dans ce cas \(D\) devient incapable de différencier les images générer par \(G\) des images du dataset. Ici l'entraînement est terminer et \(G\) produit les images attendue.
 Malheureusement ce que nos expériences nous on apprises c'est que cet états d'équilibres, si il existent, n'est jamais atteint (dans le cadre de nos expériences en tout cas).\\
-Comme vous pouvez le voir sur la figure x la moyenne des réponses du discriminateur pour les images réel et pour les images générer tant vers un point où \(D\) ne fait presque plus aucune erreur. Étant donnée que \(G\) apprend via les réponse de \(D\) on constate que le loss de \(G\) devient de plus en plus proche de l'infinie ce qui a tendances à crée une forte instabilité dans l'apprentissage. 
-En effet \(G\) a besoin que \(D\) réussisse à discriminer les images générées pour pouvoir ce corriger et s'adapter mais plus \(D\) devient bon plus \(G\) obtient un loss important qui le pousse au déséquilibre et a ce que l'on appelle dans le monde des GANs un collapse (effondrement en anglais). Vous pouvez voir sur la figure x un exemples d'images générer lors du collapse d'un générateur. On constate que la diversité des images devient pauvres et totalement incohérente. Ce phénomène s'explique car \(D\) devenue trop douée pousse \(G\) a ce focaliser sur les quelques images qui réussissent un peut a tromper \(D\).\\ 
+Comme vous pouvez le voir sur la figure \ref{fig:fig5} la moyenne des réponses du discriminateur pour les images réel et pour les images générer tant vers un point où \(D\) ne fait presque plus aucune erreur. Étant donnée que \(G\) apprend via les réponse de \(D\) on constate que le loss de \(G\) devient de plus en plus proche de l'infinie ce qui a tendances à crée une forte instabilité dans l'apprentissage. Cette instabilité peut être observer sur la figure \ref{fig:fig6} où l'on constate que plus l'apprentissage ce prolonge plus le loss de \(G\) devient inconstant. 
+En effet \(G\) a besoin que \(D\) réussisse à discriminer les images générées pour pouvoir ce corriger et s'adapter mais plus \(D\) devient bon plus \(G\) obtient un loss important qui le pousse au déséquilibre et a ce que l'on appelle dans le monde des GANs un collapse (effondrement en anglais). Vous pouvez voir sur la figure \ref{fig:fig7} un exemples d'images générer lors du collapse d'un générateur. On constate que la diversité des images devient pauvres et totalement incohérente. Ce phénomène s'explique car \(D\) devenue trop douée pousse \(G\) a ce focaliser sur les quelques images qui réussissent un peut a tromper \(D\).\\ 
 Ces résultats avait déjà pu être observer dans d'autres articles t-elle que \cite{NIPS2014_5423}.
+
+\begin{figure}[!h]
+    \centering
+    \includegraphics[width=0.9\textwidth]{Figures/LossG_et_Convergeance/scores300-64.png}
+    \caption{Moyenne des réponse de \(D\) pour les images réels en bleu et les images générées en orange, au cour de l'entraînement.}
+    \label{fig:fig5}
+\end{figure}
+
+\begin{figure}[!h]
+    \centering
+    \includegraphics[width=0.9\textwidth]{Figures/LossG_et_Convergeance/losses300-64.png}
+    \caption{Valeurs des fonction de pertes de \(G\) (en bleu) et \(D\) (en orange), au cour de l'entraînement.}
+    \label{fig:fig6}
+\end{figure}
+
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=0.5\textwidth]{Figures/LossG_et_Convergeance/collapse_980.png}
+    \caption{Exemples d'images générer lors du collapse d'un générateur. On constate une faible diversité ainsi qu'une incohérences des images par rapport au dataset.}
+    \label{fig:fig7}
+\end{figure}
 
 \subsection{Comparaison des espaces latent connu et générer}
 \label{sec:ComparaisonLS}
 Vous pouvez voir sure la figure x des images extraite du dataset FDD.
-Après avoir entraîner 6 modèles a générer des images cohérentes par rapport a celle du dataset nous avons pu générer les images visible dans les figures x. 
-En comparant ces images avec la figure x on ne constate aucune correspondance entre les générer par G et celle construite en utilisant les formules Fractal Dream \ref{sec:FDD}.
+Après avoir entraîner et paramétrer différents modèles a générer des images cohérentes par rapport a celles du dataset nous avons pu générer les images visible dans les figures x. 
+En comparant ces images avec la figure x on ne constate aucune correspondance entre celles générer par G et celles construite en utilisant les formules Fractal Dream \ref{sec:FDD}.
 Ce résultats tendes a montrer que l'espace latent de G n'a pas développer de correspondance avec l'espace des paramètres de FDD durant sont entraînement. 
 
 %\subsection{Interpolation dans l'espace latent}
