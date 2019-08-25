@@ -96,9 +96,9 @@ Les \textit{Generative Adversarial Networks} (GAN) sont des modèles qui permett
 
 Ces modèles dans la version d'origine présentée par I. Goodfellow~\cite{NIPS2014_5423} se présente sous la forme de deux réseaux distinct : \\
 \begin{itemize}
-  \item Un générateur \(G\) qui prend en entrée un vecteur aléatoire \(z\) dans un espace latent de dimension \(L\) et produit en sortie des données qui, après un entraînement réussi, doivent approcher la loi de probabilité \(P(x,z)\). Ici l'espace de représentation des données est a l'entrée de \(G\), il s'agit d'un cas spécifique aux GANs. Les poids de \(G\) sont notés \(\theta_G\) (c.f. figure \ref{fig:fig9}) ;
+  \item Un générateur \(G\) qui prend en entrée un vecteur aléatoire \(z\) dans un espace latent de dimension \(L\) et produit en sortie des données qui, après un entraînement réussi, doivent approcher la loi de probabilité \(P(x,z)\). Ici l'espace de représentation des données est a l'entrée de \(G\), il s'agit d'un cas spécifique aux GANs. Les poids de \(G\) sont notés \(\theta_G\) (c.f. figure~\ref{fig:fig9}) ;
   
-  \item Un discriminateur \(D\) qui a pour objectif de calculer la probabilité de \(y\) sachant \(x\), avec \(y\) le label et \(x\) les données. Dans notre cas le label est soit \(0\) pour des données générées soit \(1\) pour des données appartenant a \(x\). Son objectif est donc de déterminer si \(x\) appartiennent au jeu de données ou non. Les poids de \(D\) sont notés \(\theta_D\) (c.f. figure \ref{fig:fig9}) .
+  \item Un discriminateur \(D\) qui a pour objectif de calculer la probabilité de \(y\) sachant \(x\), avec \(y\) le label et \(x\) les données. Dans notre cas le label est soit \(0\) pour des données générées soit \(1\) pour des données appartenant a \(x\). Son objectif est donc de déterminer si \(x\) appartiennent au jeu de données ou non. Les poids de \(D\) sont notés \(\theta_D\) (c.f. figure~\ref{fig:fig9}) .
 \end{itemize}
 Ces deux réseaux vont être entraînés en parallèle par rétro-propagation du gradient en minimisant les fonctions de coûts suivantes pour le discriminateur:
 $$
@@ -150,13 +150,13 @@ Pour entraîner les deux réseaux, on suit l'algorithme suivant :
 L'algorithme utilisé pour effectuer les descentes de gradient lors de nos expériences est \href{https://arxiv.org/pdf/1412.6980.pdf}{ADAM}~\cite{kingma2014adam}. Des tests ont été réalisés avec une descente de gradient stochastique standard sans changement qualitatitaif notable dans l'entraînement. ADAM est tout de même plus rapide et il a donc été choisi par défaut.
 \subsection{Limites théoriques des GANs}
 \label{sec:CompEtLimites}
-Une part importante de nos recherches a consisté à essayer de comprendre les barrières théoriques qui entourent les GANs et leurs apprentissages. Les difficultés rencontrées lors de l'apprentissage d'un GAN sont importantes notamment à cause du grand nombre d'hyper-paramètres (voir section \ref{sec:ParamsScans}) ou encore de la difficulté qu'il y a de mesurer la qualité de l'apprentissage durant l'entraînent. 
+Une part importante de nos recherches a consisté à essayer de comprendre les barrières théoriques qui entourent les GANs et leurs apprentissages. Les difficultés rencontrées lors de l'apprentissage d'un GAN sont importantes notamment à cause du grand nombre d'hyper-paramètres (voir section~\ref{sec:ParamsScans}) ou encore de la difficulté qu'il y a de mesurer la qualité de l'apprentissage durant l'entraînent. 
 En effet, pour les GANs standard, aucune mesure ne permet directement de savoir si les images générées sont cohérentes au vu du jeu de données. L'objectif pratique des GANs n'est pas d'obtenir un générateur qui produise exactement les images du jeu de données, mais plutôt de produire des images à la fois diverses et proches des données. Cette notion de distance entre les images générées et celles du jeu de données est difficile à mesurer. C'est pourquoi la plupart du temps il est nécessaire d'observer les images générées pour juger de la qualité de l'entraînement.
 
-Nous nous sommes également penchés sur le problème dit de \textit{mode collapse}, qui fait référence à un apprentissage lors duquel le générateur se met à produire des images peu diversifiées et souvent incohérentes, compte tenu du jeu de données (c.f. figure \ref{fig:fig7}). Ce problème a notamment été  étudié dans la section 3.2 de~\cite{salimans2016improved} et dans la section 2.4 de~\cite{DBLP:journals/corr/MetzPPS16}.
+Nous nous sommes également penchés sur le problème dit de \textit{mode collapse}, qui fait référence à un apprentissage lors duquel le générateur se met à produire des images peu diversifiées et souvent incohérentes, compte tenu du jeu de données (c.f. figure~\ref{fig:fig7}). Ce problème a notamment été  étudié dans la section 3.2 de~\cite{salimans2016improved} et dans la section 2.4 de~\cite{DBLP:journals/corr/MetzPPS16}.
 
 La difficulté qui existe pour atteindre un point de convergence, dû au fait que l'équilibre de Nash entre les deux réseaux n'est pas garanti, fait également partie des problèmes important rencontrés lors de l'entraînement d'un GAN.
-Ces questions seront discutées dans les sections  \ref{sec:ParamsScans}, \ref{sec:Mesure}, \ref{sec:Nash_Collapse}.
+Ces questions seront discutées dans les sections ~\ref{sec:ParamsScans},~\ref{sec:Mesure},~\ref{sec:Nash_Collapse}.
 
 \newpage
 \subsection{Adversarial Auto-Encoder (AAE)}
@@ -169,12 +169,12 @@ Ces questions seront discutées dans les sections  \ref{sec:ParamsScans}, \ref{s
     \label{fig:fig10}
 \end{figure}
 
-Pour les expériences sur l'étude des espaces latent que nous allons détailler par la suite (c.f. section \ref{sec:CorrespondancesLS}) nous avons choisi d'utiliser une architecture proche de celle présentée dans l'article de~\cite{GADAE}. Cette architecture nous donne un contrôle sur l'espace latent.
+Pour les expériences sur l'étude des espaces latent que nous allons détailler par la suite (c.f. section~\ref{sec:CorrespondancesLS}) nous avons choisi d'utiliser une architecture proche de celle présentée dans l'article de~\cite{GADAE}. Cette architecture nous donne un contrôle sur l'espace latent.
 On trouve dans la littérature différentes formes d'auto-encodeurs adversaires, comme par exemple la version de~\cite{makhzani2015adversarial} qui est la plus répandue.
 
 Dans le modèle que nous avons choisi, on trouve dans un premier temps un auto-encodeur (AE), qui est un réseau composer de deux parties symétriques avec en entrée un encodeur \(E\) qui réduit la dimension des données jusqu'à une taille \(L\) et en sortie un décodeur \(G\) qui augmente la taille de ce vecteur de taille \(L\) jusqu'à la taille d'origine des données. 
 
-Nous avons donc dans notre réseau (c.f. figure \ref{fig:fig9}):
+Nous avons donc dans notre réseau (c.f. figure~\ref{fig:fig9}):
 \begin{itemize}
   \item un AE comme présenté ci-dessus, avec un encodeur \(E\) (dont les poids seront notés \(\theta_E\)), un décodeur \(G\) qui sert également de générateur (dont les poids seront notés \(\theta_G\)). À la sortie de \(E\) et a l'entrée de \(G\) on trouve un espace latent de taille \(L\);
   \item On associe ce réseau à un discriminateur \(D\) chargé de déterminer si les images qui lui sont présentées viennent du décodeur ou du jeu de données. Les poids de \(D\) sont notés \(\theta_D\) 
@@ -190,7 +190,7 @@ lossG = -\log(D(G(z)))
 lossEG = MSE(x, G(E(x))) + MSE(z_{imgs}, z_{zeros}) + MSE(z_{imgs}^2, z_{ones}^2)^{0.5}
 \]
 Avec MSE définie comme l'erreur quadratique moyenne.
-Le \(lossEG\) sera détaillé dans la sous-section suivante \ref{sec:LatentSpace}.
+Le \(lossEG\) sera détaillé dans la sous-section suivante~\ref{sec:LatentSpace}.
 
 L'intérêt d'un tel dispositif est qu'il permet d'avoir un accès direct à l'espace latent. Ainsi on pourra par la suite mener des expériences sur la façon dont est construit l'espace latent.
 
@@ -246,7 +246,7 @@ On suit un algorithme d'entraînement légèrement diffèrent que pour les GANs 
 \label{sec:LatentSpace}
 %lien avec VAE de Kingma \url{https://arxiv.org/pdf/1312.6114.pdf}
 Le \(lossEG\) s'inspire d'un article de Kingma~\cite{kingma2013auto} dans lequel est détaillé une méthode permettant notamment de contraindre une loi de probabilité quelconque à suivre une loi Gaussienne. Grâce à cet outil, on s'assure que l'espace latent \(z\) au centre de l'auto-encodeur suive une loi Gaussienne, et plus particulièrement normale, c'est à dire de moyenne nulle et de variance l'unité. Ceci nous permettra par la suite d'utiliser le générateur (qui est le décodeur de l'AE) en lui donnant des vecteurs suivants une loi normale. Ainsi l'espace latent de l'AE et celui du générateur correspondront.
-En créant cette correspondance entre les deux espaces latents on pourra les étudier en détail, ce qui sera le sujet de l'une des expériences que nous présentons dans la section \ref{sec:CorrespondancesLS}.
+En créant cette correspondance entre les deux espaces latents on pourra les étudier en détail, ce qui sera le sujet de l'une des expériences que nous présentons dans la section~\ref{sec:CorrespondancesLS}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Méthodes}
@@ -260,7 +260,7 @@ Ainsi nous avons pu parcourir de manière efficace ces immenses espaces de param
 
 \subsection{Simpsons Dataset}
 \label{sec:SimpsonsDataset}
-Pour certaines de nos expériences nous avons utilisé le jeu de données \href{https://www.kaggle.com/kostastokis/simpsons-faces}{Simpsons Faces} \footnote{\label{note2}Simpsons Faces : https://www.kaggle.com/kostastokis/simpsons-faces}. Ce jeu de données contient 9877 images de visage des personnages des Simpsons extrait des épisodes de manière automatique. Ce processus a introduit un certain nombre d'erreurs dans les données (aucun personnage sur l'image, des visages coupés, ect...), pour cette raison j'ai effectué une passe manuelle pour retirer au maximum ces mauvaises images du jeu de données et nous avons finalement utilisé 9629 images pour nos expériences. Vous pouvez voir quelques exemples d'images de ce jeu de données sur la figure \ref{fig:fig1}.\\
+Pour certaines de nos expériences nous avons utilisé le jeu de données \href{https://www.kaggle.com/kostastokis/simpsons-faces}{Simpsons Faces} \footnote{\label{note2}Simpsons Faces : https://www.kaggle.com/kostastokis/simpsons-faces}. Ce jeu de données contient 9877 images de visage des personnages des Simpsons extrait des épisodes de manière automatique. Ce processus a introduit un certain nombre d'erreurs dans les données (aucun personnage sur l'image, des visages coupés, ect...), pour cette raison j'ai effectué une passe manuelle pour retirer au maximum ces mauvaises images du jeu de données et nous avons finalement utilisé 9629 images pour nos expériences. Vous pouvez voir quelques exemples d'images de ce jeu de données sur la figure~\ref{fig:fig1}.\\
 Après des tests avec des résolutions plus faibles nous avons choisi d'utiliser ces images en taille 128x128 pixels pour nos expériences. Le procédé fonctionne peu importe la taille des images, mais 128x128 pixels a été un bon compromis entre résolution des images et temps de calcul.
 
 \begin{figure}[!h]
@@ -287,19 +287,19 @@ Après des tests avec des résolutions plus faibles nous avons choisi d'utiliser
 \subsection{Simpsons Generator}
 \label{sec:SimpsonsGenerator}
 La première partie du stage à consisté en une exploration du monde des GANs. Nous nous sommes donc fixé comme objectif la recherche, l'étude et l'entraînement d'un modèle capable de générer des visages de personnages des Simpson.
-Après avoir choisi notre jeu de données nous avons exploré l'immense monde des GANs et nous avons rapidement dû faire des choix étant donné la quantité astronomique d'articles présentant des variantes de GAN (c.f. \href{https://github.com/hindupuravinash/the-gan-zoo}{The Gan Zoo} \ref{note1}).
+Après avoir choisi notre jeu de données nous avons exploré l'immense monde des GANs et nous avons rapidement dû faire des choix étant donné la quantité astronomique d'articles présentant des variantes de GAN (c.f. \href{https://github.com/hindupuravinash/the-gan-zoo}{The Gan Zoo}~\ref{note1}).
 Nous avons donc focalisé notre attention sur les systèmes les plus éprouvés afin de comprendre au mieux la théorie derrière ces modèles.
 
-Nous avons particulièrement utilisé les DCGAN~\cite{radford2015unsupervised} qui sont notamment composés de couches de convolution très adaptées au traitement des images. Puis dans un second temps nous nous sommes penchés sur les \textit{Adversarial Auto-Encoders} (AAE) qui nous on servi par la suite pour l'expérience présentée en section \ref{sec:CorrespondancesLS}.
+Nous avons particulièrement utilisé les DCGAN~\cite{radford2015unsupervised} qui sont notamment composés de couches de convolution très adaptées au traitement des images. Puis dans un second temps nous nous sommes penchés sur les \textit{Adversarial Auto-Encoders} (AAE) qui nous on servi par la suite pour l'expérience présentée en section~\ref{sec:CorrespondancesLS}.
 
 \subsection{Fractal Dream Dataset}
 \label{sec:FDD}
-Pour l'une des expériences que nous souhaitions mener (c.f. section \ref{sec:CorrespondancesLS}), nous avions besoin d'un jeu de données paramétrique. 
+Pour l'une des expériences que nous souhaitions mener (c.f. section~\ref{sec:CorrespondancesLS}), nous avions besoin d'un jeu de données paramétrique. 
 En effet il nous fallait un jeu de données dont chaque image puisse être associées à un point dans l'espace de manière cohérente. 
 Pour ce faire nous avons décidé de construire un nouveau jeu de données à partir d'un outil mathématique : les attracteurs étranges~\cite{Pickover}. Ces objets permettent notamment de générer des figures variées à partir d'un nombre donné de paramètres.
-Les Fractal Dream~\cite{Pickover} sont un type particulier d'attracteur étrange que nous avons choisi pour notre jeu de données. À partir de six paramètres, la formule disponibles en annexes \ref{appendix:annexe1} permet de calculer de manière itérative (pour un nombre d'itération donner) un ensemble de points qui constitue la trajectoire de l'attracteur. Une fois ces points placés dans un quadrillage de taille finie (128x128 dans notre cas) on obtient une image comme celles visibles dans la figure \ref{fig:fig2}. Dans les images les nuances de couleurs des pixels correspondent aux nombres de fois ou l'attracteur est passé dans la case. 
-Le jeu de données est constitué de trois classes d'images correspondant aux trois palettes de couleurs choisis (bleu, orange et vert), pour nos expériences nous n'avons utilisé qu'une seule de ces trois palettes pour faciliter l'entraînement.\\
-Le jeu de données construit pour l'occasion ainsi que les codes utilisés on était mis à disposition sur le site Kaggle : \href{https://www.kaggle.com/lgoareguer/fractal-dream-dataset}{Fractal Dream Dataset} \footnote{\label{note3}Fractal Dream Dataset : https://www.kaggle.com/lgoareguer/fractal-dream-dataset}.
+Les Fractal Dream~\cite{Pickover} sont un type particulier d'attracteur étrange que nous avons choisi pour notre jeu de données. À partir de six paramètres, la formule disponibles en annexe~\ref{appendix:annexe1} permet de calculer de manière itérative (pour un nombre d'itérations donné) un ensemble de points qui constitue la trajectoire de l'attracteur. Une fois ces points placés dans un quadrillage de taille finie (128x128 dans notre cas) on obtient une image comme celles visibles dans la figure~\ref{fig:fig2}. Dans les images, les nuances de couleurs des pixels correspondent aux nombres de fois ou l'attracteur est passé dans la case. 
+Le jeu de données est constitué de trois classes d'images correspondant aux trois palettes de couleurs choisies (bleu, orange et vert), pour nos expériences nous n'avons utilisé qu'une seule de ces trois palettes pour faciliter l'entraînement.\\
+J'ai mis à disposition sur le site Kaggle ce jeu de données construit pour l'occasion ainsi que les codes utilisés : \href{https://www.kaggle.com/lgoareguer/fractal-dream-dataset}{Fractal Dream Dataset} \footnote{\label{note3}Fractal Dream Dataset : https://www.kaggle.com/lgoareguer/fractal-dream-dataset}.
 
 \begin{figure}[h!]
     \centering
@@ -312,14 +312,14 @@ Le jeu de données construit pour l'occasion ainsi que les codes utilisés on é
     \begin{subfigure}[b]{0.20\textwidth}
         \includegraphics[width=\textwidth]{Figures/FDD/-0,9333646250089_-0,3698044331245828_-1,9514116449042127_-0,376713271698188_-1,1759178511809651_-1,7157801385982319.png}
     \end{subfigure}
-    \caption{Exemples d'images du jeu de données Fractal Dream Dataset utilisé pour certaines expériences. Vous pourrez trouver la liste des paramètres utilisés pour générer ces trois figures en annexes \ref{appendix:annexe1}.}
+    \caption{Exemples d'images du jeu de données Fractal Dream Dataset utilisé pour certaines expériences. Vous pourrez trouver la liste des paramètres utilisés pour générer ces trois figures en annexes~\ref{appendix:annexe1}.}
     \label{fig:fig2}
 \end{figure}
 
 \subsection{Correspondances des espaces latents}
 \label{sec:CorrespondancesLS}
 Nous nous sommes posé de nombreuses question concernant la façon dont est construit l'espace latent des GANs. 
-Nous avons notamment voulu savoir si étant donné une base de données \(data\) composée d'images \(x\), chacune associée à un unique vecteur \(v\), de dimension \(L\), répartie de manière cohérente dans l'espace. Un générateur \(G\) entraîné avec un AAE, pourrait-il générer une image \(x'\) proche de celle d'une image \(x\) pour un même vecteur \(v\) ? Autrement dit : le générateur serait-il capable de reconstruire, par un entraînement adversaire, la fonction qui relie les images de \(data\) au vecteur \(v\) qui leur est associé. Pour mettre en place cette expérience nous avons entraîné un AAE avec le jeu de données FDD présenté dans la section \ref{sec:FDD}. Ensuite, nous avons pu comparer les images de FDD aux images générées par \(G\) pour un même vecteur \(v\). La figure \ref{fig:fig11} décris cette expérience.
+Nous avons notamment voulu savoir si étant donné une base de données \(data\) composée d'images \(x\), chacune associée à un unique vecteur \(v\), de dimension \(L\), répartie de manière cohérente dans l'espace. Un générateur \(G\) entraîné avec un AAE, pourrait-il générer une image \(x'\) proche de celle d'une image \(x\) pour un même vecteur \(v\) ? Autrement dit : le générateur serait-il capable de reconstruire, par un entraînement adversaire, la fonction qui relie les images de \(data\) au vecteur \(v\) qui leur est associé. Pour mettre en place cette expérience nous avons entraîné un AAE avec le jeu de données FDD présenté dans la section~\ref{sec:FDD}. Ensuite, nous avons pu comparer les images de FDD aux images générées par \(G\) pour un même vecteur \(v\). La figure~\ref{fig:fig11} décris cette expérience.
 
 \begin{figure}[!h]
     \centering
@@ -334,7 +334,7 @@ Nous avons notamment voulu savoir si étant donné une base de données \(data\)
 \subsection{Simpsons Cohérent}
 \label{sec:SimpsonsCoherent}
 
-Le balayage des hyper-paramètres ainsi que l'affinage des modèles au grès de nos recherches ont permis d'obtenir de très bons résultats. Vous pouvez voir sur la figure \ref{fig:fig3} les résultats obtenus avec un DCGAN et sur la figure \ref{fig:fig4} les résultats obtenus avec un AAE. 
+Le balayage des hyper-paramètres ainsi que l'affinage des modèles au grès de nos recherches ont permis d'obtenir de très bons résultats. Vous pouvez voir sur la figure~\ref{fig:fig3} les résultats obtenus avec un DCGAN et sur la figure~\ref{fig:fig4} les résultats obtenus avec un AAE. 
 Il faut noter que les deux modèles étant diffèrent ils disposent d'hyper-paramètres adapter, mais nous avons cherché a leurs données des capacités similaires (même nombre de couches pour \(G\) et \(D\), même nombre de filtres par convolution,etc...). L'objectif était de pouvoir comparer les deux architecture sur le plan de la génération d'images et sur ce point les AAE montrent des capacités moindre que les DCGAN.
 On constate ici et dans chacune de nos expériences que les images obtenues avec l'AAE présente un aspect flou. Ceci vient certainement du fait que la fonction de coût de l'AE rentre en opposition (ou du moins n'est pas en totale adéquation) avec la fonction de coût du générateur qui est affecter par les deux.
 
@@ -367,8 +367,8 @@ A ce problème de mesure s'ajoute un problème d'équilibre.
 En effet comme dit précédemment on peut voir l'apprentissage de notre réseaux comme un jeu a somme nul dans lequel ce que \(G\) gagne \(D\) le perd et inversement.\\
 L'objectif de ce jeu est donc d'atteindre le point d'équilibre tel que \(G\) produit un résultat suivant la loi de probabilité \(P(x\)). Dans ce cas \(D\) devient incapable de différencier les images générée par \(G\) des images du jeu de données. Ici l'entraînement est terminé et \(G\) produit les images attendues. L'équilibre de Nash est atteint.\\
 Malheureusement ce que nos expériences nous ont apprises c'est que cet état d'équilibre, s'il existe, n'est jamais atteint (dans le cadre de nos expériences en tout cas).\\
-Comme vous pouvez le voir sur la figure \ref{fig:fig5} la moyenne des réponses du discriminateur pour les images réelles et pour les images générées tend vers un point où \(D\) ne fait presque plus aucune erreur. Étant donné que \(G\) apprend via les réponses de \(D\) on constate que la fonction de coût de \(G\) devient de plus en plus proche de l'infini ce qui à tendance à créer une forte instabilité dans l'apprentissage. Cette instabilité peut être observée sur la figure \ref{fig:fig6} où l'on constate que plus l'apprentissage ce prolonge plus la fonction de coût de \(G\) devient inconstant.
-En effet \(G\), dû fait de sa fonction de coût \ref{sec:GAN}, a besoin que \(D\) réussisse à discriminer les images générées pour pouvoir se corriger et s'adapter. Mais plus \(D\) réussis à classer correctement les images plus \(G\) obtient une fonction de coût importante ce qui le pousse au déséquilibre. C'est ce que l'on appelle dans le monde des GANs un \textit{mode collapse}. Vous pouvez voir sur la figure \ref{fig:fig7} un exemple d'images générer lors du \textit{mode collapse} d'un générateur. On constate que la diversité des images devient pauvre et totalement incohérente. Ce phénomène s'explique, par le fait que \(D\), fini par réussir tellement bien à classer les images, qu'il pousse \(G\) à se focaliser sur les quelques images qui réussissent encore a trompées \(D\). Ainsi \(G\) ce met a générer une seule (ou très peut) d'images ce qui veut dire que l'espace latent de \(G\) devient très uniforme. De nombreux articles on étudier le \textit{mode collapse} comme par exemple~\cite{NIPS2014_5423}.\\
+Comme vous pouvez le voir sur la figure~\ref{fig:fig5} la moyenne des réponses du discriminateur pour les images réelles et pour les images générées tend vers un point où \(D\) ne fait presque plus aucune erreur. Étant donné que \(G\) apprend via les réponses de \(D\) on constate que la fonction de coût de \(G\) devient de plus en plus proche de l'infini ce qui à tendance à créer une forte instabilité dans l'apprentissage. Cette instabilité peut être observée sur la figure~\ref{fig:fig6} où l'on constate que plus l'apprentissage ce prolonge plus la fonction de coût de \(G\) devient inconstant.
+En effet \(G\), dû fait de sa fonction de coût~\ref{sec:GAN}, a besoin que \(D\) réussisse à discriminer les images générées pour pouvoir se corriger et s'adapter. Mais plus \(D\) réussis à classer correctement les images plus \(G\) obtient une fonction de coût importante ce qui le pousse au déséquilibre. C'est ce que l'on appelle dans le monde des GANs un \textit{mode collapse}. Vous pouvez voir sur la figure~\ref{fig:fig7} un exemple d'images générer lors du \textit{mode collapse} d'un générateur. On constate que la diversité des images devient pauvre et totalement incohérente. Ce phénomène s'explique, par le fait que \(D\), fini par réussir tellement bien à classer les images, qu'il pousse \(G\) à se focaliser sur les quelques images qui réussissent encore a trompées \(D\). Ainsi \(G\) ce met a générer une seule (ou très peut) d'images ce qui veut dire que l'espace latent de \(G\) devient très uniforme. De nombreux articles on étudier le \textit{mode collapse} comme par exemple~\cite{NIPS2014_5423}.\\
 Fort heureusement cet absences d'équilibre n'empêche pas l'entraînement du générateur. Il est vraie que \(D\) fini toujours (dans nos expériences) par prendre l'avantage et ne fait presque plus aucune erreur, mais \(G\) réussis encore, rarement, a flouée \(D\). Le fait que \(G\) réussisse a gagner face a un générateur bien meilleurs que lui, lui permet de continuer son apprentissage. Les victoires de \(G\), même si elle sont rare, permettent a \(D\) de s'améliorer puis les victoires de \(D\) permettent a leur tours à \(G\) de s'améliorer. \\
 \newpage
 \begin{figure}[!h]
@@ -395,8 +395,8 @@ Fort heureusement cet absences d'équilibre n'empêche pas l'entraînement du g�
 
 \subsection{Comparaison des espaces latents connu et générer}
 \label{sec:ComparaisonLS}
-Vous pouvez voir sur la gauche de la figure \ref{fig:fig8} des images extraite du jeu de données FDD. Après avoir entraîné et paramétré différents modèles à générer des images cohérentes par rapport à celles du jeu de données nous avons pu générer les images visibles à droite et au centre de la figure \ref{fig:fig8}. 
-En comparant ces images avec celle de gauche on ne constate aucune correspondance entre celles générer par G et celles construite en utilisant les formules Fractal Dream \ref{sec:FDD}. 
+Vous pouvez voir sur la gauche de la figure~\ref{fig:fig8} des images extraite du jeu de données FDD. Après avoir entraîné et paramétré différents modèles à générer des images cohérentes par rapport à celles du jeu de données nous avons pu générer les images visibles à droite et au centre de la figure~\ref{fig:fig8}. 
+En comparant ces images avec celle de gauche on ne constate aucune correspondance entre celles générer par G et celles construite en utilisant les formules Fractal Dream~\ref{sec:FDD}. 
 Ce résultat tend a montrer que l'espace latent de G n'a pas développé de correspondance avec l'espace des paramètres de FDD durant sont entraînement.
 
 \begin{figure}[!h]
@@ -423,7 +423,7 @@ Ce résultat tend a montrer que l'espace latent de G n'a pas développé de corr
 \label{sec:Conclusion}
 
 \subsection{Apprentissage des GANs}
-L'apprentissage des GANs est une tâche ardue et nous avons eu besoin de beaucoup de test avant d'arriver à un résultat un tant soit peu convaincant. Le grand nombre d'hyper-paramètres ainsi que les vides théoriques présentés section \ref{sec:CompEtLimites} posent de nombreuses difficultés. Néanmoins les résultats obtenus, avec les Simpsons notamment, sont tout à fait convaincant.
+L'apprentissage des GANs est une tâche ardue et nous avons eu besoin de beaucoup de test avant d'arriver à un résultat un tant soit peu convaincant. Le grand nombre d'hyper-paramètres ainsi que les vides théoriques présentés section~\ref{sec:CompEtLimites} posent de nombreuses difficultés. Néanmoins les résultats obtenus, avec les Simpsons notamment, sont tout à fait convaincant.
 
 \subsection{Découverte et prise en mains de nombreux outils}
 Durant le stage j'ai été amené à me former a de nombreuse technologies et outils. On peut citer parmi les plus importants Pytorch~\cite{paszke2017automatic} ou encore Tensorboard~\cite{tensorflow2015-whitepaper}, à ceci s'ajoute également un usage quotidien de Linux et de Python qui m'ont permis de découvrir de nombreux logiciels et bibliothèques. Ensemble ces outils s'agrègent à ceux utilisés lors de mon Master et me permettront, je l'espère, de commencer ma vie professionnelle sur de bonnes bases.
@@ -473,7 +473,7 @@ En utilisant cette formule successivement un grand nombre de fois on peut calcul
       \label{tab:tab3}
     \end{table}
     
-Pour l'exemple les paramètres utiliser pour générer les trois images de la figure \ref{fig:fig2} sont respectivement :\\
+Pour l'exemple les paramètres utiliser pour générer les trois images de la figure~\ref{fig:fig2} sont respectivement :\\
  1 : \(x = -0,00545687187361743 ~y = -0,5312304575586382 ~a = 1,8197494653032407 ~b = 2,422111729355857 ~c = 1,4944898296889655 ~d = 2,487490210145214\)\\
  2 : \( ~x = -0,319459804135373 ~y = -0,0981842500805612 ~a = 0,42291442353441633 ~b = 1,7253282321258185 ~c = 1,4272325555244099 ~d = 1,3701336149016234\)\\
  3 :  \(~x = -0,9333646250089 ~y = -0,3698044331245828 ~a = -1,9514116449042127 ~b = -0,376713271698188 ~c = -1,1759178511809651 ~d = -1,7157801385982319\)
