@@ -147,13 +147,14 @@ Pour entraîner les deux réseaux, on suit l'algorithme suivant :
   \label{tab:tab1}
 \end{table}
 
-L'algorithme utilisé pour effectuer les descentes de gradient lors de nos expériences est \href{https://arxiv.org/pdf/1412.6980.pdf}{ADAM}~\cite{kingma2014adam}. Des tests ont été réalisés avec une descente de gradient stochastique standard sans changements notable dans l'entraînement ADAM a donc été choisi par défaut.\\
-
+L'algorithme utilisé pour effectuer les descentes de gradient lors de nos expériences est \href{https://arxiv.org/pdf/1412.6980.pdf}{ADAM}~\cite{kingma2014adam}. Des tests ont été réalisés avec une descente de gradient stochastique standard sans changement qualitatitaif notable dans l'entraînement. ADAM est tout de même plus rapide et il a donc été choisi par défaut.
 \subsection{Limites théoriques des GANs}
 \label{sec:CompEtLimites}
-Une part importante de nos recherches ont consisté à essayer de comprendre les barrières théoriques qui entourent les GANs et leurs apprentissages. Les difficultés rencontrées lors de l'apprentissage d'un GAN sont importante notamment à cause du grand d'hyper-paramètre (c.f. section \ref{sec:ParamsScans}) ou encore de la difficulté qu'il y a mesurer la qualité de l'apprentissage durant l'entraînent. 
-En effet, pour les GANs standard, aucune mesure ne permet directement de savoir si les images générées sont cohérentes au vu du jeu de données. L'objectif pratique des GANs n'est pas d'obtenir un générateur qui produise exactement les images du jeu de données, mais plutôt de produire des images à la fois diverses et proches des données. Cette notion de distance entre les images générées et celles du jeu de données est difficile à mesurer. C'est pourquoi la plupart du temps il est nécessaire d'observer les images générées pour juger de la qualité de l'entraînement.\\
-Nous nous sommes également penchés sur le problème dit de \textit{mode collapse}, qui fait référence à un apprentissage lors du quel le générateur ce mets à produire des images peu diversifiées et souvent incohérentes, compte tenu du jeu de données (c.f. figure \ref{fig:fig7}). Ce problème a notamment été  étudié dans la section 3.2 de~\cite{salimans2016improved} et dans la section 2.4 de~\cite{DBLP:journals/corr/MetzPPS16}.\\
+Une part importante de nos recherches a consisté à essayer de comprendre les barrières théoriques qui entourent les GANs et leurs apprentissages. Les difficultés rencontrées lors de l'apprentissage d'un GAN sont importantes notamment à cause du grand nombre d'hyper-paramètres (voir section \ref{sec:ParamsScans}) ou encore de la difficulté qu'il y a de mesurer la qualité de l'apprentissage durant l'entraînent. 
+En effet, pour les GANs standard, aucune mesure ne permet directement de savoir si les images générées sont cohérentes au vu du jeu de données. L'objectif pratique des GANs n'est pas d'obtenir un générateur qui produise exactement les images du jeu de données, mais plutôt de produire des images à la fois diverses et proches des données. Cette notion de distance entre les images générées et celles du jeu de données est difficile à mesurer. C'est pourquoi la plupart du temps il est nécessaire d'observer les images générées pour juger de la qualité de l'entraînement.
+
+Nous nous sommes également penchés sur le problème dit de \textit{mode collapse}, qui fait référence à un apprentissage lors duquel le générateur se met à produire des images peu diversifiées et souvent incohérentes, compte tenu du jeu de données (c.f. figure \ref{fig:fig7}). Ce problème a notamment été  étudié dans la section 3.2 de~\cite{salimans2016improved} et dans la section 2.4 de~\cite{DBLP:journals/corr/MetzPPS16}.
+
 La difficulté qui existe pour atteindre un point de convergence, dû au fait que l'équilibre de Nash entre les deux réseaux n'est pas garanti, fait également partie des problèmes important rencontrés lors de l'entraînement d'un GAN.
 Ces questions seront discutées dans les sections  \ref{sec:ParamsScans}, \ref{sec:Mesure}, \ref{sec:Nash_Collapse}.
 
@@ -164,7 +165,7 @@ Ces questions seront discutées dans les sections  \ref{sec:ParamsScans}, \ref{s
 \begin{figure}[h!]
     \centering
     \includegraphics[width=\textwidth]{Figures/GAN/AAE_representation.png}
-    \caption{Architecture d'un AAE. Le vecteur \(v\) représente une entrée direct de \(G\) sans passer par \(E\).}
+    \caption{Architecture d'un AAE. Le vecteur \(v\) représente une entrée directe de \(G\) sans passer par \(E\).}
     \label{fig:fig10}
 \end{figure}
 
