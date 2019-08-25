@@ -40,7 +40,7 @@
 \usepackage{appendix}
 \usepackage[export]{adjustbox}
 
-\title{Rapport de stage\\ Études des ``Generative Adverserial Networks''}
+\title{Rapport de stage\\ Études des ``Generative Adversarial Networks''}
 
 \author{Lucas Goareguer \\
   Aix-Marseille Université \\
@@ -55,7 +55,7 @@
 \begin{document}
 \maketitle
 \begin{abstract}
-Ce rapport a pour objectif de décrire le travail effectué durant le stage final du Master \emph{Intelligence Artificielle et Apprentissage Automatique}. Ce stage de six mois s'est déroulé à l'Institut de Neurosciences de la Timone et a été encadré par Laurent Perrinet, chercheur CNRS à l'université d'Aix-Marseille. Le principal objectif du stage était la compréhension des \textit{Generative Adverserials Networks} (GAN) appliquée à la génération d'images. Un apport majeur de ce travail a été le développement d'outils facilitant la création et le test de GAN, notamment une librairie consacrée à cette tâche ainsi qu'un outil d'exploration de l'espace paramétrique.
+Ce rapport a pour objectif de décrire le travail effectué durant le stage final du Master \emph{Intelligence Artificielle et Apprentissage Automatique}. Ce stage de six mois s'est déroulé à l'Institut de Neurosciences de la Timone et a été encadré par Laurent Perrinet, chercheur CNRS à l'université d'Aix-Marseille. Le principal objectif du stage était la compréhension des \textit{Generative Adversarial Networks} (GAN) appliquée à la génération d'images. Un apport majeur de ce travail a été le développement d'outils facilitant la création et le test de GAN, notamment une librairie consacrée à cette tâche ainsi qu'un outil d'exploration de l'espace paramétrique.
 \end{abstract}
 
 \blfootnote{
@@ -68,7 +68,7 @@ License details:  \url{http://creativecommons.org/licenses/by/4.0/}}
 
 \subsection{Pourquoi les GANs ?}
 \label{sec:Intro}
-Les réseaux génératifs adverses ou \textit{Generatif Adverserial Networks} (GAN) en anglais sont des modèles qui permettent, par un apprentissage non supervisé, de générer des données cohérentes par rapport à un jeu de données.\\
+Les réseaux génératifs adverses ou \textit{Generatif Adversarial Networks} (GAN) en anglais sont des modèles qui permettent, par un apprentissage non supervisé, de générer des données cohérentes par rapport à un jeu de données.\\
 Une bonne analogie pour présenter les GANs est la suivante : imaginons un faussaire \(G\) qui a pour objectif de créer des faux billets utilisables et un policier \(D\) qui a pour objectif de distinguer les faux billets des vrais.
 Lorsque \(G\) verra le policier repérer ses contre façon il va modifier et améliorer sa technique. \(D\) quand a lui en comparant les faux billets à des vrais finira par mieux les repérer. Nos deux protagonistes vont alors ce livrer a un duel de compétences. Là où \(G\) gagnera il fera perdre \(D\) et inversement. Nos deux compères se retrouvent en plein dans ce que l'on appelle un jeu à somme nul. Contrairement à la plupart des autres modèles génératif qui résolvent des problèmes d'optimisation standard, avec les GANs on cherche à ce rapprocher d'un équilibre de Nash. C'est à dire un point où \(G\) et \(D\) prévoient parfaitement les choix de l'adversaire et prennent les bonnes décisions en conséquence. C'est dans cet état d'équilibre, que le modèle converge et que le faussaire génère des billets indiscernables (pour le policier) des vrais.\\
 Ces modèles ont été décrits pour la première fois en 2014 dans l'article de I. Goodfellow \cite{NIPS2014_5423}, depuis ils ont connu un engouement grandissant et de nombreux chercheurs s'y sont intéressés comme en témoigne cette page référençant de nombreux articles : \href{https://github.com/hindupuravinash/the-gan-zoo}{The Gan Zoo} \footnote{\label{note1}The Gan Zoo : https://github.com/hindupuravinash/the-gan-zoo}.\\ 
@@ -79,7 +79,7 @@ Cette technologie étant très intéressante à bien des égards, la tâche qui 
 Pour une fonction \(f : \mathbb{R}^a \rightarrow \mathbb{R}^b \) on appelle espace latent la représentions dans \(\mathbb{R}^b\) des données de \(\mathbb{R}^a\).
 Tous vecteur de dimension \(b\) pourras donc être plongé dans un espace latent de dimension \(\mathbb{R}^b\).
 
-\subsection{Generatif Adverserial Networks (GAN)}
+\subsection{Generatif Adversarial Networks (GAN)}
 %$\mathcal{L}_{EG}$
 \label{sec:GAN}
 \begin{figure}[!h]
@@ -88,7 +88,7 @@ Tous vecteur de dimension \(b\) pourras donc être plongé dans un espace latent
     \caption{Architecture d'un GAN.}
     \label{fig:fig9}
 \end{figure}
-Les \textit{Generatif Adverserial Networks} (GAN) sont des modèles qui permettent de générer des données approchant une loi de probabilité cible \(P(x)\), où \(x\) est l'ensemble des données que l'on cherche à approcher.\\
+Les \textit{Generatif Adversarial Networks} (GAN) sont des modèles qui permettent de générer des données approchant une loi de probabilité cible \(P(x)\), où \(x\) est l'ensemble des données que l'on cherche à approcher.\\
 Ces modèles dans la version d'origine présentée par I. Goodfellow \cite{NIPS2014_5423} se présente sous la forme de deux réseaux distinct : \\
 \begin{itemize}
   \item Un générateur \(G\) qui prend en entrée un vecteur aléatoire \(z\) dans un espace latent de dimension \(L\) et produit en sortie des données qui, après un entraînement réussi, doivent approcher la loi de probabilité \(P(x,z)\). Ici l'espace de représentation des données est a l'entrée de \(G\), il s'agit d'un cas spécifique aux GANs. Les poids de \(G\) sont notés \(\theta_G\) (c.f. figure \ref{fig:fig9}) ;\\
@@ -147,7 +147,7 @@ La difficulté qui existe pour atteindre un point de convergence, dû au fait qu
 Ces questions seront discutées dans les sections  \ref{sec:ParamsScans}, \ref{sec:Mesure}, \ref{sec:Nash_Collapse}.
 
 \newpage
-\subsection{Adverserial Auto-Encoder (AAE)}
+\subsection{Adversarial Auto-Encoder (AAE)}
 \label{sec:AAE}
 
 \begin{figure}[h!]
@@ -275,7 +275,7 @@ Après des tests avec des résolutions plus faibles nous avons choisi d'utiliser
 La première partie du stage à consisté en une exploration du monde des GANs. Nous nous sommes donc fixé comme objectif la recherche, l'étude et l'entraînement d'un modèle capable de générer des visages de personnages des Simpson.
 Après avoir choisi notre jeu de données nous avons exploré l'immense monde des GANs et nous avons rapidement dû faire des choix étant donné la quantité astronomique d'articles présentant des variantes de GAN (c.f. \href{https://github.com/hindupuravinash/the-gan-zoo}{The Gan Zoo} \ref{note1}).
 Nous avons donc focalisé notre attention sur les systèmes les plus éprouvés afin de comprendre au mieux la théorie derrière ces modèles.\\
-Nous avons particulièrement utilisé les DCGAN \cite{radford2015unsupervised} qui sont notamment composés de couches de convolution très adaptées au traitement des images. Puis dans un second temps nous nous sommes penchés sur les \textit{Adverserial Auto-Encoders} (AAE) qui nous on servie par la suite pour l'expérience présentée en section \ref{sec:CorrespondancesLS}.
+Nous avons particulièrement utilisé les DCGAN \cite{radford2015unsupervised} qui sont notamment composés de couches de convolution très adaptées au traitement des images. Puis dans un second temps nous nous sommes penchés sur les \textit{Adversarial Auto-Encoders} (AAE) qui nous on servie par la suite pour l'expérience présentée en section \ref{sec:CorrespondancesLS}.
 
 \subsection{Fractal Dream Dataset}
 \label{sec:FDD}
