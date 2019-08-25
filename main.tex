@@ -360,28 +360,33 @@ Malgré l'importante quantité de travaux sur le sujet, les GANs laissent encore
 Durant nos expériences nous nous sommes confrontés à de nombreuses barrières théoriques qui ne sont pas encore tombées.
 
 L'une des principales faiblesses des GANs est l'absence de mesure de la qualité des résultats. En effet même si dans la section 4.2 de l'article~\cite{NIPS2014_5423}, \(G\) est sensé converger vers un point où les données qu'il génère suive la loi de probabilités du jeu de données, dans la pratique aucun point de convergence n'est atteint entre \(G\) et \(D\). Ceci est dû notamment au fait que \(G\) n'apprend que par le biais de \(D\), il n'a donc pas pour objectif de se rapprocher des données du jeu de données, mais de générer des données qui trompent \(D\). On ne peut donc pas ce fier au fonction de coût de \(G\) pour évaluer son niveau d'apprentissage. 
-Certain articles se sont focalisés sur la recherche d'une métrique adaptée aux GANs comme dans~\cite{salimans2016improved} qui utilise ce qu'ils appellent l'Inception score pour évaluer les images ou encore~\cite{berthelot2017began} qui introduit une nouvelle architecture de GAN ainsi qu'une métrique associée.\\
-
+Certain articles se sont focalisés sur la recherche d'une métrique adaptée aux GANs comme dans~\cite{salimans2016improved} qui utilise ce qu'ils appellent l'Inception score pour évaluer les images ou encore~\cite{berthelot2017began} qui introduit une nouvelle architecture de GAN ainsi qu'une métrique associée.
+%
 \subsection{Équilibre de Nash et \textit{mode collapse}}
 \label{sec:Nash_Collapse}
-A ce problème de mesure s'ajoute un problème d'équilibre. 
-En effet comme dit précédemment on peut voir l'apprentissage de notre réseaux comme un jeu a somme nul dans lequel ce que \(G\) gagne \(D\) le perd et inversement.\\
-L'objectif de ce jeu est donc d'atteindre le point d'équilibre tel que \(G\) produit un résultat suivant la loi de probabilité \(P(x\)). Dans ce cas \(D\) devient incapable de différencier les images générée par \(G\) des images du jeu de données. Ici l'entraînement est terminé et \(G\) produit les images attendues. L'équilibre de Nash est atteint.\\
-Malheureusement ce que nos expériences nous ont apprises c'est que cet état d'équilibre, s'il existe, n'est jamais atteint (dans le cadre de nos expériences en tout cas).\\
-Comme vous pouvez le voir sur la figure~\ref{fig:fig5} la moyenne des réponses du discriminateur pour les images réelles et pour les images générées tend vers un point où \(D\) ne fait presque plus aucune erreur. Étant donné que \(G\) apprend via les réponses de \(D\) on constate que la fonction de coût de \(G\) devient de plus en plus proche de l'infini ce qui à tendance à créer une forte instabilité dans l'apprentissage. Cette instabilité peut être observée sur la figure~\ref{fig:fig6} où l'on constate que plus l'apprentissage ce prolonge plus la fonction de coût de \(G\) devient inconstant.
-En effet \(G\), dû fait de sa fonction de coût~\ref{sec:GAN}, a besoin que \(D\) réussisse à discriminer les images générées pour pouvoir se corriger et s'adapter. Mais plus \(D\) réussis à classer correctement les images plus \(G\) obtient une fonction de coût importante ce qui le pousse au déséquilibre. C'est ce que l'on appelle dans le monde des GANs un \textit{mode collapse}. Vous pouvez voir sur la figure~\ref{fig:fig7} un exemple d'images générer lors du \textit{mode collapse} d'un générateur. On constate que la diversité des images devient pauvre et totalement incohérente. Ce phénomène s'explique, par le fait que \(D\), fini par réussir tellement bien à classer les images, qu'il pousse \(G\) à se focaliser sur les quelques images qui réussissent encore a trompées \(D\). Ainsi \(G\) ce met a générer une seule (ou très peut) d'images ce qui veut dire que l'espace latent de \(G\) devient très uniforme. De nombreux articles on étudier le \textit{mode collapse} comme par exemple~\cite{NIPS2014_5423}.\\
-Fort heureusement cet absences d'équilibre n'empêche pas l'entraînement du générateur. Il est vraie que \(D\) fini toujours (dans nos expériences) par prendre l'avantage et ne fait presque plus aucune erreur, mais \(G\) réussis encore, rarement, a flouée \(D\). Le fait que \(G\) réussisse a gagner face a un générateur bien meilleurs que lui, lui permet de continuer son apprentissage. Les victoires de \(G\), même si elle sont rare, permettent a \(D\) de s'améliorer puis les victoires de \(D\) permettent a leur tours à \(G\) de s'améliorer. \\
+\`A ce problème de mesure s'ajoute un problème d'équilibre. 
+En effet comme dit précédemment on peut voir l'apprentissage de notre réseau comme un jeu a somme nulle dans lequel ce que \(G\) gagne \(D\) le perd et inversement.
+
+L'objectif de ce jeu est donc d'atteindre le point d'équilibre tel que \(G\) produit un résultat suivant la loi de probabilité \(P(x\)). Dans ce cas \(D\) devient incapable de différencier les images générées par \(G\) des images du jeu de données. Ici l'entraînement est terminé et \(G\) produit les images attendues. L'équilibre de Nash est atteint.
+
+Malheureusement, ce que nos expériences nous ont apprises c'est que cet état d'équilibre, s'il existe, n'est jamais atteint (dans le cadre de nos expériences en tout cas). Ce problème est régulièrement rapporté dans la littérature des GANs et des cas où l'équilibre est atteint sont très rarement mentionnés.
+
+Comme vous pouvez le voir sur la figure~\ref{fig:fig5} la moyenne des réponses du discriminateur pour les images réelles et pour les images générées tend vers un point où \(D\) ne fait presque plus aucune erreur. Étant donné que \(G\) apprend via les réponses de \(D\), on constate que la fonction de coût de \(G\) devient de plus en plus proche de l'infini ce qui à tendance à créer une forte instabilité dans l'apprentissage. Cette instabilité peut être observée sur la figure~\ref{fig:fig6} où l'on constate que plus l'apprentissage progresse, plus la fonction de coût de \(G\) devient variable.
+En effet \(G\), du fait de sa fonction de coût~\ref{sec:GAN}, a besoin que \(D\) réussisse à discriminer les images générées pour pouvoir se corriger et s'adapter. Mais plus \(D\) réussit à classer correctement les images, plus \(G\) obtient une fonction de coût importante ce qui le pousse au déséquilibre. C'est ce que l'on appelle dans le monde des GANs un \textit{mode collapse}. Vous pouvez voir sur la figure~\ref{fig:fig7} un exemple d'images générées lors du \textit{mode collapse} d'un générateur. On constate que la diversité des images devient pauvre et totalement incohérente. Ce phénomène s'explique par le fait que \(D\) finit par réussir tellement bien à classer les images qu'il pousse \(G\) à se focaliser sur les quelques images qui réussissent encore à le tromper \(D\). Ainsi, \(G\) se met a générer une seule (ou très peu) d'images différentes ce qui veut dire que l'espace latent de \(G\) devient très uniforme. De nombreux articles ont étudié le \textit{mode collapse} comme par exemple~\cite{NIPS2014_5423}.
+
+Fort heureusement, cette absence d'équilibre n'empêche pas l'entraînement du générateur. Il est vrai que \(D\) finit toujours (dans nos expériences) par prendre l'avantage et ne fait presque plus aucune erreur, mais \(G\) réussit encore, rarement, a flouer \(D\). Le fait que \(G\) réussisse à gagner face à un générateur bien meilleur que lui lui permet de continuer son apprentissage. Les victoires de \(G\), même si elles sont rares, permettent a \(D\) de s'améliorer --- puis les victoires de \(D\) permettent a leu tours à \(G\) de s'améliorer. 
+
 \newpage
 \begin{figure}[!h]
  \centering
     \begin{subfigure}[b]{\textwidth}
         \includegraphics[width=0.85\textwidth]{Figures/LossG_et_Convergeance/scores300-64.png}
-        \caption{Moyenne des réponses de \(D\) pour les images réels en bleu et les images générées en orange, au cours de l'entraînement.}
+        \caption{Moyenne des réponses de \(D\) pour les images réelles en bleu et les images générées en orange, au cours de l'entraînement.}
         \label{fig:fig5}
     \end{subfigure}
     \begin{subfigure}[b]{\textwidth}
         \includegraphics[width=0.85\textwidth]{Figures/LossG_et_Convergeance/losses300-64.png}
-        \caption{Valeurs des fonctions de coûts de \(G\) (en bleu) et \(D\) (en orange), au cours de l'entraînement.}
+        \caption{Valeurs des fonctions de coût de \(G\) (en bleu) et \(D\) (en orange), au cours de l'entraînement.}
         \label{fig:fig6}
     \end{subfigure}
     \caption{Courbes des coûts et des scores au cours de l'entraînement.}
@@ -390,21 +395,21 @@ Fort heureusement cet absences d'équilibre n'empêche pas l'entraînement du g�
 \begin{figure}[h!]
     \centering
     \includegraphics[width=0.40\textwidth]{Figures/LossG_et_Convergeance/collapse_980.png}
-    \caption{Exemples d'images générer lors du \textit{mode collapse} d'un générateur. On constate une faible diversité ainsi qu'une incohérence des images par rapport au jeu de données.}
+    \caption{Exemples d'images générées lors d'un \textit{mode collapse} d'un générateur. On constate une faible diversité ainsi qu'une incohérence des images par rapport au jeu de données.}
     \label{fig:fig7}
 \end{figure}
 
 \subsection{Comparaison des espaces latents connu et générer}
 \label{sec:ComparaisonLS}
-Vous pouvez voir sur la gauche de la figure~\ref{fig:fig8} des images extraite du jeu de données FDD. Après avoir entraîné et paramétré différents modèles à générer des images cohérentes par rapport à celles du jeu de données nous avons pu générer les images visibles à droite et au centre de la figure~\ref{fig:fig8}. 
-En comparant ces images avec celle de gauche on ne constate aucune correspondance entre celles générer par G et celles construite en utilisant les formules Fractal Dream~\ref{sec:FDD}. 
+Vous pouvez voir sur la gauche de la figure~\ref{fig:fig8} des images extraite du jeu de données FDD. Après avoir entraîné et paramétré différents modèles à générer des images cohérentes par rapport à celles du jeu de données, nous avons pu générer les images visibles à droite et au centre de la figure~\ref{fig:fig8}. 
+En comparant ces images avec celles de gauche on ne constate aucune correspondance entre celles générer par G et celles construite en utilisant les formules Fractal Dream~\ref{sec:FDD}. 
 Ce résultat tend a montrer que l'espace latent de G n'a pas développé de correspondance avec l'espace des paramètres de FDD durant sont entraînement.
 
 \begin{figure}[!h]
     \centering
     \begin{subfigure}[b]{0.32\textwidth}
         \includegraphics[width=\textwidth]{Figures/ComparaisonLS/dataset_sample.png}
-        \caption{Des éléments extraits du jeu de données Fractal Dream Dataset.}
+        \caption{Des éléments extraits du jeu de données \emph{Fractal Dream Dataset}.}
     \end{subfigure}
     \begin{subfigure}[b]{0.32\textwidth}
         \includegraphics[width=\textwidth]{Figures/ComparaisonLS/scan7_eps0,1_lrelu0,01_0.png}
@@ -414,7 +419,7 @@ Ce résultat tend a montrer que l'espace latent de G n'a pas développé de corr
         \includegraphics[width=\textwidth]{Figures/ComparaisonLS/scan8_eps0,1_lrelu1e06_0.png}
         \caption{Des images générées par un autre générateur entraîné par un AAE.}
     \end{subfigure}
-    \caption{Les images générées l'on était en utilisant un vecteur latent correspondant aux paramètres utiliser pour calculer les images extraite du jeu de données visible à droite.}
+    \caption{Images générées en utilisant par des vecteurs latents aléatoires mais identiques dans le modèle mathématiques et deux exemples de réseaux de type AAE.}
     \label{fig:fig8}
 \end{figure}
 %\subsection{Interpolation dans l'espace latent}
@@ -424,14 +429,14 @@ Ce résultat tend a montrer que l'espace latent de G n'a pas développé de corr
 \label{sec:Conclusion}
 
 \subsection{Apprentissage des GANs}
-L'apprentissage des GANs est une tâche ardue et nous avons eu besoin de beaucoup de test avant d'arriver à un résultat un tant soit peu convaincant. Le grand nombre d'hyper-paramètres ainsi que les vides théoriques présentés section~\ref{sec:CompEtLimites} posent de nombreuses difficultés. Néanmoins les résultats obtenus, avec les Simpsons notamment, sont tout à fait convaincant.
+L'apprentissage des GANs est une tâche ardue et nous avons eu besoin de beaucoup de tests et de paramétrisation avant d'arriver à un résultat un tant soit peu convaincant. Le grand nombre d'hyper-paramètres ainsi que les vides théoriques présentés section~\ref{sec:CompEtLimites} posent de nombreuses difficultés. Néanmoins les résultats obtenus, avec les Simpsons notamment, sont finalement tout à fait convaincants.
 
 \subsection{Découverte et prise en mains de nombreux outils}
-Durant le stage j'ai été amené à me former a de nombreuse technologies et outils. On peut citer parmi les plus importants Pytorch~\cite{paszke2017automatic} ou encore Tensorboard~\cite{tensorflow2015-whitepaper}, à ceci s'ajoute également un usage quotidien de Linux et de Python qui m'ont permis de découvrir de nombreux logiciels et bibliothèques. Ensemble ces outils s'agrègent à ceux utilisés lors de mon Master et me permettront, je l'espère, de commencer ma vie professionnelle sur de bonnes bases.
+Durant le stage, j'ai été amené à me former a de nombreuses technologies et outils. On peut citer parmi les plus importants Pytorch~\cite{paszke2017automatic} ou encore Tensorboard~\cite{tensorflow2015-whitepaper}, à ceci s'ajoute également un usage quotidien de Linux et de Python qui m'ont permis de découvrir de nombreux logiciels et bibliothèques. Ensembles, ces outils s'agrègent à ceux utilisés lors de mon Master et me permettront, je l'espère, de commencer ma vie professionnelle sur de bonnes bases.
 
 \subsection{Premier pas dans le monde professionnels}
-Les laboratoires de recherche sont un monde particulier que j'avais déjà pu approcher lors de mes études, ce stage m'a permis de les découvrir en détails. J'ai pu apprendre tout ce qui fait le monde professionnel : horaires fixes, journée complètes, réunions de travail ect... 
-Ces nouvelles expériences forme le début de mon parcours professionnel.
+Les laboratoires de recherche sont un monde particulier que j'avais déjà pu approcher lors de mes études, ce stage m'a permis de les découvrir en détails. J'ai pu apprendre tout ce qui fait le monde professionnel : horaires fixes, journée complètes, réunions de travail etc... J'ai aussi pu apprendre à gérer l'avancement de mon projet avec une méthode agile centrée sur l'utilisation de GitHub pour l'écriture de rapports d'expérience (cahier de laboratoire électronique) qui suivait mes expériences, avancées et points à améliorer.
+Ces nouvelles expériences forment le début de mon parcours professionnel.
 
 \newpage
 %{\bf Appendices}: Appendices, if any, directly follow the text and the references (but see above).  Letter them in sequence and provide an informative title: {\bf Appendix A. Title of Appendix}.
@@ -442,8 +447,7 @@ Ces nouvelles expériences forme le début de mon parcours professionnel.
 %when submitting your paper for review.
 
 \section*{Remerciements}
-Je tiens à remercier Laurent Perrinet pour m'avoir encadrés et guidés durant ce Stage.
-Ainsi que Victor Boutin pour ces précieux conseils lors de la rédaction de ce rapport.
+Je tiens à remercier Laurent Perrinet pour m'avoir encadré et guidé durant ce Stage, ainsi que Victor Boutin pour ces précieux conseils lors de la rédaction de ce rapport.
 
 \bibliography{biblio}
 \bibliographystyle{acl}
@@ -505,8 +509,8 @@ Les réseaux on était entraîner avec les hyper-paramètres suivants pour les e
 
 \section{-  Détail de l'architecture des réseaux}
 \label{appendix:annexe3}
-Vous trouverez ci-dessous un détail couches par couches de l'architecture des réseaux DCGAN et AAE ayant servie pour nos expériences.
-Les noms des fonction utiliser sont ceux de la librairie Pytorch en version 1.1.0.
+Vous trouverez ci-dessous un détail couche par couche de l'architecture des réseaux DCGAN et AAE ayant servi pour nos expériences.
+Les noms des fonctions utilisées sont ceux définis par la librairie Pytorch en version 1.1.0.
 
 \begin{table}[h]
   \begin{tabular}{l}
