@@ -169,9 +169,11 @@ Ces questions seront discutées dans les sections  \ref{sec:ParamsScans}, \ref{s
     \label{fig:fig10}
 \end{figure}
 
-Pour les expériences sur l'étude des espaces latent que nous allons détailler par la suite (c.f. section \ref{sec:CorrespondancesLS}) nous avons choisi d'utiliser une architecture proche de celle présentée dans l'article~\cite{GADAE}. Cette architecture nous donne un contrôle sur l'espace latent.
-On trouve dans la littérature différentes formes d'auto-encodeurs adversaires, comme par exemple cette version qui est la plus répandue~\cite{makhzani2015adversarial}.\\
-Dans le modèle que nous avons choisi on trouve dans un premier temps un auto-encodeur (AE), qui est un réseau composer de deux parties symétriques avec en entrée un encodeur \(E\) qui réduit la dimension des données jusqu'à une taille \(L\) et en sortie un décodeur \(G\) qui augmente la taille de ce vecteur de taille \(L\) jusqu'à la taille d'origine des données. \\
+Pour les expériences sur l'étude des espaces latent que nous allons détailler par la suite (c.f. section \ref{sec:CorrespondancesLS}) nous avons choisi d'utiliser une architecture proche de celle présentée dans l'article de~\cite{GADAE}. Cette architecture nous donne un contrôle sur l'espace latent.
+On trouve dans la littérature différentes formes d'auto-encodeurs adversaires, comme par exemple la version de~\cite{makhzani2015adversarial} qui est la plus répandue.
+
+Dans le modèle que nous avons choisi, on trouve dans un premier temps un auto-encodeur (AE), qui est un réseau composer de deux parties symétriques avec en entrée un encodeur \(E\) qui réduit la dimension des données jusqu'à une taille \(L\) et en sortie un décodeur \(G\) qui augmente la taille de ce vecteur de taille \(L\) jusqu'à la taille d'origine des données. 
+
 Nous avons donc dans notre réseau (c.f. figure \ref{fig:fig9}):
 \begin{itemize}
   \item un AE comme présenté ci-dessus, avec un encodeur \(E\) (dont les poids seront notés \(\theta_E\)), un décodeur \(G\) qui sert également de générateur (dont les poids seront notés \(\theta_G\)). À la sortie de \(E\) et a l'entrée de \(G\) on trouve un espace latent de taille \(L\);
@@ -185,7 +187,7 @@ lossD = -\log(D(x)) - \log(1-D(G(z)))
 lossG = -\log(D(G(z)))
 \]
 \[
-lossEG = MSE(x, G(E(x))) + MSE(z_{imgs}, z_{zeros}) + MSE(z_{imgs}^2, z_{ones})^{0.5}
+lossEG = MSE(x, G(E(x))) + MSE(z_{imgs}, z_{zeros}) + MSE(z_{imgs}^2, z_{ones}^2)^{0.5}
 \]
 Avec MSE définie comme l'erreur quadratique moyenne.
 Le \(lossEG\) sera détaillé dans la sous-section suivante \ref{sec:LatentSpace}.
@@ -204,36 +206,36 @@ On suit un algorithme d'entraînement légèrement diffèrent que pour les GANs 
   Sortie: G un générateur entraîner \tabularnewline
   \hline
   Pour \(I\) étapes faire :\tabularnewline 
-  \hspace{1cm}\(z \leftarrow\) ensemble de \(B\) vecteur de taille \(L\) \(\sim \mathcal{N}(0,1)\);\tabularnewline
-  \hspace{1cm}\(imagesGenerees \leftarrow\) \(G(z)\);\tabularnewline  
-  \hspace{1cm}\(imagesReelles \leftarrow\) échantillon aléatoire de \(B\) images de \(data\);\tabularnewline
-  \hspace{1cm}\(Fake \leftarrow\) vecteur de taille \(B\) initialiser à 0;\tabularnewline
-  \hspace{1cm}\(Valid \leftarrow\) vecteur de taille \(B\) initialiser à 1;\tabularnewline
+  \hspace{1cm}\(z \leftarrow\) ensemble de \(B\) vecteur de taille \(L\) \(\sim \mathcal{N}(0,1)\)\tabularnewline
+  \hspace{1cm}\(imagesGenerees \leftarrow\) \(G(z)\)\tabularnewline  
+  \hspace{1cm}\(imagesReelles \leftarrow\) échantillon aléatoire de \(B\) images de \(data\)\tabularnewline
+  \hspace{1cm}\(Fake \leftarrow\) vecteur de taille \(B\) initialiser à 0\tabularnewline
+  \hspace{1cm}\(Valid \leftarrow\) vecteur de taille \(B\) initialiser à 1\tabularnewline
   \tabularnewline
   
-  \hspace{1cm}// Entraînement de EG\tabularnewline
-  \hspace{1cm}\(z_{zeros} \leftarrow\) ensemble de \(B\) vecteur de taille \(L\) initialiser à 0;\tabularnewline
-  \hspace{1cm}\(z_{ones} \leftarrow\) ensemble de \(B\) vecteur de taille \(L\) initialiser à 1;\tabularnewline
-  \hspace{1cm}\(z_{imgs} \leftarrow E(imagesReelles)\);\tabularnewline
-  \hspace{1cm}\(decoded_{imgs} \leftarrow G(z_{imgs})\);\tabularnewline
+  \hspace{1cm}\# Entraînement de EG\tabularnewline
+  \hspace{1cm}\(z_{zeros} \leftarrow\) ensemble de \(B\) vecteur de taille \(L\) initialiser à 0\tabularnewline
+  \hspace{1cm}\(z_{ones} \leftarrow\) ensemble de \(B\) vecteur de taille \(L\) initialiser à 1\tabularnewline
+  \hspace{1cm}\(z_{imgs} \leftarrow E(imagesReelles)\)\tabularnewline
+  \hspace{1cm}\(decoded_{imgs} \leftarrow G(z_{imgs})\)\tabularnewline
   \hspace{1cm}\(lossEG \leftarrow MSE(imagesReelles, decoded_{imgs}) + MSE(z_{imgs}, z_{zeros}) +\)\tabularnewline
-  \hspace{2,8cm}\(MSE(z_{imgs}^2, z_{ones})^{0.5}\);\tabularnewline
-  \hspace{1cm}Utilisation de \(lossEG\) pour mettre à jour \(\theta_E\) et \(\theta_G\) par descente de gradient stochastique;\tabularnewline
+  \hspace{2,8cm}\(MSE(z_{imgs}^2, z_{ones}^2)^{0.5}\)\tabularnewline
+  \hspace{1cm}Utilisation de \(lossEG\) pour mettre à jour \(\theta_E\) et \(\theta_G\) par descente de gradient stochastique\tabularnewline
   \tabularnewline
   
-  \hspace{1cm}// Entraînement de D\tabularnewline
-  \hspace{1cm}\(d_x \leftarrow D(imagesReelles)\);\tabularnewline
-  \hspace{1cm}\(d_{g_z} \leftarrow D(imagesGenerees)\);\tabularnewline
-  \hspace{1cm}\(lossD \leftarrow BCE(d_x,Valid) + BCE(d_{g_z},Fake)\);\tabularnewline
-  \hspace{1cm}Utilisation de \(lossD\) pour mettre à jour \(\theta_D\) par descente de gradient stochastique;\tabularnewline
+  \hspace{1cm}\# Entraînement de D\tabularnewline
+  \hspace{1cm}\(d_x \leftarrow D(imagesReelles)\)\tabularnewline
+  \hspace{1cm}\(d_{g_z} \leftarrow D(imagesGenerees)\)\tabularnewline
+  \hspace{1cm}\(lossD \leftarrow BCE(d_x,Valid) + BCE(d_{g_z},Fake)\)\tabularnewline
+  \hspace{1cm}Utilisation de \(lossD\) pour mettre à jour \(\theta_D\) par descente de gradient stochastique\tabularnewline
   \tabularnewline
   
-  \hspace{1cm}// Entraînement de G\tabularnewline
-  \hspace{1cm}\(lossG\leftarrow BCE(d_{g_z},Valid)\);\tabularnewline
-  \hspace{1cm}Utilisation de \(lossG\) pour mettre à jour \(\theta_G\) par descente de gradient stochastique;\tabularnewline
+  \hspace{1cm}\# Entraînement de G\tabularnewline
+  \hspace{1cm}\(lossG\leftarrow BCE(d_{g_z},Valid)\)\tabularnewline
+  \hspace{1cm}Utilisation de \(lossG\) pour mettre à jour \(\theta_G\) par descente de gradient stochastique\tabularnewline
   \tabularnewline
   
-  return G;\tabularnewline
+  return G\tabularnewline
   \hline
   \end{tabular}
   \label{tab:tab2}
@@ -464,7 +466,7 @@ En utilisant cette formule successivement un grand nombre de fois on peut calcul
       \(x' \leftarrow sin(y*b)+c*sin(x*b)\)\tabularnewline
       \(y' \leftarrow sin(x*a)+d*sin(y*a)\)\tabularnewline
       \tabularnewline
-      return \((x', y')\);\tabularnewline
+      return \((x', y')\)\tabularnewline
       \hline
       \end{tabular}
       \label{tab:tab3}
