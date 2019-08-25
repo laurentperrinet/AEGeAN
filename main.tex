@@ -68,7 +68,7 @@ License details:  \url{http://creativecommons.org/licenses/by/4.0/}}
 
 \subsection{Pourquoi les GANs ?}
 \label{sec:Intro}
-Les \emph{réseaux génératifs adverses} connus en anglais sous le terme \href{https://en.wikipedia.org/wiki/Generative_adversarial_network}{Generatif Adversarial Networks} (GAN) sont des modèles qui permettent, par un apprentissage non supervisé, de générer des données cohérentes par rapport à un jeu de données.
+Les \emph{réseaux génératifs adverses} connus en anglais sous le terme \href{https://en.wikipedia.org/wiki/Generative_adversarial_network}{Generative Adversarial Networks} (GAN) sont des modèles qui permettent, par un apprentissage non supervisé, de générer des données cohérentes par rapport à un jeu de données.
 
 Une bonne analogie pour présenter les GANs est la suivante : imaginons un faussaire \(G\) qui a pour objectif de créer de faux billets utilisables et un policier \(D\) qui a pour objectif de distinguer les faux billets des vrais.
 Lorsque \(G\) verra le policier repérer ses contrefaçons, il va modifier et améliorer sa technique. \(D\) quant à lui en comparant les faux billets à des vrais finira par mieux les repérer. Nos deux protagonistes vont alors se livrer à un duel de compétences. Là où \(G\) gagnera, il fera perdre \(D\) et inversement. Nos deux compères se retrouvent alors dans ce que l'on appelle un jeu à somme nulle. Contrairement à la plupart des autres modèles génératif qui résolvent des problèmes d'optimisation standard, on cherche avec les GANs à se rapprocher d'un équilibre de Nash. C'est à dire un point où \(G\) et \(D\) prévoient parfaitement les choix de l'adversaire et prennent les bonnes décisions en conséquence. C'est dans cet état d'équilibre, que le modèle converge et que le faussaire génère des billets indiscernables (pour le policier) des vrais.
@@ -83,7 +83,7 @@ Cette technologie étant très intéressante à bien des égards, la tâche qui 
 Pour une fonction \(f : \mathbb{R}^a \rightarrow \mathbb{R}^b \), on appelle espace latent la représentions dans \(\mathbb{R}^b\) des données de \(\mathbb{R}^a\).
 Tous vecteur de dimension \(b\) pourras donc être plongé dans un espace latent de dimension \(\mathbb{R}^b\).
 
-\subsection{Generatif Adversarial Networks (GAN)}
+\subsection{Generative Adversarial Networks (GAN)}
 %$\mathcal{L}_{EG}$
 \label{sec:GAN}
 \begin{figure}[!h]
@@ -92,23 +92,30 @@ Tous vecteur de dimension \(b\) pourras donc être plongé dans un espace latent
     \caption{Architecture d'un GAN.}
     \label{fig:fig9}
 \end{figure}
-Les \textit{Generatif Adversarial Networks} (GAN) sont des modèles qui permettent de générer des données approchant une loi de probabilité cible \(P(x)\), où \(x\) est l'ensemble des données que l'on cherche à approcher.\\
+Les \textit{Generative Adversarial Networks} (GAN) sont des modèles qui permettent de générer des données approchant une loi de probabilité cible \(P(x)\), où \(x\) est l'ensemble des données que l'on cherche à approcher.
+
 Ces modèles dans la version d'origine présentée par I. Goodfellow~\cite{NIPS2014_5423} se présente sous la forme de deux réseaux distinct : \\
 \begin{itemize}
-  \item Un générateur \(G\) qui prend en entrée un vecteur aléatoire \(z\) dans un espace latent de dimension \(L\) et produit en sortie des données qui, après un entraînement réussi, doivent approcher la loi de probabilité \(P(x,z)\). Ici l'espace de représentation des données est a l'entrée de \(G\), il s'agit d'un cas spécifique aux GANs. Les poids de \(G\) sont notés \(\theta_G\) (c.f. figure \ref{fig:fig9}) ;\\
-  \item Un discriminateur \(D\) qui a pour objectif de calculer la probabilité de \(y\) sachant \(x\), avec \(y\) le label et \(x\) les données. Dans notre cas le label est soit \(0\) pour des données générées soit \(1\) pour des données appartenant a \(x\). Son objectif est donc de déterminer si \(x\) appartiennent au jeu de données ou non. Les poids de \(D\) sont notés \(\theta_D\) (c.f. figure \ref{fig:fig9}) .\\
+  \item Un générateur \(G\) qui prend en entrée un vecteur aléatoire \(z\) dans un espace latent de dimension \(L\) et produit en sortie des données qui, après un entraînement réussi, doivent approcher la loi de probabilité \(P(x,z)\). Ici l'espace de représentation des données est a l'entrée de \(G\), il s'agit d'un cas spécifique aux GANs. Les poids de \(G\) sont notés \(\theta_G\) (c.f. figure \ref{fig:fig9}) ;
+  
+  \item Un discriminateur \(D\) qui a pour objectif de calculer la probabilité de \(y\) sachant \(x\), avec \(y\) le label et \(x\) les données. Dans notre cas le label est soit \(0\) pour des données générées soit \(1\) pour des données appartenant a \(x\). Son objectif est donc de déterminer si \(x\) appartiennent au jeu de données ou non. Les poids de \(D\) sont notés \(\theta_D\) (c.f. figure \ref{fig:fig9}) .
 \end{itemize}
-Ces deux réseaux vont être entraînés en parallèle par rétro-propagation du gradient en minimisant les fonctions de coûts suivantes pour chacun des deux réseaux.\\
-\(lossD = -log(D(x)) - log(1-D(G(z))) \) \\
-\(lossG = -log(D(G(z))) \)  \\
-
-Ces deux fonctions de coûts se rapportent dans notre cas à la fonction de \textit{Binary Cross Entropy} tel que : 
+Ces deux réseaux vont être entraînés en parallèle par rétro-propagation du gradient en minimisant les fonctions de coûts suivantes pour le discriminateur:
+$$
+lossD = -\log(D(x)) - \log(1-D(G(z))) 
+$$
+et le générateur
+$$
+lossG = -\log(D(G(z)))  \\
+$$
+Ces deux fonctions de coût se rapportent dans notre cas à la fonction de \textit{Binary Cross Entropy} qui mesure la distance (en bits) à l'optimum de chaque composant tel que : 
 \[
-BCE(a, b) = -[b * log(a) + (1 - b) * log(1 - a)]
+BCE(a, b) = -[b * \log(a) + (1 - b) * \log(1 - a)]
 \]
-Avec \(a\) les réponses données par \(D\) pour des images et \(b\) les réponses attendues pour ces images.\\
+Avec \(a\) les réponses données par \(D\) pour des images et \(b\) les réponses attendues pour ces images.
+
 \newpage
-Pour entraîner les deux réseaux on suit l'algorithme suivant :
+Pour entraîner les deux réseaux, on suit l'algorithme suivant :
 \begin{table}[h!]
   \begin{tabular}{l}
   \hline
@@ -118,23 +125,23 @@ Pour entraîner les deux réseaux on suit l'algorithme suivant :
   Sortie: G un générateur entraîné \tabularnewline
   \hline
   Pour \(I\) étapes faire :\tabularnewline 
-  \hspace{1cm}\(z \leftarrow\) ensemble de \(B\) vecteur de taille \(L\) \(\sim \mathcal{N}(0,1)\);\tabularnewline
-  \hspace{1cm}\(imagesGenerees \leftarrow\) \(G(z)\);\tabularnewline  
-  \hspace{1cm}\(imagesReels \leftarrow\) échantillon de \(B\) images de \(data\);\tabularnewline
-  \hspace{1cm}\(Fake \leftarrow\) vecteur de taille \(B\) initialiser à 0;\tabularnewline
-  \hspace{1cm}\(Valid \leftarrow\) vecteur de taille \(B\) initialiser à 1;\tabularnewline
+  \hspace{1cm}\(z \leftarrow\) ensemble de \(B\) vecteur de taille \(L\) \(\sim \mathcal{N}(0,1)\)\tabularnewline
+  \hspace{1cm}\(imagesGenerees \leftarrow\) \(G(z)\)\tabularnewline  
+  \hspace{1cm}\(imagesReelles \leftarrow\) échantillon de \(B\) images de \(data\)\tabularnewline
+  \hspace{1cm}\(Fake \leftarrow\) vecteur de taille \(B\) initialisé à 0\tabularnewline
+  \hspace{1cm}\(Valid \leftarrow\) vecteur de taille \(B\) initialisé à 1\tabularnewline
   \tabularnewline
-  \hspace{1cm}// Entraînement de D\tabularnewline
-  \hspace{1cm}\(d_x \leftarrow D(imagesReels)\);\tabularnewline
-  \hspace{1cm}\(d_{g_z} \leftarrow D(imagesGenerees)\);\tabularnewline
-  \hspace{1cm}\(lossD \leftarrow BCE(d_x,Valid) + BCE(d_{g_z},Fake)\);\tabularnewline
-  \hspace{1cm}Utilisation de \(lossD\) pour mettre à jour \(\theta_D\) par descente de gradient stochastique;\tabularnewline
+  \hspace{1cm}\# Entraînement de D\tabularnewline
+  \hspace{1cm}\(d_x \leftarrow D(imagesReelles)\)\tabularnewline
+  \hspace{1cm}\(d_{g_z} \leftarrow D(imagesGenerees)\)\tabularnewline
+  \hspace{1cm}\(lossD \leftarrow BCE(d_x,Valid) + BCE(d_{g_z},Fake)\)\tabularnewline
+  \hspace{1cm}Utilisation de \(lossD\) pour mettre à jour \(\theta_D\) par descente de gradient stochastique\tabularnewline
   \tabularnewline
-  \hspace{1cm}// Entraînement de G\tabularnewline
-  \hspace{1cm}\(lossG\leftarrow BCE(d_{g_z},Valid)\);\tabularnewline
-  \hspace{1cm}Utilisation de \(lossG\) pour mettre à jour \(\theta_G\) par descente de gradient stochastique;\tabularnewline
+  \hspace{1cm}\# Entraînement de G\tabularnewline
+  \hspace{1cm}\(lossG\leftarrow BCE(d_{g_z},Valid)\)\tabularnewline
+  \hspace{1cm}Utilisation de \(lossG\) pour mettre à jour \(\theta_G\) par descente de gradient stochastique\tabularnewline
   \tabularnewline
-  return G;\tabularnewline
+  return G\tabularnewline
   \hline
   \end{tabular}
   \label{tab:tab1}
@@ -171,10 +178,10 @@ Nous avons donc dans notre réseau (c.f. figure \ref{fig:fig9}):
 \end{itemize}
 Les fonctions de coûts utilisées pour entraîner ce réseau sont :
 \[
-lossD = -log(D(x)) - log(1-D(G(z)))
+lossD = -\log(D(x)) - \log(1-D(G(z)))
 \]
 \[
-lossG = -log(D(G(z)))
+lossG = -\log(D(G(z)))
 \]
 \[
 lossEG = MSE(x, G(E(x))) + MSE(z_{imgs}, z_{zeros}) + MSE(z_{imgs}^2, z_{ones})^{0.5}
@@ -198,7 +205,7 @@ On suit un algorithme d'entraînement légèrement diffèrent que pour les GANs 
   Pour \(I\) étapes faire :\tabularnewline 
   \hspace{1cm}\(z \leftarrow\) ensemble de \(B\) vecteur de taille \(L\) \(\sim \mathcal{N}(0,1)\);\tabularnewline
   \hspace{1cm}\(imagesGenerees \leftarrow\) \(G(z)\);\tabularnewline  
-  \hspace{1cm}\(imagesReels \leftarrow\) échantillon aléatoire de \(B\) images de \(data\);\tabularnewline
+  \hspace{1cm}\(imagesReelles \leftarrow\) échantillon aléatoire de \(B\) images de \(data\);\tabularnewline
   \hspace{1cm}\(Fake \leftarrow\) vecteur de taille \(B\) initialiser à 0;\tabularnewline
   \hspace{1cm}\(Valid \leftarrow\) vecteur de taille \(B\) initialiser à 1;\tabularnewline
   \tabularnewline
@@ -206,15 +213,15 @@ On suit un algorithme d'entraînement légèrement diffèrent que pour les GANs 
   \hspace{1cm}// Entraînement de EG\tabularnewline
   \hspace{1cm}\(z_{zeros} \leftarrow\) ensemble de \(B\) vecteur de taille \(L\) initialiser à 0;\tabularnewline
   \hspace{1cm}\(z_{ones} \leftarrow\) ensemble de \(B\) vecteur de taille \(L\) initialiser à 1;\tabularnewline
-  \hspace{1cm}\(z_{imgs} \leftarrow E(imagesReels)\);\tabularnewline
+  \hspace{1cm}\(z_{imgs} \leftarrow E(imagesReelles)\);\tabularnewline
   \hspace{1cm}\(decoded_{imgs} \leftarrow G(z_{imgs})\);\tabularnewline
-  \hspace{1cm}\(lossEG \leftarrow MSE(imagesReels, decoded_{imgs}) + MSE(z_{imgs}, z_{zeros}) +\)\tabularnewline
+  \hspace{1cm}\(lossEG \leftarrow MSE(imagesReelles, decoded_{imgs}) + MSE(z_{imgs}, z_{zeros}) +\)\tabularnewline
   \hspace{2,8cm}\(MSE(z_{imgs}^2, z_{ones})^{0.5}\);\tabularnewline
   \hspace{1cm}Utilisation de \(lossEG\) pour mettre à jour \(\theta_E\) et \(\theta_G\) par descente de gradient stochastique;\tabularnewline
   \tabularnewline
   
   \hspace{1cm}// Entraînement de D\tabularnewline
-  \hspace{1cm}\(d_x \leftarrow D(imagesReels)\);\tabularnewline
+  \hspace{1cm}\(d_x \leftarrow D(imagesReelles)\);\tabularnewline
   \hspace{1cm}\(d_{g_z} \leftarrow D(imagesGenerees)\);\tabularnewline
   \hspace{1cm}\(lossD \leftarrow BCE(d_x,Valid) + BCE(d_{g_z},Fake)\);\tabularnewline
   \hspace{1cm}Utilisation de \(lossD\) pour mettre à jour \(\theta_D\) par descente de gradient stochastique;\tabularnewline
