@@ -318,8 +318,8 @@ J'ai mis à disposition sur le site Kaggle ce jeu de données construit pour l'o
 
 \subsection{Correspondances des espaces latents}
 \label{sec:CorrespondancesLS}
-Nous nous sommes posé de nombreuses question concernant la façon dont est construit l'espace latent des GANs. 
-Nous avons notamment voulu savoir si étant donné une base de données \(data\) composée d'images \(x\), chacune associée à un unique vecteur \(v\), de dimension \(L\), répartie de manière cohérente dans l'espace. Un générateur \(G\) entraîné avec un AAE, pourrait-il générer une image \(x'\) proche de celle d'une image \(x\) pour un même vecteur \(v\) ? Autrement dit : le générateur serait-il capable de reconstruire, par un entraînement adversaire, la fonction qui relie les images de \(data\) au vecteur \(v\) qui leur est associé. Pour mettre en place cette expérience nous avons entraîné un AAE avec le jeu de données FDD présenté dans la section~\ref{sec:FDD}. Ensuite, nous avons pu comparer les images de FDD aux images générées par \(G\) pour un même vecteur \(v\). La figure~\ref{fig:fig11} décris cette expérience.
+Nous nous sommes posés de nombreuses questions concernant la façon dont est construit l'espace latent des GANs. 
+Nous avons notamment voulu savoir si (étant donnés une base de données \(data\) composée d'images \(x\), chacune associée à un unique vecteur \(v\), de dimension \(L\), répartie de manière cohérente dans l'espace) un générateur \(G\) entraîné avec un AAE pourrait générer une image \(x'\) proche de celle d'une image \(x\) pour un vecteur \(v\) proche? Autrement dit : le générateur serait-il capable de reconstruire, par un entraînement adversaire, la fonction qui relie les images de \(data\) au vecteur \(v\) qui leur est associé. Pour mettre en place cette expérience nous avons entraîné un AAE avec le jeu de données FDD présenté dans la section~\ref{sec:FDD}. Ensuite, nous avons pu comparer les images de FDD aux images générées par \(G\) pour un même vecteur \(v\). La figure~\ref{fig:fig11} décrit cette expérience.
 
 \begin{figure}[!h]
     \centering
@@ -335,8 +335,8 @@ Nous avons notamment voulu savoir si étant donné une base de données \(data\)
 \label{sec:SimpsonsCoherent}
 
 Le balayage des hyper-paramètres ainsi que l'affinage des modèles au grès de nos recherches ont permis d'obtenir de très bons résultats. Vous pouvez voir sur la figure~\ref{fig:fig3} les résultats obtenus avec un DCGAN et sur la figure~\ref{fig:fig4} les résultats obtenus avec un AAE. 
-Il faut noter que les deux modèles étant diffèrent ils disposent d'hyper-paramètres adapter, mais nous avons cherché a leurs données des capacités similaires (même nombre de couches pour \(G\) et \(D\), même nombre de filtres par convolution,etc...). L'objectif était de pouvoir comparer les deux architecture sur le plan de la génération d'images et sur ce point les AAE montrent des capacités moindre que les DCGAN.
-On constate ici et dans chacune de nos expériences que les images obtenues avec l'AAE présente un aspect flou. Ceci vient certainement du fait que la fonction de coût de l'AE rentre en opposition (ou du moins n'est pas en totale adéquation) avec la fonction de coût du générateur qui est affecter par les deux.
+Il faut noter que les deux modèles étant diffèrent ils disposent d'hyper-paramètres adaptés, mais nous avons cherché a leurs donner des capacités similaires (même nombre de couches pour \(G\) et \(D\), même nombre de filtres par convolution, etc...). L'objectif était de pouvoir comparer les deux architectures sur le plan de la génération d'images et sur ce point les AAE montrent des capacités moindres que les DCGAN.
+On constate ici et dans chacune de nos expériences que les images obtenues avec l'AAE présente un aspect flou. Ceci vient certainement du fait que la fonction de coût de l'AE rentre en opposition (ou du moins n'est pas en totale adéquation) avec la fonction de coût du générateur qui est affecté par les deux.
 
 \begin{figure}[!h]
  \centering
@@ -356,10 +356,11 @@ On constate ici et dans chacune de nos expériences que les images obtenues avec
 \subsection{Mesure de la qualité des résultats}
 \label{sec:Mesure}
 
-Malgré l'importante quantité de travaux sur le sujet, les GANs laissent encore planer de nombreuses questions. 
-Durant nos expériences nous nous sommes confronté à de nombreuse barrières théoriques qui ne sont pas encore tombées.\\
+Malgré l'importante quantité de travaux sur le sujet, les GANs laissent encore de nombreuses questions en suspens. 
+Durant nos expériences nous nous sommes confrontés à de nombreuses barrières théoriques qui ne sont pas encore tombées.
+
 L'une des principales faiblesses des GANs est l'absence de mesure de la qualité des résultats. En effet même si dans la section 4.2 de l'article~\cite{NIPS2014_5423}, \(G\) est sensé converger vers un point où les données qu'il génère suive la loi de probabilités du jeu de données, dans la pratique aucun point de convergence n'est atteint entre \(G\) et \(D\). Ceci est dû notamment au fait que \(G\) n'apprend que par le biais de \(D\), il n'a donc pas pour objectif de se rapprocher des données du jeu de données, mais de générer des données qui trompent \(D\). On ne peut donc pas ce fier au fonction de coût de \(G\) pour évaluer son niveau d'apprentissage. 
-Certain article se sont focalisés sur la recherche d'une métrique adaptée aux GANs comme dans~\cite{salimans2016improved} qui utilise ce qu'ils appellent l'Inception score pour évaluer les images ou encore~\cite{berthelot2017began} qui introduit une nouvelle architecture de GAN ainsi qu'une métrique associée.\\
+Certain articles se sont focalisés sur la recherche d'une métrique adaptée aux GANs comme dans~\cite{salimans2016improved} qui utilise ce qu'ils appellent l'Inception score pour évaluer les images ou encore~\cite{berthelot2017began} qui introduit une nouvelle architecture de GAN ainsi qu'une métrique associée.\\
 
 \subsection{Équilibre de Nash et \textit{mode collapse}}
 \label{sec:Nash_Collapse}
