@@ -45,7 +45,7 @@
 \author{Lucas Goareguer \\
   Aix-Marseille Université \\
   {\small \texttt{Lucas.Goareguer@etu.univ-amu.fr}   } \\\And
-   {\bf Supervision : Laurent Perrinet} \\
+   {\bf Superviseur : Laurent Perrinet} \\
   Institut de Neurosciences de la Timone \\
   {\small \tt Laurent.Perrinet@univ-amu.fr} \\}
 \date{}
@@ -73,11 +73,11 @@ Les \emph{réseaux génératifs adverses} connus en anglais sous le terme \href{
 Une bonne analogie pour présenter les GANs est la suivante : imaginons un faussaire \(G\) qui a pour objectif de créer de faux billets utilisables et un policier \(D\) qui a pour objectif de distinguer les faux billets des vrais.
 Lorsque \(G\) verra le policier repérer ses contrefaçons, il va modifier et améliorer sa technique. \(D\) quant à lui en comparant les faux billets à des vrais finira par mieux les repérer. Nos deux protagonistes vont alors se livrer à un duel de compétences. Là où \(G\) gagnera, il fera perdre \(D\) et inversement. Nos deux compères se retrouvent alors dans ce que l'on appelle un jeu à somme nulle. Contrairement à la plupart des autres modèles génératif qui résolvent des problèmes d'optimisation standard, on cherche avec les GANs à se rapprocher d'un équilibre de Nash. C'est à dire un point où \(G\) et \(D\) prévoient parfaitement les choix de l'adversaire et prennent les bonnes décisions en conséquence. C'est dans cet état d'équilibre, que le modèle converge et que le faussaire génère des billets indiscernables (pour le policier) des vrais.
 
-Ces modèles ont été décrits pour la première fois en 2014 dans l'article de Ian Goodfellow~\cite{NIPS2014_5423}, depuis ils ont connu un engouement grandissant et de nombreux chercheurs s'y sont intéressés, comme en témoigne cette page référençant de nombreux articles : \href{https://github.com/hindupuravinash/the-gan-zoo}{The Gan Zoo}\footnote{\label{note1}The Gan Zoo : https://github.com/hindupuravinash/the-gan-zoo}.\\ 
+Ces modèles ont été décrits pour la première fois en 2014 dans l'article de Ian Goodfellow~\cite{NIPS2014_5423}, depuis ils ont connus un engouement grandissant et de nombreux chercheurs s'y sont intéressés, comme en témoigne cette page référençant de nombreux articles : \href{https://github.com/hindupuravinash/the-gan-zoo}{The Gan Zoo}\footnote{\label{note1}The Gan Zoo : https://github.com/hindupuravinash/the-gan-zoo}.\\ 
 
 L'usage des GANs comme un outil de compréhension de notre cerveau est tentant en neurosciences. Le pas a notamment été franchi concernant le parallèle entre imagination et modèles génératifs via les travaux de~\cite{GAN_Brain_Signals} qui tendent notamment à montrer un lien entre la façon dont les images sont générées dans notre cerveau et dans les GANs.
 
-Cette technologie étant très intéressante à bien des égards, la tâche qui m'a été confiée lors de mon stage a été d'étudier les GANs et de développer des outils permettant de les utiliser, de les entraîner mais aussi de tester le rôle des meta-paramètres.
+Cette technologie étant très intéressante à bien des égards, la tâche qui m'a été confiée lors de mon stage a été d'étudier les GANs et de développer des outils permettant de les utiliser, de les entraîner mais aussi de tester le rôle des hyper-paramètres.
 
 \subsection{Espace latent}
 Pour une fonction \(f : \mathbb{R}^a \rightarrow \mathbb{R}^b \), on appelle espace latent la représentions dans \(\mathbb{R}^b\) des données de \(\mathbb{R}^a\).
@@ -96,17 +96,17 @@ Les \textit{Generative Adversarial Networks} (GAN) sont des modèles qui permett
 
 Ces modèles dans la version d'origine présentée par I. Goodfellow~\cite{NIPS2014_5423} se présente sous la forme de deux réseaux distinct : \\
 \begin{itemize}
-  \item Un générateur \(G\) qui prend en entrée un vecteur aléatoire \(z\) dans un espace latent de dimension \(L\) et produit en sortie des données qui, après un entraînement réussi, doivent approcher la loi de probabilité \(P(x,z)\). Ici l'espace de représentation des données est a l'entrée de \(G\), il s'agit d'un cas spécifique aux GANs. Les poids de \(G\) sont notés \(\theta_G\) (c.f. figure~\ref{fig:fig9}) ;
+  \item Un générateur \(G\) qui prend en entrée un vecteur \(z\) dans un espace latent de dimension \(L\) et produit en sortie des données qui, après un entraînement réussi, doivent approcher la loi de probabilité \(P(x,z)\). Ici l'espace de représentation des données est a l'entrée de \(G\), il s'agit d'un cas spécifique aux GANs. Les poids de \(G\) sont notés \(\theta_G\) (c.f. figure~\ref{fig:fig9}) ;
   
   \item Un discriminateur \(D\) qui a pour objectif de calculer la probabilité de \(y\) sachant \(x\), avec \(y\) le label et \(x\) les données. Dans notre cas le label est soit \(0\) pour des données générées soit \(1\) pour des données appartenant a \(x\). Son objectif est donc de déterminer si \(x\) appartiennent au jeu de données ou non. Les poids de \(D\) sont notés \(\theta_D\) (c.f. figure~\ref{fig:fig9}) .
 \end{itemize}
-Ces deux réseaux vont être entraînés en parallèle par rétro-propagation du gradient en minimisant les fonctions de coûts suivantes pour le discriminateur:
+Ces deux réseaux vont être entraînés en parallèle par rétro-propagation du gradient en minimisant les fonctions de coûts suivantes, pour le discriminateur:
 $$
-lossD = -\log(D(x)) - \log(1-D(G(z))) 
+\mathcal{L}_{D} = -\log(D(x)) - \log(1-D(G(z))) 
 $$
-et le générateur
+et le générateur :
 $$
-lossG = -\log(D(G(z)))  \\
+\mathcal{L}_{G} = -\log(D(G(z)))  \\
 $$
 Ces deux fonctions de coût se rapportent dans notre cas à la fonction de \textit{Binary Cross Entropy} qui mesure la distance (en bits) à l'optimum de chaque composant tel que : 
 \[
@@ -134,14 +134,14 @@ Pour entraîner les deux réseaux, on suit l'algorithme suivant :
   \hspace{1cm}\# Entraînement de D\tabularnewline
   \hspace{1cm}\(d_x \leftarrow D(imagesReelles)\)\tabularnewline
   \hspace{1cm}\(d_{g_z} \leftarrow D(imagesGenerees)\)\tabularnewline
-  \hspace{1cm}\(lossD \leftarrow BCE(d_x,Valid) + BCE(d_{g_z},Fake)\)\tabularnewline
-  \hspace{1cm}Utilisation de \(lossD\) pour mettre à jour \(\theta_D\) par descente de gradient stochastique\tabularnewline
+  \hspace{1cm}\(\mathcal{L}_{D} \leftarrow BCE(d_x,Valid) + BCE(d_{g_z},Fake)\)\tabularnewline
+  \hspace{1cm}Utilisation de \(\mathcal{L}_{D}\) pour mettre à jour \(\theta_D\) par descente de gradient stochastique\tabularnewline
   \tabularnewline
   \hspace{1cm}\# Entraînement de G\tabularnewline
-  \hspace{1cm}\(lossG\leftarrow BCE(d_{g_z},Valid)\)\tabularnewline
-  \hspace{1cm}Utilisation de \(lossG\) pour mettre à jour \(\theta_G\) par descente de gradient stochastique\tabularnewline
+  \hspace{1cm}\(\mathcal{L}_{G}\leftarrow BCE(d_{g_z},Valid)\)\tabularnewline
+  \hspace{1cm}Utilisation de \(\mathcal{L}_{G}\) pour mettre à jour \(\theta_G\) par descente de gradient stochastique\tabularnewline
   \tabularnewline
-  return G\tabularnewline
+  retourner G\tabularnewline
   \hline
   \end{tabular}
   \label{tab:tab1}
@@ -181,16 +181,16 @@ Nous avons donc dans notre réseau (c.f. figure~\ref{fig:fig9}):
 \end{itemize}
 Les fonctions de coûts utilisées pour entraîner ce réseau sont :
 \[
-lossD = -\log(D(x)) - \log(1-D(G(z)))
+\mathcal{L}_{D} = -\log(D(x)) - \log(1-D(G(z)))
 \]
 \[
-lossG = -\log(D(G(z)))
+\mathcal{L}_{G} = -\log(D(G(z)))
 \]
 \[
-lossEG = MSE(x, G(E(x))) + MSE(z_{imgs}, z_{zeros}) + MSE(z_{imgs}^2, z_{ones}^2)^{0.5}
+\mathcal{L}_{EG} = MSE(x, G(E(x))) + MSE(z_{imgs}, z_{zeros}) + MSE(z_{imgs}^2, z_{ones}^2)^{0.5}
 \]
 Avec MSE définie comme l'erreur quadratique moyenne.
-Le \(lossEG\) sera détaillé dans la sous-section suivante~\ref{sec:LatentSpace}.
+Le \(\mathcal{L}_{EG}\) sera détaillé dans la sous-section suivante~\ref{sec:LatentSpace}.
 
 L'intérêt d'un tel dispositif est qu'il permet d'avoir un accès direct à l'espace latent. Ainsi on pourra par la suite mener des expériences sur la façon dont est construit l'espace latent.
 
@@ -218,24 +218,24 @@ On suit un algorithme d'entraînement légèrement diffèrent que pour les GANs 
   \hspace{1cm}\(z_{ones} \leftarrow\) ensemble de \(B\) vecteur de taille \(L\) initialiser à 1\tabularnewline
   \hspace{1cm}\(z_{imgs} \leftarrow E(imagesReelles)\)\tabularnewline
   \hspace{1cm}\(decoded_{imgs} \leftarrow G(z_{imgs})\)\tabularnewline
-  \hspace{1cm}\(lossEG \leftarrow MSE(imagesReelles, decoded_{imgs}) + MSE(z_{imgs}, z_{zeros}) +\)\tabularnewline
+  \hspace{1cm}\(\mathcal{L}_{EG} \leftarrow MSE(imagesReelles, decoded_{imgs}) + MSE(z_{imgs}, z_{zeros}) +\)\tabularnewline
   \hspace{2,8cm}\(MSE(z_{imgs}^2, z_{ones}^2)^{0.5}\)\tabularnewline
-  \hspace{1cm}Utilisation de \(lossEG\) pour mettre à jour \(\theta_E\) et \(\theta_G\) par descente de gradient stochastique\tabularnewline
+  \hspace{1cm}Utilisation de \(\mathcal{L}_{EG}\) pour mettre à jour \(\theta_E\) et \(\theta_G\) par descente de gradient stochastique\tabularnewline
   \tabularnewline
   
   \hspace{1cm}\# Entraînement de D\tabularnewline
   \hspace{1cm}\(d_x \leftarrow D(imagesReelles)\)\tabularnewline
   \hspace{1cm}\(d_{g_z} \leftarrow D(imagesGenerees)\)\tabularnewline
-  \hspace{1cm}\(lossD \leftarrow BCE(d_x,Valid) + BCE(d_{g_z},Fake)\)\tabularnewline
-  \hspace{1cm}Utilisation de \(lossD\) pour mettre à jour \(\theta_D\) par descente de gradient stochastique\tabularnewline
+  \hspace{1cm}\(\mathcal{L}_{D} \leftarrow BCE(d_x,Valid) + BCE(d_{g_z},Fake)\)\tabularnewline
+  \hspace{1cm}Utilisation de \(\mathcal{L}_{D}\) pour mettre à jour \(\theta_D\) par descente de gradient stochastique\tabularnewline
   \tabularnewline
   
   \hspace{1cm}\# Entraînement de G\tabularnewline
-  \hspace{1cm}\(lossG\leftarrow BCE(d_{g_z},Valid)\)\tabularnewline
-  \hspace{1cm}Utilisation de \(lossG\) pour mettre à jour \(\theta_G\) par descente de gradient stochastique\tabularnewline
+  \hspace{1cm}\(\mathcal{L}_{G}\leftarrow BCE(d_{g_z},Valid)\)\tabularnewline
+  \hspace{1cm}Utilisation de \(\mathcal{L}_{G}\) pour mettre à jour \(\theta_G\) par descente de gradient stochastique\tabularnewline
   \tabularnewline
   
-  return G\tabularnewline
+  retourner G\tabularnewline
   \hline
   \end{tabular}
   \label{tab:tab2}
@@ -245,7 +245,7 @@ On suit un algorithme d'entraînement légèrement diffèrent que pour les GANs 
 \subsection{Contraindre l'espace latent de l'auto-encodeur}
 \label{sec:LatentSpace}
 %lien avec VAE de Kingma \url{https://arxiv.org/pdf/1312.6114.pdf}
-Le \(lossEG\) s'inspire d'un article de Kingma~\cite{kingma2013auto} dans lequel est détaillé une méthode permettant notamment de contraindre une loi de probabilité quelconque à suivre une loi Gaussienne. Grâce à cet outil, on s'assure que l'espace latent \(z\) au centre de l'auto-encodeur suive une loi Gaussienne, et plus particulièrement normale, c'est à dire de moyenne nulle et de variance l'unité. Ceci nous permettra par la suite d'utiliser le générateur (qui est le décodeur de l'AE) en lui donnant des vecteurs suivants une loi normale. Ainsi l'espace latent de l'AE et celui du générateur correspondront.
+Le \(\mathcal{L}_{EG}\) s'inspire d'un article de Kingma~\cite{kingma2013auto} dans lequel est détaillé une méthode permettant notamment de contraindre une loi de probabilité quelconque à suivre une loi Gaussienne. Grâce à cet outil, on s'assure que l'espace latent \(z\) au centre de l'auto-encodeur suive une loi Gaussienne de moyenne nulle et de variance égale à 1. Ceci nous permettra par la suite d'utiliser le générateur (qui est le décodeur de l'AE) en lui donnant des vecteurs suivants une loi normale. Ainsi l'espace latent de l'AE et celui du générateur correspondront.
 En créant cette correspondance entre les deux espaces latents on pourra les étudier en détail, ce qui sera le sujet de l'une des expériences que nous présentons dans la section~\ref{sec:CorrespondancesLS}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -290,7 +290,7 @@ La première partie du stage à consisté en une exploration du monde des GANs. 
 Après avoir choisi notre jeu de données nous avons exploré l'immense monde des GANs et nous avons rapidement dû faire des choix étant donné la quantité astronomique d'articles présentant des variantes de GAN (c.f. \href{https://github.com/hindupuravinash/the-gan-zoo}{The Gan Zoo}~\ref{note1}).
 Nous avons donc focalisé notre attention sur les systèmes les plus éprouvés afin de comprendre au mieux la théorie derrière ces modèles.
 
-Nous avons particulièrement utilisé les DCGAN~\cite{radford2015unsupervised} qui sont notamment composés de couches de convolution très adaptées au traitement des images. Puis dans un second temps nous nous sommes penchés sur les \textit{Adversarial Auto-Encoders} (AAE) qui nous on servi par la suite pour l'expérience présentée en section~\ref{sec:CorrespondancesLS}.
+Nous avons particulièrement utilisé les DCGAN~\cite{radford2015unsupervised}, qui sont notamment composés de couches de convolution très adaptées au traitement des images. Puis dans un second temps nous nous sommes penchés sur les \textit{Adversarial Auto-Encoders} (AAE) qui nous on servi par la suite pour l'expérience présentée en section~\ref{sec:CorrespondancesLS}.
 
 \subsection{Fractal Dream Dataset}
 \label{sec:FDD}
@@ -334,7 +334,8 @@ Nous avons notamment voulu savoir si (étant donnés une base de données \(data
 \subsection{Simpsons Cohérent}
 \label{sec:SimpsonsCoherent}
 
-Le balayage des hyper-paramètres ainsi que l'affinage des modèles au grès de nos recherches ont permis d'obtenir de très bons résultats. Vous pouvez voir sur la figure~\ref{fig:fig3} les résultats obtenus avec un DCGAN et sur la figure~\ref{fig:fig4} les résultats obtenus avec un AAE. 
+Le balayage des hyper-paramètres ainsi que l'affinage des modèles au grès de nos recherches ont permis d'obtenir de très bons résultats. Vous pouvez voir sur la figure~\ref{fig:fig3} les résultats obtenus avec un DCGAN et sur la figure~\ref{fig:fig4} les résultats obtenus avec un AAE.
+Les hyper-paramètres ainsi que l'architecture détaillée des deux réseaux sont disponibles en annexes~\ref{appendix:annexe2} et ~\ref{appendix:annexe3}.\\
 Il faut noter que les deux modèles étant diffèrent ils disposent d'hyper-paramètres adaptés, mais nous avons cherché a leurs donner des capacités similaires (même nombre de couches pour \(G\) et \(D\), même nombre de filtres par convolution, etc...). L'objectif était de pouvoir comparer les deux architectures sur le plan de la génération d'images et sur ce point les AAE montrent des capacités moindres que les DCGAN.
 On constate ici et dans chacune de nos expériences que les images obtenues avec l'AAE présente un aspect flou. Ceci vient certainement du fait que la fonction de coût de l'AE rentre en opposition (ou du moins n'est pas en totale adéquation) avec la fonction de coût du générateur qui est affecté par les deux.
 
@@ -361,7 +362,7 @@ Durant nos expériences nous nous sommes confrontés à de nombreuses barrières
 
 L'une des principales faiblesses des GANs est l'absence de mesure de la qualité des résultats. En effet même si dans la section 4.2 de l'article~\cite{NIPS2014_5423}, \(G\) est sensé converger vers un point où les données qu'il génère suive la loi de probabilités du jeu de données, dans la pratique aucun point de convergence n'est atteint entre \(G\) et \(D\). Ceci est dû notamment au fait que \(G\) n'apprend que par le biais de \(D\), il n'a donc pas pour objectif de se rapprocher des données du jeu de données, mais de générer des données qui trompent \(D\). On ne peut donc pas ce fier au fonction de coût de \(G\) pour évaluer son niveau d'apprentissage. 
 Certain articles se sont focalisés sur la recherche d'une métrique adaptée aux GANs comme dans~\cite{salimans2016improved} qui utilise ce qu'ils appellent l'Inception score pour évaluer les images ou encore~\cite{berthelot2017began} qui introduit une nouvelle architecture de GAN ainsi qu'une métrique associée.
-%
+
 \subsection{Équilibre de Nash et \textit{mode collapse}}
 \label{sec:Nash_Collapse}
 \`A ce problème de mesure s'ajoute un problème d'équilibre. 
@@ -422,7 +423,6 @@ Ce résultat tend a montrer que l'espace latent de G n'a pas développé de corr
     \caption{Images générées en utilisant par des vecteurs latents aléatoires mais identiques dans le modèle mathématiques et deux exemples de réseaux de type AAE.}
     \label{fig:fig8}
 \end{figure}
-%\subsection{Interpolation dans l'espace latent}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Conclusions et perspectives}
