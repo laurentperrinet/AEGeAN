@@ -64,7 +64,6 @@ class Encoder(nn.Module):
 
         return z
 
-
 class Generator(nn.Module):
     def __init__(self, opt):
         super(Generator, self).__init__()

@@ -5,7 +5,7 @@ import argparse
 def init():
     parser = argparse.ArgumentParser()
     parser.add_argument("-r", "--runs_path", type=str, default='vanilla',
-                        help="Dossier de stockage des résultats sous la forme : Experience_names/parameters/")
+                        help="Dossier de stockage des résultats pour Tensorboard sous la forme : Experience_names/parameters/")
     parser.add_argument("-e", "--n_epochs", type=int, default=30, help="number of epochs of training")
     parser.add_argument("-b", "--batch_size", type=int, default=16, help="size of the batches")
     parser.add_argument("--lrE", type=float, default=0.00015, help="adam: learning rate for E")
@@ -27,7 +27,7 @@ def init():
     parser.add_argument("-i", "--img_size", type=int, default=128, help="size of each image dimension")
     parser.add_argument("--channels", type=int, default=3, help="number of image channels")
     parser.add_argument("-s", "--sample_interval", type=int, default=2, help="interval between image sampling")
-    parser.add_argument("--N_samples", type=int, default=25, help="number of samples to generate")
+    parser.add_argument("--N_samples", type=int, default=24, help="number of samples to generate each time")
     parser.add_argument("--sample_path", type=str, default='images')
     parser.add_argument("-m", "--model_save_interval", type=int, default=5000,
                         help="interval between image sampling. If model_save_interval > n_epochs : no save")
@@ -43,5 +43,6 @@ def init():
     # Dossier de sauvegarde
     os.makedirs(opt.model_save_path, exist_ok=True)
 
-    # print(opt)
+    if opt.verbose:
+        print(opt)
     return opt

@@ -10,6 +10,7 @@ try:
     do_tensorboard = True
 except: # ImportError:
     do_tensorboard = False
+    print("Impossible de charger Tensorboard, le module ne sera pas utiliser.\nVerrifier l'instalation.")
 
 from torch.utils.data import DataLoader
 from torchvision import datasets
@@ -41,10 +42,7 @@ def learn(opt):
         tag = datetime.datetime.now().replace(microsecond=0).isoformat(sep='_')
     tag = tag.replace(':','.')
 
-
-
     cuda = True if torch.cuda.is_available() else False
-
 
     # Loss function
     adversarial_loss = torch.nn.BCEWithLogitsLoss()
@@ -92,18 +90,19 @@ def learn(opt):
     # ----------
     start_epoch = 1
     if opt.load_model == True:
-        start_epoch = load_models(discriminator, optimizer_D, generator, optimizer_G, opt.n_epochs, opt.model_save_path)
+        start_epoch = load_models(discriminator, optimizer_D, generator, optimizer_G, encoder, optimizer_E, opt.n_epochs, opt.model_save_path)
 
     # ----------
     #  Tensorboard
     # ----------
-    path_data1 = os.path.join("./runs", opt.runs_path)
-    path_data2 = os.path.join("./runs", opt.runs_path + '_' + tag[:-1])
-
-    # Les runs sont sauvegardés dans un dossiers "runs" à la racine du projet, dans un sous dossiers opt.runs_path.
-    os.makedirs(path_data1, exist_ok=True)
-
     if do_tensorboard:
+        path_data1 = os.path.join("./runs", opt.runs_path)
+        path_data2 = os.path.join("./runs", opt.runs_path + '_' + tag[:-1])
+
+        # Les runs sont sauvegardés dans un dossiers "runs" à la racine du projet, dans un sous dossiers opt.runs_path.
+        os.makedirs(path_data1, exist_ok=True)
+
+    
         os.makedirs(path_data2, exist_ok=True)
         writer = SummaryWriter(log_dir=path_data2)
 
