@@ -1,5 +1,8 @@
 __version__ = '20190725'
 
+import sys
+sys.path.append("../")
+
 __all__ = ["utils", "plot", "models", "init", "aegean", "SimpsonsDataset"]
 
 from .SimpsonsDataset import SimpsonsDataset, FastSimpsonsDataset
