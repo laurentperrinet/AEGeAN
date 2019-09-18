@@ -15,10 +15,10 @@ import time
 from itertools import product
 import os
 
-# import sys
-# sys.path.append("../")  # ../../GAN-SDPC/
+import sys
+sys.path.append("../")  # ../../GAN-SDPC/
 
-from .SimpsonsDataset import *
+from SimpsonsDataset import *
 
 
 def weights_init_normal(m, factor=1.0):
@@ -40,24 +40,24 @@ def weights_init_normal(m, factor=1.0):
         m.bias.data.zero_()
 
 
-def load_data(path, img_size, batch_size, Fast=True, rand_hflip=False, rand_affine=None, return_dataset=False, mode='RGB'):
+def load_data(path, img_size, batch_size, Fast=True, FDD=False, rand_hflip=False, rand_affine=None, return_dataset=False, mode='RGB'):
     print("Loading data...")
     t_total = time.time()
 
-    # Transformation appliquer avant et pendant l'entraînement
-    transform_constante = transforms.Compose([transforms.ToTensor(), transforms.Normalize(
-        [0.5, 0.5, 0.5], [0.5, 0.5, 0.5]), transforms.ToPILImage(mode="RGB")])
+    # Transformation appliquer pendant l'entraînement
     transform_tmp = []
     if rand_hflip:
         transform_tmp.append(transforms.RandomHorizontalFlip(p=0.5))
     if rand_affine != None:
         transform_tmp.append(transforms.RandomAffine(degrees=rand_affine[0], scale=rand_affine[1]))
     transform_tmp = transform_tmp + [transforms.ToTensor(), transforms.Normalize([0.5, 0.5, 0.5], [0.5, 0.5, 0.5])]
-    transform_tmp = transforms.Compose(transform_tmp)
-    transform = transforms.Compose([transform_constante, transform_tmp])
+    transform = transforms.Compose(transform_tmp)
 
     if Fast:
-        dataset = FastSimpsonsDataset(path, img_size, img_size, transform_constante, transform_tmp, mode)
+        if FDD:
+            dataset = FastFDD(path, img_size, img_size, transform)
+        else:
+            dataset = FastSimpsonsDataset(path, img_size, img_size, transform, mode)
     else:
         dataset = SimpsonsDataset(path, img_size, img_size, transform)
 
@@ -86,46 +86,82 @@ def load_model(model, optimizer, path):
     checkpoint = torch.load(path)
 
     model.load_state_dict(checkpoint['model_state_dict'])
-
+    
     if optimizer is not None:
         optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
 
     return checkpoint['epoch']
 
 
-def load_models(discriminator, optimizer_D, generator, optimizer_G, n_epochs, model_save_path):
+def load_models(discriminator, optimizer_D, generator, optimizer_G, n_epochs, model_save_path, encoder=None, optimizer_E=None):
     start_epochD = load_model(discriminator, optimizer_D, model_save_path + "/last_D.pt")
     start_epochG = load_model(generator, optimizer_G, model_save_path + "/last_G.pt")
-
+    
+    if encoder is not None:
+        start_epochE = load_model(encoder, optimizer_E, model_save_path + "/last_E.pt")
+        
     if start_epochG is not start_epochD:
         print("Error : G trained different times of D  !!")
-        exit(0)
+        #exit(0)
     start_epoch = start_epochD
     if start_epoch >= n_epochs:
         print("Error : Nombre d'epochs demander inférieur au nombre d'epochs déjà effectuer !!")
-        exit(0)
+        #exit(0)
 
     return start_epoch + 1  # La dernière epoch est déjà faite
 
-def sampling(noise, generator, path, epoch, tag=''):
+def sampling(noise, generator, path, epoch, tag='', nrow=5):
     """
     Utilise generator et noise pour générer une images sauvegarder à path/epoch.png
     Le sample est efféctuer en mode eval pour generator puis il est de nouveau régler en mode train.
     """
     generator.eval()
     gen_imgs = generator(noise)
-    save_image(gen_imgs.data[:], "%s/%s_%3d.png" % (path, tag, epoch), nrow=5, normalize=True)
+    save_image(gen_imgs.data[:], "%s/%s%d.png" % (path, tag, epoch), nrow=nrow, normalize=True)
     generator.train()
 
 
-def tensorboard_sampling(noise, generator, writer, epoch):
+def tensorboard_sampling(noise, generator, writer, epoch, nrow=8, image_type='Images générer'):
     """
     Sauvegarde des images générer par generator dans writer pour les visualiser avec tensorboard
     """
     generator.eval()
     gen_imgs = generator(noise)
-    grid = torchvision.utils.make_grid(gen_imgs, normalize=True)
-    writer.add_image('Images générer', grid, epoch)
+    grid = torchvision.utils.make_grid(gen_imgs, normalize=True, nrow=nrow)
+    writer.add_image(image_type, grid, epoch)
+    generator.train()
+
+def tensorboard_AE_comparator(imgs, generator, encoder, writer, epoch):
+    """
+    Sauvegarde dans tensorboard une imgs (image du dataset) sous forme normale et après encodage et décodage. 
+    """
+    generator.eval()
+    encoder.eval()
+    
+    enc_imgs = encoder(imgs)
+    dec_imgs = generator(enc_imgs)
+    
+    grid_imgs = torchvision.utils.make_grid(imgs, normalize=True)
+    grid_dec = torchvision.utils.make_grid(dec_imgs, normalize=True)
+    writer.add_image('Images dataset', grid_imgs, epoch)
+    writer.add_image('Images encoder puis décoder', grid_dec, epoch)
+    
+    generator.train()
+    encoder.train()
+
+def tensorboard_LSD_comparator(imgs, vectors, generator, writer, epoch):
+    """
+    Sauvegarde dans tensorboard une imgs (image du dataset) sous forme normale et une après generator(vectors).
+    """
+    generator.eval()
+    
+    g_v = generator(vectors)
+    
+    grid_imgs = torchvision.utils.make_grid(imgs, normalize=True)
+    grid_g_v = torchvision.utils.make_grid(g_v, normalize=True)
+    writer.add_image('Images dataset', grid_imgs, epoch)
+    writer.add_image('Images Generator(Vectors)', grid_g_v, epoch)
+    
     generator.train()
 
 def tensorboard_conditional_sampling(noise, label, generator, writer, epoch):
@@ -164,8 +200,7 @@ def comp(s):
 
     return int(num)
 
-
-def generate_animation(path):
+def generate_animation(path, fps=1):
     import imageio
     images_path = glob(path + '[0-9]*.png')
 
@@ -173,9 +208,9 @@ def generate_animation(path):
 
     images = []
     for i in images_path:
-        # print(i)
+        #print(i)
         images.append(imageio.imread(i))
-    imageio.mimsave(path + 'training.gif', images, fps=1)
+    imageio.mimsave(path + 'training.gif', images, fps=fps)
 
 def scan(exp_name, params, permutation=True, gpu_repart=False):
     """
@@ -200,7 +235,7 @@ def scan(exp_name, params, permutation=True, gpu_repart=False):
     else:
         perm = list(zip(*val_tab))
     #print(perm)
-
+    
     # Construction du noms de chaque test en fonction des paramètre qui la compose
     names = list()
     for values in perm:
@@ -221,7 +256,7 @@ def scan(exp_name, params, permutation=True, gpu_repart=False):
         print(com)
         commandes.append(com)
     print("Nombre de commande à lancer :", len(commandes))
-
+    
     # Demande de validation
     print("Valider ? (Y/N)")
     reponse = input()
@@ -229,7 +264,7 @@ def scan(exp_name, params, permutation=True, gpu_repart=False):
     if reponse == 'N':
         print("Annulation !")
         exit(0)
-
+    
     """# Répartition sur plusieurs GPU
     if torch.cuda.is_available():
         nb_gpu = torch.cuda.device_count()
@@ -248,14 +283,14 @@ def scan(exp_name, params, permutation=True, gpu_repart=False):
                     count_gpu = 0
             commandes = rep_commandes
     p = input()"""
-
+    
     # Appelle successif des script avec différents paramètres
     log = list()
     for com in commandes:
         print("Lancement de : ",com)
         ret = os.system(com)
         log.append(ret)
-
+        
     # Récapitulatif
     for idx,com in enumerate(commandes):
         print("Code retour : ",log[idx],"\t| Commandes ", com)
