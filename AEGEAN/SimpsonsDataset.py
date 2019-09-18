@@ -116,7 +116,7 @@ class FastSimpsonsDataset(Dataset):
 
         # Transform image to tensor
         img_as_tensor = self.transform(img_as_img)
-        
+
         # Return image and the label
         return (img_as_tensor, single_image_label)
 
@@ -143,7 +143,7 @@ class FastFDD(Dataset):
         for img in self.files:
             img_as_img = Image.open(img).resize((self.height, self.width))
             self.imgs.append(img_as_img)
-            
+
         # Chargement des noms des images
         self.vectors = list()
         # Mise en forme du nom des fichiers
@@ -152,13 +152,13 @@ class FastFDD(Dataset):
             path = path[:-4] # Supp extension
             vector = path.replace('_',' ').split()
             vector = [float(e) for e in vector]
-            
+
             vector[2:] = [e/3 for e in vector[2:]] # Bornage des 4 paramètres entre 0 et 1
-            
+
             vector = torch.tensor(vector,dtype=torch.float64)
             #print(vector)
             self.vectors.append(vector)
-                
+
     def __getitem__(self, index):
         #print("Image load : ",self.files[index])
         single_image_label = self.labels[index]
@@ -167,7 +167,7 @@ class FastFDD(Dataset):
 
         # Transform image to tensor
         img_as_tensor = self.transform(img_as_img)
-        
+
         # Return image and the label
         return (img_as_tensor, single_image_label, vector)
 
@@ -185,20 +185,20 @@ class FastClassifiedDataset(Dataset):
                 transform_tmp: pytorch transforms for transforms and tensor conversion during training
         """
         self.dir = glob(dir_path + '*')
-        
+
         self.total = 0
-        
+
         # Lecture du noms des images
         self.classes = list()
         for d in self.dir:
             self.classes.append(glob(d + '/*'))
             self.total = self.total + len(self.classes[-1])
-            
+
         for i,c in enumerate(self.classes):
             print("Files in class ",i,": ",len(c))
         print("Dir : ",len(self.dir))
         print(self.dir)
-        
+
         # Construction des labels
         nb_label = 0
         self.labels = np.zeros(self.total)
@@ -206,11 +206,11 @@ class FastClassifiedDataset(Dataset):
             c_length = len(self.classes[i])
             nb_label = nb_label + len(self.classes[i-1])
             self.labels[nb_label:nb_label+c_length] = i
-            
+
         #u,c = np.unique(self.labels,return_counts=True)
         #print(u)
         #print(c)
-        
+
         self.height = height
         self.width = width
         self.transform_constante = transform_constante
@@ -248,46 +248,41 @@ class FastClassifiedDataset(Dataset):
         return len(self.files)
 
 
-<<<<<<< HEAD
 INPUT_DATA_DIR = "../../cropped_clear/cp/"
 IMAGE_SIZE = 200
-=======
-INPUT_DATA_DIR = "../cropped/cp/"
-IMAGE_SIZE = 128
->>>>>>> 5d7e009680a453800ca424a161409e41f93b3965
 OUTPUT_DIR = './{date:%Y-%m-%d_%H:%M:%S}/'.format(date=datetime.datetime.now())
 
 
 if __name__ == "__main__":
 
     # Name space test
-    
+
     INPUT_DATA_DIR = "../Dataset/FDD/data/kbc_light/"
-    
+
     transformations = transforms.Compose(
         [transforms.Resize(IMAGE_SIZE), transforms.RandomHorizontalFlip(p=0.5), transforms.ToTensor(), transforms.Normalize([0.5], [0.5])])
     FDD = FastFDD(INPUT_DATA_DIR, IMAGE_SIZE, IMAGE_SIZE, transformations)
 
     print(type(FDD), len(FDD))
-    
+
     x = FDD.__getitem__(1)
     print("Vecteur :",x[2])
     print("Label :",x[1])
     #show_tensor(x[0], 1)
-    
-    
+
+
     """
     # Fast Classified Dataset test
-    
+
     INPUT_DATA_DIR = "../Dataset/FDD/data/"
-    
+
     transformations = transforms.Compose(
         [transforms.Resize(IMAGE_SIZE), transforms.ToTensor(), transforms.Normalize([0.5], [0.5])])
     FDD = FastClassifiedDataset(INPUT_DATA_DIR, IMAGE_SIZE, IMAGE_SIZE, transformations)
 
     print(type(FDD), len(FDD))
     """
-    
+
     """
     # HSV test
     transformations = transforms.Compose(
@@ -303,61 +298,61 @@ if __name__ == "__main__":
     """"
     #DataNoise test
     nb_images = 100
-    
+
     images = []
     for i in range(nb_images):
         images.append(np.asarray(simpsonsDataset.__getitem__(i)[0].permute(1, 2, 0)))
     images = np.asarray(images)
     print(images.shape)
-    
-    
+
+
     bags = np.reshape(images,(-1,3))
     print("Bags shape :",bags.shape)
     print(bags[0])
-    
+
     from torchvision.utils import save_image
     import torch
-    
+
     batch_size= 4
     batch = []
     for i in range(batch_size):
         batch.append(np.asarray(simpsonsDataset.__getitem__(i)[0]))
     batch = torch.tensor(batch)
     print(batch.shape)
-    
+
     #print("Shape image :",real.shape)
     #save_image(real, "test.png", nrow=1, normalize=True)
-    
+
     taux = 0.1 # Part des pixels de i à remplacer
-    
+
     nb_pixels = int(batch_size*IMAGE_SIZE*IMAGE_SIZE * taux)
     print("Pixel bruiter par batch :",nb_pixels)
-    
+
     idx = np.random.permutation(np.arange(len(bags)))[:nb_pixels]
     print("Index du bruit dans bags:")
     print(idx.shape)
     #print(idx)
-    
+
     pixels = bags[idx]
     print("Pixels bruitées choisis")
     print(pixels.shape)
     #print(pixels)
-    
+
     nb = IMAGE_SIZE*IMAGE_SIZE
     nb_by_batch = batch_size*IMAGE_SIZE**2
     print("Pixels par images :",nb)
     print("Pixels par batch :",nb_by_batch)
-    
+
     # Construction
     mask = np.ones((nb_by_batch,3))
     print("Mask shape :",mask.shape)
     noise = np.zeros((nb_by_batch,3))
     print("Noise shape :",noise.shape)
-    
+
     # Random pixels idx
     pixels_idx = np.random.permutation(np.arange(batch_size*IMAGE_SIZE**2))[:nb_pixels]
     print("Pixels idx shape :",pixels_idx.shape)
-    
+
     # Remplissage
     mask[pixels_idx] = 0
     noise[pixels_idx] += pixels
@@ -365,23 +360,23 @@ if __name__ == "__main__":
     print(mask)
     print("noise")
     print(noise)
-     
+
     # Reshape (IMAGE_SIZE**2,3)=>(IMAGE_SIZE,IMAGE_SIZE,3) / Transpose (IMAGE_SIZE,IMAGE_SIZE,3)=>(3,IMAGE_SIZE,IMAGE_SIZE)
     mask = mask.reshape((batch_size,IMAGE_SIZE,IMAGE_SIZE,3)).transpose(0,-1,1,2)
     noise = noise.reshape((batch_size,IMAGE_SIZE,IMAGE_SIZE,3)).transpose(0,-1,1,2)
     print("Noise shape :",noise.shape)
     print("Mask shape :",mask.shape)
-    
+
     # Ajout dans l'image
     clear_image = batch * torch.tensor(mask).float()
     noised_image = clear_image + torch.tensor(noise).float()
-    
+
     print(batch[1][1])
-    
+
     print(clear_image[1][1])
-    
+
     print(noised_image[1][1])
-    
+
     save_image(noised_image, "test_fin.png", nrow=1, normalize=False)
-     
+
     #show_tensor(item[0],0)"""

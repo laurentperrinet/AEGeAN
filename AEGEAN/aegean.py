@@ -45,7 +45,7 @@ def learn(opt):
     cuda = True if torch.cuda.is_available() else False
 
     # Loss function
-    adversarial_loss = torch.nn.BCEWithLogitsLoss()
+    adversarial_loss = torch.nn.BCEWithLogitsLoss() # eq. 8 in https://arxiv.org/pdf/1701.00160.pdf
     MSE_loss = torch.nn.MSELoss()
     sigmoid = nn.Sigmoid()
 
@@ -101,8 +101,6 @@ def learn(opt):
 
         # Les runs sont sauvegardés dans un dossiers "runs" à la racine du projet, dans un sous dossiers opt.runs_path.
         os.makedirs(path_data1, exist_ok=True)
-
-    
         os.makedirs(path_data2, exist_ok=True)
         writer = SummaryWriter(log_dir=path_data2)
 
@@ -194,7 +192,11 @@ def learn(opt):
             # New discriminator descision, Since we just updated D
             d_g_z = discriminator(gen_imgs)
             # Loss measures generator's ability to fool the discriminator
-            g_loss = adversarial_loss(d_g_z, valid)
+            if opt.do_ian_loss:
+                # eq. 14 in https://arxiv.org/pdf/1701.00160.pdf
+                g_loss = d_g_z / (1 - d_g_z)
+            else:
+                g_loss = adversarial_loss(d_g_z, valid)
             # Backward
             g_loss.backward()
 

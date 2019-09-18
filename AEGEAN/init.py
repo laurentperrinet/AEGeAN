@@ -38,6 +38,7 @@ def init():
     parser.add_argument("-v", "--verbose", action="store_true",
                         help="Afficher des informations complémentaire.")
     parser.add_argument("--GPU", type=int, default=0, help="Identifiant du GPU à utiliser.")
+    parser.add_argument("--do_ian_loss", type=bool, default=True, help="Use the loss from Ian Goodfellow.")
     opt = parser.parse_args()
 
     # Dossier de sauvegarde
