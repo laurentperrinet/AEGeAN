@@ -23,11 +23,11 @@ def init():
     parser.add_argument("--channel1", type=int, default=128, help="size of the channel 1")
     parser.add_argument("--channel2", type=int, default=256, help="size of the channel 2")
     parser.add_argument("--channel3", type=int, default=512, help="size of the channel 3")
-    parser.add_argument("--latent_dim", type=int, default=32, help="dimensionality of the latent space")
+    parser.add_argument("--latent_dim", type=int, default=16, help="dimensionality of the latent space")
     parser.add_argument("-i", "--img_size", type=int, default=128, help="size of each image dimension")
     parser.add_argument("--channels", type=int, default=3, help="number of image channels")
     parser.add_argument("-s", "--sample_interval", type=int, default=2, help="interval between image sampling")
-    parser.add_argument("--N_samples", type=int, default=24, help="number of samples to generate each time")
+    parser.add_argument("--N_samples", type=int, default=49, help="number of samples to generate each time")
     parser.add_argument("--sample_path", type=str, default='images')
     parser.add_argument("-m", "--model_save_interval", type=int, default=5000,
                         help="interval between image sampling. If model_save_interval > n_epochs : no save")
