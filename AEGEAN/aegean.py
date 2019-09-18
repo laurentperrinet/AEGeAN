@@ -194,7 +194,7 @@ def learn(opt):
             # Loss measures generator's ability to fool the discriminator
             if opt.do_ian_loss:
                 # eq. 14 in https://arxiv.org/pdf/1701.00160.pdf
-                g_loss = torch.sum(d_g_z / (1. - d_g_z))
+                g_loss = - torch.sum(d_g_z / (1. - d_g_z))
             else:
                 g_loss = adversarial_loss(d_g_z, valid)
             # Backward
