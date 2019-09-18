@@ -1,4 +1,4 @@
-default: rsync
+default: meso_rsync
 
 clean_models:
 	rm */models/*.pt; rm */*/models/*.pt
@@ -8,3 +8,6 @@ pep8:
 
 maria_rsync:
 	rsync --progress -avhuz --exclude-from=ExclusionRSync  laurent@10.164.6.243:science/GAN-SDPC/GAN-SDPC/ .
+
+meso_rsync:
+	rsync --progress -avhuz --exclude-from=ExclusionRSync lperrinet@login.mesocentre.univ-amu.fr:/scratch/lperrinet/SDPC/GAN-SDPC/ .
