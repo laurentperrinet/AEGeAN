@@ -1,5 +1,8 @@
 default: meso_rsync
 
+load_modules:
+	module purge; module load userspace/all; module load python3/3.6.3
+	
 clean_models:
 	rm */models/*.pt; rm */*/models/*.pt
 
