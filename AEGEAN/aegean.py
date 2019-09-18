@@ -90,7 +90,7 @@ def learn(opt):
     # ----------
     start_epoch = 1
     if opt.load_model == True:
-        start_epoch = load_models(discriminator, optimizer_D, generator, optimizer_G, encoder, optimizer_E, opt.n_epochs, opt.model_save_path)
+        start_epoch = load_models(discriminator, optimizer_D, generator, optimizer_G, opt.n_epochs, opt.model_save_path, encoder, optimizer_E)
 
     # ----------
     #  Tensorboard
