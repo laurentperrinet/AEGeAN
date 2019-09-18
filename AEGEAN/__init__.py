@@ -1,4 +1,4 @@
-__version__ = '20190725'
+__version__ = '20190918'
 
 import sys
 sys.path.append("../AEGEAN/")
