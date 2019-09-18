@@ -10,7 +10,7 @@ try:
     do_tensorboard = True
 except: # ImportError:
     do_tensorboard = False
-    print("Impossible de charger Tensorboard, le module ne sera pas utilisé.\nVerifier l'orthographe.")
+    print("Impossible de charger Tensorboard, le module ne sera pas utilisé.\nVerifier l'instalation.")
 
 from torch.utils.data import DataLoader
 from torchvision import datasets

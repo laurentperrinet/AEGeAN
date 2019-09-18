@@ -248,7 +248,7 @@ class FastClassifiedDataset(Dataset):
         return len(self.files)
 
 
-INPUT_DATA_DIR = "../../cropped_clear/cp/"
+INPUT_DATA_DIR = "../cropped_clear/cp/"
 IMAGE_SIZE = 200
 OUTPUT_DIR = './{date:%Y-%m-%d_%H:%M:%S}/'.format(date=datetime.datetime.now())
 

@@ -31,7 +31,7 @@ def init():
     parser.add_argument("-m", "--model_save_interval", type=int, default=5000,
                         help="interval between image sampling. If model_save_interval > n_epochs : no save")
     parser.add_argument('--model_save_path', type=str, default='models')
-    parser.add_argument('--datapath', type=str, default='../../cropped_clear/cp/')
+    parser.add_argument('--datapath', type=str, default='../cropped_clear/cp/')
     parser.add_argument('--load_model', action="store_true",
                         help="Load model present in model_save_path/Last_*.pt, if present.")
     parser.add_argument("-v", "--verbose", action="store_true",

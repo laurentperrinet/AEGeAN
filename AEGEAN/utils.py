@@ -4,8 +4,6 @@ import torchvision
 from torchvision.utils import save_image
 from PIL import Image
 import matplotlib
-matplotlib.use('Agg')
-import matplotlib.pyplot as plt
 from glob import glob
 import datetime
 import numpy as np
@@ -308,7 +306,7 @@ if __name__ == "__main__":
     # generate_animation("W7_128_dcgan/gif/")
 
     # DataLoader test
-    loader, dataset = load_data("../../cropped_clear/cp/", 200, 6, Fast=True, rand_hflip=True,
+    loader, dataset = load_data("../cropped_clear/cp/", 200, 6, Fast=True, rand_hflip=True,
                                 rand_affine=[(-25, 25), (1.0, 1.0)], return_dataset=True, mode='RGB')
 
     for (imgs, _) in loader:
