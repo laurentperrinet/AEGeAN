@@ -45,7 +45,6 @@ def learn(opt):
     cuda = True if torch.cuda.is_available() else False
 
     # Loss function
-    sigmo = torch.nn.Sigmoid()
     adversarial_loss = torch.nn.BCEWithLogitsLoss() # eq. 8 in https://arxiv.org/pdf/1701.00160.pdf
     MSE_loss = torch.nn.MSELoss()
     sigmoid = nn.Sigmoid()
@@ -195,7 +194,7 @@ def learn(opt):
             # Loss measures generator's ability to fool the discriminator
             if opt.do_ian_loss:
                 # eq. 14 in https://arxiv.org/pdf/1701.00160.pdf
-                g_loss = - torch.sum(1 / (1. - 1/sigmo(d_g_z)))
+                g_loss = - torch.sum(1 / (1. - 1/sigmoid(d_g_z)))
             else:
                 g_loss = adversarial_loss(d_g_z, valid)
             # Backward

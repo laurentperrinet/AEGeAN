@@ -1,7 +1,7 @@
 import os
 import AEGEAN as AG
 
-tag = 'test_'
+tag = 'test_64'
 
 # VANILLA
 opt = AG.init()
