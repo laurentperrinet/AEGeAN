@@ -7,7 +7,7 @@ DEBUG = 4
 def init():
     parser = argparse.ArgumentParser()
     parser.add_argument("--runs_path", type=str, default='vanilla',
-                        help="Dossier de stockage des résultats pour Tensorboard sous la forme : Experience_names/parameters/")
+                        help="folder to save samples data and statistics")
     parser.add_argument("--n_epochs", type=int, default=32//DEBUG, help="number of epochs of training")
     parser.add_argument("--batch_size", type=int, default=64, help="size of the batches")
     parser.add_argument("--lrE", type=float, default=0.00015*DEBUG, help="adam: learning rate for E")
@@ -31,7 +31,6 @@ def init():
     parser.add_argument("--channels", type=int, default=3, help="number of input image channels")
     parser.add_argument("--sample_interval", type=int, default=1, help="interval in epochs between image sampling")
     parser.add_argument("--N_samples", type=int, default=49, help="number of samples to generate each time")
-    parser.add_argument("--sample_path", type=str, default='images', help="folder to save samples")
     parser.add_argument("--model_save_interval", type=int, default=5000,
                         help="interval between image sampling. If model_save_interval > n_epochs : no save")
     parser.add_argument('--model_save_path', type=str, default='models')

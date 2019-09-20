@@ -237,11 +237,10 @@ def learn(opt):
             # Save samples
             if epoch % opt.sample_interval == 0:
                 tensorboard_sampling(fixed_noise, generator, writer, epoch)
-        else:
-            # Save samples opt.sample_path
-            if epoch % opt.sample_interval == 0:
-                sampling(fixed_noise, generator, path_data, epoch, tag)
-                do_plot(hist, start_epoch, epoch, E_losses=True)
+
+        if epoch % opt.sample_interval == 0:
+            sampling(fixed_noise, generator, path_data, epoch, tag)
+            do_plot(hist, start_epoch, epoch, E_losses=True)
 
         # Save models
         if epoch % opt.model_save_interval == 0:
