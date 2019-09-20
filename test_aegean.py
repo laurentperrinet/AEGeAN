@@ -107,6 +107,37 @@ opt.runs_path = tag + 'high_D_noise'
 opt.D_noise = 0.5
 AG.learn(opt)
 
+
+opt = AG.init()
+opt.runs_path = tag + 'low_batch_size'
+opt.batch_size //= 2
+AG.learn(opt)
+
+opt = AG.init()
+opt.runs_path = tag + 'high_batch_size'
+opt.batch_size *= 2
+AG.learn(opt)
+
+opt = AG.init()
+opt.runs_path = tag + 'low_adam_b1'
+opt.b1 = 0.3
+AG.learn(opt)
+
+opt = AG.init()
+opt.runs_path = tag + 'low_adam_b2'
+opt.b2 = 0.8
+AG.learn(opt)
+
+opt = AG.init()
+opt.runs_path = tag + 'high_adam_b1'
+opt.b1 = 0.999
+AG.learn(opt)
+
+opt = AG.init()
+opt.runs_path = tag + 'high_adam_b2'
+opt.b2 = 0.999
+AG.learn(opt)
+
 opt = AG.init()
 opt.runs_path = tag + 'no_affine'
 opt.rand_affine = 0.

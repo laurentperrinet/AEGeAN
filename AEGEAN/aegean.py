@@ -136,7 +136,9 @@ def learn(opt):
             # DONE add a loss for the distance between of z values
             z_zeros = Variable(Tensor(z_imgs.size(0), z_imgs.size(1)).fill_(0), requires_grad=False)
             z_ones = Variable(Tensor(z_imgs.size(0), z_imgs.size(1)).fill_(1), requires_grad=False)
-            e_loss = MSE_loss(real_imgs, decoded_imgs) + MSE_loss(z_imgs, z_zeros) + MSE_loss(z_imgs.pow(2), z_ones).pow(.5)
+            e_loss = MSE_loss(real_imgs, decoded_imgs)
+            e_loss += opt.lambdaE*MSE_loss(z_imgs, z_zeros)
+            e_loss += opt.lambdaE*MSE_loss(z_imgs.pow(2), z_ones).pow(.5)
 
             # Backward
             e_loss.backward()
