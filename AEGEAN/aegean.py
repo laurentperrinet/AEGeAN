@@ -71,9 +71,10 @@ def learn(opt):
         MSE_loss.cuda()
 
     # Initialize weights
-    generator.apply(weights_init_normal)
-    discriminator.apply(weights_init_normal)
-    encoder.apply(weights_init_normal)
+    if opt.init_weight:
+        generator.apply(weights_init_normal)
+        discriminator.apply(weights_init_normal)
+        encoder.apply(weights_init_normal)
 
     # Configure data loader
     dataloader = load_data(opt.datapath, opt.img_size, opt.batch_size, rand_hflip=True)
