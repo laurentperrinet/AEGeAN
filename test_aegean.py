@@ -7,7 +7,7 @@ import AEGEAN as AG
 opt = AG.init()
 tag = f'{HOST}_{opt.img_size}_'
 
-# 
+#
 # for G_loss in ['wasserstein', 'ian', 'alternative', 'original']:
 #     opt = AG.init()
 #     opt.runs_path = tag + 'G_loss_' + G_loss
@@ -30,38 +30,38 @@ tag = f'{HOST}_{opt.img_size}_'
 # opt.latent_dim, opt.runs_path = 54, tag + 'large_latent'
 # AG.learn(opt)
 
-
-opt = AG.init()
-opt.runs_path = tag + 'small_channel0'
-opt.channel0 //= 2
-AG.learn(opt)
-
-opt = AG.init()
-opt.runs_path = tag + 'big_channel0'
-opt.channel0 *= 2
-AG.learn(opt)
-
-opt = AG.init()
-opt.runs_path = tag + 'small_channel1'
-opt.channel1 //= 2
-AG.learn(opt)
-
-opt = AG.init()
-opt.runs_path = tag + 'big_channel1'
-opt.channel1 *= 2
-AG.learn(opt)
-
-opt = AG.init()
-opt.runs_path = tag + 'small_channel2'
-opt.channel2 //= 2
-AG.learn(opt)
-
-opt = AG.init()
-opt.runs_path = tag + 'big_channel2'
-opt.channel2 *= 2
-AG.learn(opt)
-
-
+#
+# opt = AG.init()
+# opt.runs_path = tag + 'small_channel0'
+# opt.channel0 //= 2
+# AG.learn(opt)
+#
+# opt = AG.init()
+# opt.runs_path = tag + 'big_channel0'
+# opt.channel0 *= 2
+# AG.learn(opt)
+#
+# opt = AG.init()
+# opt.runs_path = tag + 'small_channel1'
+# opt.channel1 //= 2
+# AG.learn(opt)
+#
+# opt = AG.init()
+# opt.runs_path = tag + 'big_channel1'
+# opt.channel1 *= 2
+# AG.learn(opt)
+#
+# opt = AG.init()
+# opt.runs_path = tag + 'small_channel2'
+# opt.channel2 //= 2
+# AG.learn(opt)
+#
+# opt = AG.init()
+# opt.runs_path = tag + 'big_channel2'
+# opt.channel2 *= 2
+# AG.learn(opt)
+#
+#
 
 opt = AG.init()
 opt.runs_path = tag + 'D_noise'
