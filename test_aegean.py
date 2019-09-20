@@ -7,21 +7,6 @@ import AEGEAN as AG
 opt = AG.init()
 tag = f'{HOST}_{opt.img_size}_'
 
-opt = AG.init()
-opt.runs_path = tag + 'do_whitening'
-opt.do_whitening = True
-AG.learn(opt)
-
-
-# what's the effect of a smaller latent_dim ?
-opt = AG.init()
-opt.latent_dim, opt.runs_path = 4, tag + 'small_latent'
-AG.learn(opt)
-
-# what's the effect of a smaller latent_dim ?
-opt = AG.init()
-opt.latent_dim, opt.runs_path = 54, tag + 'large_latent'
-AG.learn(opt)
 
 for G_loss in ['original', 'wasserstein', 'ian', 'alternative', 'alternativ2']:
     opt = AG.init()
@@ -36,6 +21,21 @@ for G_loss in ['original', 'wasserstein', 'ian', 'alternative', 'alternativ2']:
     opt.runs_path += '_no_bn'
     opt.bn_eps = np.inf
     AG.learn(opt)
+
+opt = AG.init()
+opt.runs_path = tag + 'do_whitening'
+opt.do_whitening = True
+AG.learn(opt)
+
+# what's the effect of a smaller latent_dim ?
+opt = AG.init()
+opt.latent_dim, opt.runs_path = 4, tag + 'small_latent'
+AG.learn(opt)
+
+# what's the effect of a smaller latent_dim ?
+opt = AG.init()
+opt.latent_dim, opt.runs_path = 54, tag + 'large_latent'
+AG.learn(opt)
 
 opt = AG.init()
 opt.runs_path = tag + 'small_lrE'
@@ -96,8 +96,6 @@ opt = AG.init()
 opt.runs_path = tag + 'big_channel2'
 opt.channel2 *= 2
 AG.learn(opt)
-
-
 
 opt = AG.init()
 opt.runs_path = tag + 'low_D_noise'
