@@ -1,8 +1,8 @@
 import os
 import argparse
 
-DEBUG = 1
 DEBUG = 4
+DEBUG = 1
 
 def init():
     parser = argparse.ArgumentParser()

@@ -240,6 +240,7 @@ def learn(opt):
             # Save samples
             if epoch % opt.sample_interval == 0:
                 tensorboard_sampling(fixed_noise, generator, writer, epoch)
+                tensorboard_AE_comparator(real_imgs[:opt.N_samples], generator, encoder, writer, epoch)
 
         if epoch % opt.sample_interval == 0:
             sampling(fixed_noise, generator, path_data, epoch, tag)
