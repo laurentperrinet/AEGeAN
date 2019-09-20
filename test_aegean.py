@@ -29,7 +29,43 @@ for G_loss in ['original', 'wasserstein', 'ian', 'alternative', 'alternativ2']:
     opt.G_loss = G_loss
     AG.learn(opt)
 
+for G_loss in ['original', 'wasserstein', 'ian', 'alternative', 'alternativ2']:
+    opt = AG.init()
+    opt.runs_path = tag + 'G_loss_' + G_loss
+    opt.G_loss = G_loss
+    opt.runs_path += '_no_bn'
+    opt.bn_eps = np.inf
+    AG.learn(opt)
 
+opt = AG.init()
+opt.runs_path = tag + 'small_lrE'
+opt.lrE /= 2
+AG.learn(opt)
+
+opt = AG.init()
+opt.runs_path = tag + 'big_lrE'
+opt.lrE *= 2
+AG.learn(opt)
+
+opt = AG.init()
+opt.runs_path = tag + 'small_lrG'
+opt.lrG /= 2
+AG.learn(opt)
+
+opt = AG.init()
+opt.runs_path = tag + 'big_lrG'
+opt.lrG *= 2
+AG.learn(opt)
+opt = AG.init()
+
+opt.runs_path = tag + 'small_lrD'
+opt.lrG /= 2
+AG.learn(opt)
+
+opt = AG.init()
+opt.runs_path = tag + 'big_lrD'
+opt.lrG *= 2
+AG.learn(opt)
 
 opt = AG.init()
 opt.runs_path = tag + 'small_channel0'
@@ -64,7 +100,12 @@ AG.learn(opt)
 
 
 opt = AG.init()
-opt.runs_path = tag + 'D_noise'
+opt.runs_path = tag + 'low_D_noise'
+opt.D_noise = 0.05
+AG.learn(opt)
+
+opt = AG.init()
+opt.runs_path = tag + 'high_D_noise'
 opt.D_noise = 0.5
 AG.learn(opt)
 

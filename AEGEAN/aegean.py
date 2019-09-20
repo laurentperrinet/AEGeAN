@@ -31,6 +31,7 @@ from .plot import *
 from .models import *
 
 def learn(opt):
+    print('Starting ', opt.runs_path)
 
     # Create a time tag
     try:
