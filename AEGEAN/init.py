@@ -14,6 +14,7 @@ def init():
     parser.add_argument("--lrD", type=float, default=0.00005*DEBUG, help="adam: learning rate for D")
     parser.add_argument("--lrG", type=float, default=0.00025*DEBUG, help="adam: learning rate for G")
     parser.add_argument("--do_ian_loss", type=bool, default=True, help="Use the loss from Ian Goodfellow.")
+    parser.add_argument("--do_whitening", type=bool, default=True, help="Use contrasted images.")
     parser.add_argument("--bn_eps", type=float, default=.5, help="batchnorm: espilon for numerical stability")
     parser.add_argument("--bn_momentum", type=float, default=.1, help="batchnorm: momentum for numerical stability")
     parser.add_argument("--b1", type=float, default=0.5, help="adam: decay of first order momentum of gradient")
@@ -37,7 +38,7 @@ def init():
     parser.add_argument('--datapath', type=str, default='../cropped_clear/cp/')
     parser.add_argument('--load_model', action="store_true",
                         help="Load model present in model_save_path/Last_*.pt, if present.")
-    parser.add_argument("--verbose", action="store_true", help="Displays more verbose output.")
+    parser.add_argument("--verbose", type=bool, default=False, help="Displays more verbose output.")
     parser.add_argument("--GPU", type=int, default=0, help="Identifiant du GPU à utiliser.")
     opt = parser.parse_args()
 

@@ -15,6 +15,25 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch
 
+# see research/UniStellar/AlignAndStack/2019-06-27-B1c_linear_inverter-decorrelation.ipynb
+from torch.nn.functional import conv2d
+KW = torch.zeros(size=(1, 1, 3, 3))
+KW[0, 0, :, 0] = torch.Tensor([0, -1, 0])
+KW[0, 0, :, 1] = torch.Tensor([-1, 4, -1])
+KW[0, 0, :, 2] = torch.Tensor([0, -1, 0])
+# KW = KW * torch.ones(1, 3, 1, 1)
+KW = KW * torch.eye(3).view(3, 3, 1, 1)
+KW /= np.sqrt(4. * 3)
+Kinv = torch.zeros((1, 1, 3, 3))
+Kinv[0, 0, :, 0] = torch.Tensor([.75, 1.5, .75])
+Kinv[0, 0, :, 1] = torch.Tensor([1.5, 4.5, 1.5])
+Kinv[0, 0, :, 2] = torch.Tensor([.75, 1.5, .75])
+# Kinv = Kinv * torch.ones(1, 3, 1, 1)
+Kinv = Kinv * torch.eye(3).view(3, 3, 1, 1)
+Kinv /= np.sqrt(4. * 3)
+# print(conv2d(KW, Kinv, padding=1))
+# print(conv2d(Kinv, KW, padding=1))
+# print(KW, Kinv, conv2d(KW, Kinv, padding=1), conv2d(Kinv, KW, padding=1))
 
 class Encoder(nn.Module):
     def __init__(self, opt):
@@ -48,6 +67,12 @@ class Encoder(nn.Module):
     def forward(self, img):
         if self.opt.verbose: print("Encoder")
         if self.opt.verbose: print("Image shape : ",img.shape)
+        out = img #.copy()
+        if self.opt.do_whitening:
+            # for i in range(self.opt.channels):
+            #     out[:, i, :, :] = conv2d(out[:, i, :, :], KW, padding=1)
+            out = conv2d(out, KW, padding=1)
+        if self.opt.verbose: print("WImage shape : ",out.shape)
         out = self.conv1(img)
         if self.opt.verbose: print("Conv1 out : ",out.shape)
         out = self.conv2(out)
@@ -118,6 +143,9 @@ class Generator(nn.Module):
         # Dim : (opt.chanels, opt.img_size, opt.img_size)
         if self.opt.verbose: print("img out : ", img.shape)
 
+        if self.opt.do_whitening:
+            img = conv2d(img, Kinv, padding=1)
+
         return img
 
     def _name(self):
@@ -155,32 +183,35 @@ class Discriminator(nn.Module):
             print("D")
             print("Image shape : ",img.shape)
             # Dim : (opt.chanels, opt.img_size, opt.img_size)
-        out = self.conv1(img)
+        out = img
+        if self.opt.do_whitening:
+            out = conv2d(out, KW, padding=1)
 
+        out = self.conv1(img)
         if self.opt.verbose:
             print("Conv1 out : ",out.shape)
-        out = self.conv2(out)
 
+        out = self.conv2(out)
         if self.opt.verbose:
             print("Conv2 out : ",out.shape)
-        out = self.conv3(out)
 
+        out = self.conv3(out)
         if self.opt.verbose:
             print("Conv3 out : ",out.shape)
-        out = self.conv4(out)
 
+        out = self.conv4(out)
         if self.opt.verbose:
             print("Conv4 out : ",out.shape)
-        out = out.view(out.shape[0], -1)
 
+        out = out.view(out.shape[0], -1)
         if self.opt.verbose:
             print("View out : ",out.shape)
-        validity = self.adv_layer(out)
 
+        validity = self.adv_layer(out)
         if self.opt.verbose:
             print("Val out : ",validity.shape)
             # Dim : (1)
-        
+
         return validity
 
     def _name(self):
