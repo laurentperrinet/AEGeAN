@@ -108,7 +108,7 @@ class Generator(nn.Module):
         def generator_block(in_filters, out_filters, bn=True):
             block = [nn.UpsamplingNearest2d(scale_factor=opts_conv['stride']),
                      nn.Conv2d(in_filters, out_filters, kernel_size=opts_conv['kernel_size'], stride=1, padding=opts_conv['padding'], padding_mode=opts_conv['padding_mode']),
-                     #nn.BatchNorm2d(out_filters, eps=opt.bn_eps, momentum=opt.bn_momentum), 
+                     #nn.BatchNorm2d(out_filters, eps=opt.bn_eps, momentum=opt.bn_momentum),
                      NL]
             if bn and (not opt.bn_eps==np.inf):
                 block.append(nn.BatchNorm2d(out_filters, eps=opt.bn_eps, momentum=opt.bn_momentum))
@@ -191,7 +191,7 @@ class Discriminator(nn.Module):
             print("D")
             print("Image shape : ",img.shape)
             # Dim : (opt.chanels, opt.img_size, opt.img_size)
-        out = img
+        out = img + self.opt.D_noise * torch.randn(img.shape)
         if self.opt.do_whitening:
             out = conv2d(out, KW, padding=1)
 

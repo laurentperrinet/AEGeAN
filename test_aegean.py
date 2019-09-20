@@ -9,6 +9,11 @@ tag = f'{HOST}_{opt.img_size}_'
 
 
 opt = AG.init()
+opt.runs_path = tag + 'D_noise'
+opt.D_noise = 0.5
+AG.learn(opt)
+
+opt = AG.init()
 opt.runs_path = tag + 'no_bn'
 opt.bn_eps = np.inf
 AG.learn(opt)
