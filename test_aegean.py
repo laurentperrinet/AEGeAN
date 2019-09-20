@@ -1,7 +1,7 @@
 import os
 import AEGEAN as AG
 
-tag = 'test_64'
+tag = 'ada_64_'
 
 # VANILLA
 opt = AG.init()
@@ -17,6 +17,11 @@ AG.learn(opt)
 # what's the effect of a smaller latent_dim ?
 opt = AG.init()
 opt.latent_dim, opt.runs_path = 54, tag + 'large_latent'
+AG.learn(opt)
+
+opt = AG.init()
+opt.runs_path = tag + 'relu'
+opt.lrelu = 0.
 AG.learn(opt)
 
 opt = AG.init()

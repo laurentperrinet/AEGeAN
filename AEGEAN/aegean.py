@@ -33,14 +33,14 @@ from .models import *
 
 def learn(opt):
 
-    # Gestion du time tag
+    # Create a time tag
     try:
         tag = datetime.datetime.now().isoformat(sep='_', timespec='seconds')
     except TypeError:
         # Python 3.5 and below
         # 'timespec' is an invalid keyword argument for this function
         tag = datetime.datetime.now().replace(microsecond=0).isoformat(sep='_')
-    tag = tag.replace(':','.')
+    tag = tag.replace(':','-')
 
     cuda = True if torch.cuda.is_available() else False
 
@@ -92,17 +92,15 @@ def learn(opt):
     if opt.load_model == True:
         start_epoch = load_models(discriminator, optimizer_D, generator, optimizer_G, opt.n_epochs, opt.model_save_path, encoder, optimizer_E)
 
+    path_data = os.path.join("./runs", opt.runs_path + '_' + tag)
     # ----------
     #  Tensorboard
     # ----------
     if do_tensorboard:
-        path_data1 = os.path.join("./runs", opt.runs_path)
-        path_data2 = os.path.join("./runs", opt.runs_path + '_' + tag[:-1])
 
         # Les runs sont sauvegardés dans un dossiers "runs" à la racine du projet, dans un sous dossiers opt.runs_path.
-        os.makedirs(path_data1, exist_ok=True)
-        os.makedirs(path_data2, exist_ok=True)
-        writer = SummaryWriter(log_dir=path_data2)
+        os.makedirs(path_data, exist_ok=True)
+        writer = SummaryWriter(log_dir=path_data)
 
     # ----------
     #  Training
@@ -242,7 +240,7 @@ def learn(opt):
         else:
             # Save samples opt.sample_path
             if epoch % opt.sample_interval == 0:
-                sampling(fixed_noise, generator, path_data1, epoch, tag)
+                sampling(fixed_noise, generator, path_data, epoch, tag)
                 do_plot(hist, start_epoch, epoch, E_losses=True)
 
         # Save models

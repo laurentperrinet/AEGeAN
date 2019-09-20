@@ -22,7 +22,8 @@ class Encoder(nn.Module):
 
         self.opt = opt
         NL = nn.LeakyReLU(opt.lrelu, inplace=True)
-        opts_conv = dict(kernel_size=opt.kernel_size, stride=opt.stride, padding=opt.padding, padding_mode='zeros')
+        opts_conv = dict(kernel_size=opt.kernel_size, stride=opt.stride,
+                         padding=opt.padding, padding_mode='zeros')
         self.channels = [opt.channel0, opt.channel1, opt.channel2, opt.channel3]
 
 
@@ -64,11 +65,15 @@ class Encoder(nn.Module):
 
         return z
 
+    def _name(self):
+        return "Encoder"
+
 class Generator(nn.Module):
     def __init__(self, opt):
         super(Generator, self).__init__()
         NL = nn.LeakyReLU(opt.lrelu, inplace=True)
-        opts_conv = dict(kernel_size=opt.kernel_size, stride=opt.stride, padding=opt.padding, padding_mode='zeros')
+        opts_conv = dict(kernel_size=opt.kernel_size, stride=opt.stride,
+                         padding=opt.padding, padding_mode='zeros')
         self.channels = [opt.channel0, opt.channel1, opt.channel2, opt.channel3]
 
 
@@ -122,7 +127,8 @@ class Discriminator(nn.Module):
     def __init__(self, opt):
         super(Discriminator, self).__init__()
         NL = nn.LeakyReLU(opt.lrelu, inplace=True)
-        opts_conv = dict(kernel_size=opt.kernel_size, stride=opt.stride, padding=opt.padding, padding_mode='zeros')
+        opts_conv = dict(kernel_size=opt.kernel_size, stride=opt.stride,
+                         padding=opt.padding, padding_mode='zeros')
         self.channels = [opt.channel0, opt.channel1, opt.channel2, opt.channel3]
 
 
@@ -148,34 +154,33 @@ class Discriminator(nn.Module):
         if self.opt.verbose:
             print("D")
             print("Image shape : ",img.shape)
-            out = self.conv1(img)
-            print("Conv1 out : ",out.shape)
-            out = self.conv2(out)
-            print("Conv2 out : ",out.shape)
-            out = self.conv3(out)
-            print("Conv3 out : ",out.shape)
-            out = self.conv4(out)
-            print("Conv4 out : ",out.shape)
-
-            out = out.view(out.shape[0], -1)
-            print("View out : ",out.shape)
-            validity = self.adv_layer(out)
-            print("Val out : ",validity.shape)
-        else:
             # Dim : (opt.chanels, opt.img_size, opt.img_size)
-            out = self.conv1(img)
-            # Dim : (self.channels[3]/8, opt.img_size/2, opt.img_size/2)
-            out = self.conv2(out)
-            # Dim : (self.channels[3]/4, opt.img_size/4, opt.img_size/4)
-            out = self.conv3(out)
-            # Dim : (self.channels[3]/2, opt.img_size/4, opt.img_size/4)
-            out = self.conv4(out)
-            # Dim : (self.channels[3], opt.img_size/8, opt.img_size/8)
+        out = self.conv1(img)
 
-            out = out.view(out.shape[0], -1)
-            validity = self.adv_layer(out)
+        if self.opt.verbose:
+            print("Conv1 out : ",out.shape)
+        out = self.conv2(out)
+
+        if self.opt.verbose:
+            print("Conv2 out : ",out.shape)
+        out = self.conv3(out)
+
+        if self.opt.verbose:
+            print("Conv3 out : ",out.shape)
+        out = self.conv4(out)
+
+        if self.opt.verbose:
+            print("Conv4 out : ",out.shape)
+        out = out.view(out.shape[0], -1)
+
+        if self.opt.verbose:
+            print("View out : ",out.shape)
+        validity = self.adv_layer(out)
+
+        if self.opt.verbose:
+            print("Val out : ",validity.shape)
             # Dim : (1)
-
+        
         return validity
 
     def _name(self):

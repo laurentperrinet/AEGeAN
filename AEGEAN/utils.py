@@ -4,6 +4,8 @@ import torchvision
 from torchvision.utils import save_image
 from PIL import Image
 import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
 from glob import glob
 import datetime
 import numpy as np
@@ -13,11 +15,7 @@ import time
 from itertools import product
 import os
 
-import sys
-sys.path.append("../")  # ../../GAN-SDPC/
-
 from .SimpsonsDataset import *
-
 
 def weights_init_normal(m, factor=1.0):
     classname = m.__class__.__name__
@@ -84,7 +82,7 @@ def load_model(model, optimizer, path):
     checkpoint = torch.load(path)
 
     model.load_state_dict(checkpoint['model_state_dict'])
-
+    
     if optimizer is not None:
         optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
 
@@ -94,24 +92,25 @@ def load_model(model, optimizer, path):
 def load_models(discriminator, optimizer_D, generator, optimizer_G, n_epochs, model_save_path, encoder=None, optimizer_E=None):
     start_epochD = load_model(discriminator, optimizer_D, model_save_path + "/last_D.pt")
     start_epochG = load_model(generator, optimizer_G, model_save_path + "/last_G.pt")
-
+    
     if encoder is not None:
         start_epochE = load_model(encoder, optimizer_E, model_save_path + "/last_E.pt")
-
+        
     if start_epochG is not start_epochD:
-        print("Error : G trained different times of D  !!")
+        print("Something seems wrong : epochs used to train G and D are different !!")
         #exit(0)
     start_epoch = start_epochD
-    if start_epoch >= n_epochs:
-        print("Error : Nombre d'epochs demander inférieur au nombre d'epochs déjà effectuer !!")
-        #exit(0)
+    #if start_epoch >= n_epochs:
+    #    print("Something seems wrong : you epochs demander inférieur au nombre d'epochs déjà effectuer !!")
+    #    #exit(0)
 
-    return start_epoch + 1  # La dernière epoch est déjà faite
+    return start_epoch + 1  # Last epoch already done
 
 def sampling(noise, generator, path, epoch, tag='', nrow=5):
     """
-    Utilise generator et noise pour générer une images sauvegarder à path/epoch.png
-    Le sample est efféctuer en mode eval pour generator puis il est de nouveau régler en mode train.
+    Use generator model and noise vector to generate images.
+    Save them to path/epoch.png
+
     """
     generator.eval()
     gen_imgs = generator(noise)
@@ -119,9 +118,10 @@ def sampling(noise, generator, path, epoch, tag='', nrow=5):
     generator.train()
 
 
-def tensorboard_sampling(noise, generator, writer, epoch, nrow=8, image_type='Images générer'):
+def tensorboard_sampling(noise, generator, writer, epoch, nrow=8, image_type='Generated images'):
     """
-    Sauvegarde des images générer par generator dans writer pour les visualiser avec tensorboard
+    Use generator model and noise vector to generate images.
+    Save them to tensorboard
     """
     generator.eval()
     gen_imgs = generator(noise)
@@ -131,46 +131,35 @@ def tensorboard_sampling(noise, generator, writer, epoch, nrow=8, image_type='Im
 
 def tensorboard_AE_comparator(imgs, generator, encoder, writer, epoch):
     """
-    Sauvegarde dans tensorboard une imgs (image du dataset) sous forme normale et après encodage et décodage.
+    Use auto-encoder model and original images to generate images.
+    Save them to tensorboard
+
     """
+    grid_imgs = torchvision.utils.make_grid(imgs, normalize=True)
+    writer.add_image('Images/original', grid_imgs, epoch)
+
     generator.eval()
     encoder.eval()
-
     enc_imgs = encoder(imgs)
     dec_imgs = generator(enc_imgs)
-
-    grid_imgs = torchvision.utils.make_grid(imgs, normalize=True)
     grid_dec = torchvision.utils.make_grid(dec_imgs, normalize=True)
-    writer.add_image('Images dataset', grid_imgs, epoch)
-    writer.add_image('Images encoder puis décoder', grid_dec, epoch)
-
+    writer.add_image('Images/auto-encoded', grid_dec, epoch)
     generator.train()
     encoder.train()
 
 def tensorboard_LSD_comparator(imgs, vectors, generator, writer, epoch):
     """
-    Sauvegarde dans tensorboard une imgs (image du dataset) sous forme normale et une après generator(vectors).
+    Use auto-encoder model and noise vector to generate images.
+    Save them to tensorboard
+
     """
+    writer.add_image('Images/original', grid_imgs, epoch)
+
     generator.eval()
-
     g_v = generator(vectors)
-
     grid_imgs = torchvision.utils.make_grid(imgs, normalize=True)
     grid_g_v = torchvision.utils.make_grid(g_v, normalize=True)
-    writer.add_image('Images dataset', grid_imgs, epoch)
-    writer.add_image('Images Generator(Vectors)', grid_g_v, epoch)
-
-    generator.train()
-
-def tensorboard_conditional_sampling(noise, label, generator, writer, epoch):
-    """
-    Sauvegarde des images générer par generator dans writer pour les visualiser avec tensorboard
-    Le générateur doit être de type conditionnel et utilise les labels.
-    """
-    generator.eval()
-    gen_imgs = generator(noise, label)
-    grid = torchvision.utils.make_grid(gen_imgs, normalize=True)
-    writer.add_image('Images générer', grid, epoch)
+    writer.add_image('Images/generated', grid_g_v, epoch)
     generator.train()
 
 
@@ -192,22 +181,15 @@ def print_network(net):
     print()
 
 
-def comp(s):
-    s = s.split("/")[-1]  # Nom du fichier
-    num = s.split(".")[0]  # Numéro dans le nom du fichier
-
-    return int(num)
-
 def generate_animation(path, fps=1):
     import imageio
     images_path = glob(path + '[0-9]*.png')
-
     images_path = sorted(images_path, key=comp)
-
     images = []
     for i in images_path:
         #print(i)
         images.append(imageio.imread(i))
+
     imageio.mimsave(path + 'training.gif', images, fps=fps)
 
 def scan(exp_name, params, permutation=True, gpu_repart=False):
@@ -233,7 +215,7 @@ def scan(exp_name, params, permutation=True, gpu_repart=False):
     else:
         perm = list(zip(*val_tab))
     #print(perm)
-
+    
     # Construction du noms de chaque test en fonction des paramètre qui la compose
     names = list()
     for values in perm:
@@ -254,7 +236,7 @@ def scan(exp_name, params, permutation=True, gpu_repart=False):
         print(com)
         commandes.append(com)
     print("Nombre de commande à lancer :", len(commandes))
-
+    
     # Demande de validation
     print("Valider ? (Y/N)")
     reponse = input()
@@ -263,32 +245,13 @@ def scan(exp_name, params, permutation=True, gpu_repart=False):
         print("Annulation !")
         exit(0)
 
-    """# Répartition sur plusieurs GPU
-    if torch.cuda.is_available():
-        nb_gpu = torch.cuda.device_count()
-        if nb_gpu > 1 and gpu_repart:
-            print("Répartition des commandes entre les GPUs : ")
-            rep_commandes = list()
-            count_gpu = 0
-            stock = ""
-            for com in commandes:
-                stock = stock + com+" --GPU "+str(count_gpu)+" & "
-                count_gpu = count_gpu+1
-                if count_gpu == nb_gpu:
-                    rep_commandes.append(stock[:-3])
-                    print(stock[:-3])
-                    stock = ""
-                    count_gpu = 0
-            commandes = rep_commandes
-    p = input()"""
-
     # Appelle successif des script avec différents paramètres
     log = list()
     for com in commandes:
         print("Lancement de : ",com)
         ret = os.system(com)
         log.append(ret)
-
+        
     # Récapitulatif
     for idx,com in enumerate(commandes):
         print("Code retour : ",log[idx],"\t| Commandes ", com)
