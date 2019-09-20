@@ -26,7 +26,6 @@ import matplotlib.pyplot as plt
 import time
 import datetime
 
-from .SimpsonsDataset import SimpsonsDataset, FastSimpsonsDataset
 from .utils import *
 from .plot import *
 from .models import *
@@ -166,7 +165,7 @@ def learn(opt):
             d_x = discriminator(real_imgs)
             # Measure discriminator's ability to classify real from generated samples
             if opt.G_loss == 'wasserstein':
-                real_loss = - torch.sum(d_g_z)
+                real_loss = torch.mean(torch.abs(valid_smooth - sigmoid(d_x)))
             else:
                 real_loss = adversarial_loss(d_x, valid_smooth)
             # Backward
@@ -176,7 +175,10 @@ def learn(opt):
             # Discriminator decision
             d_g_z = discriminator(gen_imgs.detach())
             # Measure discriminator's ability to classify real from generated samples
-            fake_loss = adversarial_loss(d_g_z, fake)
+            if opt.G_loss == 'wasserstein':
+                fake_loss = torch.mean(sigmoid(d_g_z))
+            else:
+                fake_loss = adversarial_loss(d_g_z, fake)
             # Backward
             fake_loss.backward()
 
@@ -197,7 +199,7 @@ def learn(opt):
                 # eq. 14 in https://arxiv.org/pdf/1701.00160.pdf
                 g_loss = - torch.sum(1 / (1. - 1/sigmoid(d_g_z)))
             elif opt.G_loss == 'wasserstein':
-                g_loss = - torch.sum(d_g_z)
+                g_loss = torch.mean(torch.abs(valid - sigmoid(d_g_z)))
             elif opt.G_loss == 'alternative':
                 # https://www.inference.vc/an-alternative-update-rule-for-generative-adversarial-networks/
                 g_loss = - adversarial_loss(1-d_g_z, valid)

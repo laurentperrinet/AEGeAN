@@ -36,17 +36,19 @@ def weights_init_normal(m, factor=1.0):
         m.bias.data.zero_()
 
 
-def load_data(path, img_size, batch_size, Fast=True, FDD=False, rand_hflip=False, rand_affine=None, return_dataset=False, mode='RGB'):
+def load_data(path, img_size, batch_size, Fast=True, FDD=False, rand_hflip=False, rand_affine=None, return_dataset=False, mode='RGB', mean=0, std=1):
     print("Loading data...")
     t_total = time.time()
 
-    # Transformation appliquer pendant l'entraînement
+    # Sequence of transformations
     transform_tmp = []
     if rand_hflip:
         transform_tmp.append(transforms.RandomHorizontalFlip(p=0.5))
     if rand_affine != None:
-        transform_tmp.append(transforms.RandomAffine(degrees=rand_affine[0], scale=rand_affine[1]))
-    transform_tmp = transform_tmp + [transforms.ToTensor(), transforms.Normalize([0.5, 0.5, 0.5], [0.5, 0.5, 0.5])]
+        transform_tmp.append(transforms.RandomAffine(degrees=rand_affine))
+    transform_tmp.append(transforms.ToTensor())
+    transform_tmp.append(transforms.Normalize([mean]*3, [std]*3))
+    
     transform = transforms.Compose(transform_tmp)
 
     if Fast:
@@ -82,7 +84,7 @@ def load_model(model, optimizer, path):
     checkpoint = torch.load(path)
 
     model.load_state_dict(checkpoint['model_state_dict'])
-    
+
     if optimizer is not None:
         optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
 
@@ -92,10 +94,10 @@ def load_model(model, optimizer, path):
 def load_models(discriminator, optimizer_D, generator, optimizer_G, n_epochs, model_save_path, encoder=None, optimizer_E=None):
     start_epochD = load_model(discriminator, optimizer_D, model_save_path + "/last_D.pt")
     start_epochG = load_model(generator, optimizer_G, model_save_path + "/last_G.pt")
-    
+
     if encoder is not None:
         start_epochE = load_model(encoder, optimizer_E, model_save_path + "/last_E.pt")
-        
+
     if start_epochG is not start_epochD:
         print("Something seems wrong : epochs used to train G and D are different !!")
         #exit(0)
@@ -215,7 +217,7 @@ def scan(exp_name, params, permutation=True, gpu_repart=False):
     else:
         perm = list(zip(*val_tab))
     #print(perm)
-    
+
     # Construction du noms de chaque test en fonction des paramètre qui la compose
     names = list()
     for values in perm:
@@ -236,7 +238,7 @@ def scan(exp_name, params, permutation=True, gpu_repart=False):
         print(com)
         commandes.append(com)
     print("Nombre de commande à lancer :", len(commandes))
-    
+
     # Demande de validation
     print("Valider ? (Y/N)")
     reponse = input()
@@ -251,7 +253,7 @@ def scan(exp_name, params, permutation=True, gpu_repart=False):
         print("Lancement de : ",com)
         ret = os.system(com)
         log.append(ret)
-        
+
     # Récapitulatif
     for idx,com in enumerate(commandes):
         print("Code retour : ",log[idx],"\t| Commandes ", com)

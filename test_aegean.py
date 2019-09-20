@@ -8,9 +8,36 @@ opt = AG.init()
 tag = f'{HOST}_{opt.img_size}_'
 
 
+# what's the effect of a smaller latent_dim ?
+opt = AG.init()
+opt.latent_dim, opt.runs_path = 4, tag + 'small_latent'
+AG.learn(opt)
+
+# what's the effect of a smaller latent_dim ?
+opt = AG.init()
+opt.latent_dim, opt.runs_path = 54, tag + 'large_latent'
+AG.learn(opt)
+
+
+for G_loss in ['wasserstein', 'ian', 'alternative', 'original']:
+    opt = AG.init()
+    opt.runs_path = tag + 'G_loss_' + G_loss
+    opt.G_loss = G_loss
+    AG.learn(opt)
+
+opt = AG.init()
+opt.runs_path = tag + 'do_whitening'
+opt.do_whitening = True
+AG.learn(opt)
+
 opt = AG.init()
 opt.runs_path = tag + 'D_noise'
 opt.D_noise = 0.5
+AG.learn(opt)
+
+opt = AG.init()
+opt.runs_path = tag + 'no_affine'
+opt.rand_affine = 0.
 AG.learn(opt)
 
 opt = AG.init()
@@ -24,11 +51,6 @@ opt.lrelu = 0.
 AG.learn(opt)
 
 opt = AG.init()
-opt.runs_path = tag + 'do_whitening'
-opt.do_whitening = True
-AG.learn(opt)
-
-opt = AG.init()
 opt.runs_path = tag + 'valid_smooth'
 opt.valid_smooth = 0.9
 AG.learn(opt)
@@ -37,16 +59,6 @@ AG.learn(opt)
 opt = AG.init()
 opt.runs_path = tag + 'vanilla'
 print(opt)
-AG.learn(opt)
-
-# what's the effect of a smaller latent_dim ?
-opt = AG.init()
-opt.latent_dim, opt.runs_path = 4, tag + 'small_latent'
-AG.learn(opt)
-
-# what's the effect of a smaller latent_dim ?
-opt = AG.init()
-opt.latent_dim, opt.runs_path = 54, tag + 'large_latent'
 AG.learn(opt)
 
 opt = AG.init()

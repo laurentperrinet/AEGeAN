@@ -14,6 +14,8 @@ def init():
                         help="folder to save samples data and statistics")
     parser.add_argument("--n_epochs", type=int, default=32//DEBUG, help="number of epochs of training")
     parser.add_argument("--batch_size", type=int, default=64, help="size of the batches")
+    parser.add_argument("--rand_hflip", type=bool, default=True, help="data augmentation: horizontal flip")
+    parser.add_argument("--rand_affine", type=float, default=10, help="data augmentation: angle in degrees")
     parser.add_argument("--lrE", type=float, default=0.00015*DEBUG, help="adam: learning rate for E")
     parser.add_argument("--lrD", type=float, default=0.00005*DEBUG, help="adam: learning rate for D")
     parser.add_argument("--valid_smooth", type=float, default=1.0, help="Smoothing the results of D on real images")
