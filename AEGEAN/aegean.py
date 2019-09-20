@@ -165,7 +165,10 @@ def learn(opt):
             # Discriminator decision (in logit units)
             d_x = discriminator(real_imgs)
             # Measure discriminator's ability to classify real from generated samples
-            real_loss = adversarial_loss(d_x, valid_smooth)
+            if opt.G_loss == 'wasserstein':
+                real_loss = - torch.sum(d_g_z)
+            else:
+                real_loss = adversarial_loss(d_x, valid_smooth)
             # Backward
             real_loss.backward()
 
@@ -193,6 +196,8 @@ def learn(opt):
             if opt.G_loss == 'ian':
                 # eq. 14 in https://arxiv.org/pdf/1701.00160.pdf
                 g_loss = - torch.sum(1 / (1. - 1/sigmoid(d_g_z)))
+            elif opt.G_loss == 'wasserstein':
+                g_loss = - torch.sum(d_g_z)
             elif opt.G_loss == 'alternative':
                 # https://www.inference.vc/an-alternative-update-rule-for-generative-adversarial-networks/
                 g_loss = - adversarial_loss(1-d_g_z, valid)
