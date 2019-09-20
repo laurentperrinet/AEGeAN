@@ -132,7 +132,7 @@ def do_plot(hist, start_epoch, epoch, E_losses=False):
     plot_min_max(hist["D_x_max"], hist["D_G_z_max"], hist["D_x_min"], hist["D_G_z_min"], start_epoch, epoch)
 
 
-def plot_min_max(D_x_max, D_G_z_max, D_x_min, D_G_z_min, start_epoch, current_epoch):
+def plot_min_max(D_x_max, D_G_z_max, D_x_min, D_G_z_min, start_epoch, current_epoch, path="runs/min_max.pdf"):
     # Plot game score
     fig = plt.figure(figsize=(10, 5))
     plt.title("Min and max scores for Generator and Discriminator During Training")
@@ -150,11 +150,11 @@ def plot_min_max(D_x_max, D_G_z_max, D_x_min, D_G_z_min, start_epoch, current_ep
     plt.xticks(positions, labels)
 
     plt.grid(True)
-    plt.savefig("min_max.png", format="png")
+    plt.savefig(path)
     plt.close(fig)
 
 
-def plot_std_cv(D_x_std, D_G_z_std, D_x_cv, D_G_z_cv, start_epoch, current_epoch):
+def plot_std_cv(D_x_std, D_G_z_std, D_x_cv, D_G_z_cv, start_epoch, current_epoch, path="runs/std_cv.pdf"):
     # Plot game score
     fig = plt.figure(figsize=(10, 5))
     plt.title("Generator and Discriminator standard deviation and Coefficient of variation on scores During Training")
@@ -172,11 +172,11 @@ def plot_std_cv(D_x_std, D_G_z_std, D_x_cv, D_G_z_cv, start_epoch, current_epoch
     plt.xticks(positions, labels)
 
     plt.grid(True)
-    plt.savefig("std_cv.png", format="png")
+    plt.savefig(path)
     plt.close(fig)
 
 
-def plot_scores(D_x, D_G_z, start_epoch=1, current_epoch=-1):
+def plot_scores(D_x, D_G_z, start_epoch=1, current_epoch=-1, path="runs/scores.pdf"):
     if len(D_x) <= 0 or len(D_G_z) <= 0:
         return None
 
@@ -198,11 +198,11 @@ def plot_scores(D_x, D_G_z, start_epoch=1, current_epoch=-1):
     plt.xticks(positions, labels)
 
     plt.grid(True)
-    plt.savefig("scores.png", format="png")
+    plt.savefig(path)
     plt.close(fig)
 
 
-def plot_losses(G_losses, D_losses, start_epoch=1, current_epoch=-1, path="losses.png", E_losses=-1):
+def plot_losses(G_losses, D_losses, start_epoch=1, current_epoch=-1, path="runs/losses.pdf", E_losses=-1):
     if len(G_losses) <= 0 or len(D_losses) <= 0:
         return None
 
@@ -225,11 +225,11 @@ def plot_losses(G_losses, D_losses, start_epoch=1, current_epoch=-1, path="losse
     plt.xticks(positions, labels)
 
     plt.grid(True)
-    plt.savefig(path, format="png")
+    plt.savefig(path)
     plt.close(fig)
 
 
-def plot_began(M, k, start_epoch=1, current_epoch=-1):
+def plot_began(M, k, start_epoch=1, current_epoch=-1, path="runs/M_k.pdf"):
     if len(M) <= 0 or len(k) <= 0:
         return None
 
@@ -251,11 +251,11 @@ def plot_began(M, k, start_epoch=1, current_epoch=-1):
     plt.xticks(positions, labels)
 
     plt.grid(True)
-    plt.savefig("M_k.png", format="png")
+    plt.savefig(path)
     plt.close(fig)
 
 
-def plot_lr(lr, start_epoch=1, current_epoch=-1):
+def plot_lr(lr, start_epoch=1, current_epoch=-1, path="runs/lr.pdf"):
     if len(lr) <= 0:
         return None
 
@@ -275,7 +275,7 @@ def plot_lr(lr, start_epoch=1, current_epoch=-1):
     plt.xticks(positions, labels)
 
     plt.grid(True)
-    plt.savefig("lr.png", format="png")
+    plt.savefig(path)
     plt.close(fig)
 
 
@@ -287,7 +287,7 @@ def histogram(D_x, D_G_z, epoch, i):
     plt.xlabel("Value")
     plt.ylabel("Frequency")
 
-    plt.savefig("hist/dx_" + str(epoch) + "_" + str(i) + ".png", format="png")
+    plt.savefig("runs/dx_" + str(epoch) + "_" + str(i) + ".png", format="png")
     plt.close(fig)
 
     fig = plt.figure(figsize=(10, 5))
@@ -297,11 +297,11 @@ def histogram(D_x, D_G_z, epoch, i):
     plt.xlabel("Value")
     plt.ylabel("Frequency")
 
-    plt.savefig("hist/dgz_" + str(epoch) + "_" + str(i) + ".png", format="png")
+    plt.savefig("runs/dgz_" + str(epoch) + "_" + str(i) + ".png", format="png")
     plt.close(fig)
 
 
-def plot_extrem(D_x, D_G_z, nb_batch, start_epoch=1, current_epoch=-1, name="extremum.png"):
+def plot_extrem(D_x, D_G_z, nb_batch, start_epoch=1, current_epoch=-1, path="runs/extremum.pdf"):
     if len(D_x) <= 0 or len(D_G_z) <= 0:
         return None
 
@@ -319,7 +319,7 @@ def plot_extrem(D_x, D_G_z, nb_batch, start_epoch=1, current_epoch=-1, name="ext
     plt.xticks(positions, labels)
 
     plt.grid(True)
-    plt.savefig(name, format="png")
+    plt.savefig(path)
     plt.close(fig)
 
 
