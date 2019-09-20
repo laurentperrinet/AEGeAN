@@ -202,7 +202,11 @@ def learn(opt):
                 g_loss = torch.mean(torch.abs(valid - sigmoid(d_g_z)))
             elif opt.G_loss == 'alternative':
                 # https://www.inference.vc/an-alternative-update-rule-for-generative-adversarial-networks/
-                g_loss = - adversarial_loss(1-d_g_z, valid)
+                #g_loss = - adversarial_loss(1-d_g_z, valid)
+                g_loss = - torch.sum(torch.log(sigmoid(d_g_z)))
+            elif opt.G_loss == 'alternativ2':
+                # https://www.inference.vc/an-alternative-update-rule-for-generative-adversarial-networks/
+                g_loss = - torch.sum(torch.log(1 / (1. - 1/sigmoid(d_g_z))))
             else:
                 g_loss = adversarial_loss(d_g_z, valid)
             # Backward
