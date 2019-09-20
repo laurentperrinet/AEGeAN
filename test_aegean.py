@@ -8,6 +8,18 @@ opt = AG.init()
 tag = f'{HOST}_{opt.img_size}_'
 
 
+for G_loss in ['wasserstein', 'ian', 'alternative', 'original']:
+    opt = AG.init()
+    opt.runs_path = tag + 'G_loss_' + G_loss
+    opt.G_loss = G_loss
+    AG.learn(opt)
+
+opt = AG.init()
+opt.runs_path = tag + 'do_whitening'
+opt.do_whitening = True
+AG.learn(opt)
+
+
 # what's the effect of a smaller latent_dim ?
 opt = AG.init()
 opt.latent_dim, opt.runs_path = 4, tag + 'small_latent'
@@ -50,16 +62,6 @@ opt.channel2 *= 2
 AG.learn(opt)
 
 
-for G_loss in ['wasserstein', 'ian', 'alternative', 'original']:
-    opt = AG.init()
-    opt.runs_path = tag + 'G_loss_' + G_loss
-    opt.G_loss = G_loss
-    AG.learn(opt)
-
-opt = AG.init()
-opt.runs_path = tag + 'do_whitening'
-opt.do_whitening = True
-AG.learn(opt)
 
 opt = AG.init()
 opt.runs_path = tag + 'D_noise'
