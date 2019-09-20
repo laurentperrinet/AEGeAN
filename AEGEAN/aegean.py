@@ -190,9 +190,12 @@ def learn(opt):
             # New discriminator descision, Since we just updated D
             d_g_z = discriminator(gen_imgs)
             # Loss measures generator's ability to fool the discriminator
-            if opt.do_ian_loss:
+            if opt.G_loss == 'ian':
                 # eq. 14 in https://arxiv.org/pdf/1701.00160.pdf
                 g_loss = - torch.sum(1 / (1. - 1/sigmoid(d_g_z)))
+            elif opt.G_loss == 'alternative':
+                # https://www.inference.vc/an-alternative-update-rule-for-generative-adversarial-networks/
+                g_loss = - adversarial_loss(1-d_g_z, valid)
             else:
                 g_loss = adversarial_loss(d_g_z, valid)
             # Backward

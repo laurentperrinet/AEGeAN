@@ -13,7 +13,7 @@ def init():
     parser.add_argument("--lrE", type=float, default=0.00015*DEBUG, help="adam: learning rate for E")
     parser.add_argument("--lrD", type=float, default=0.00005*DEBUG, help="adam: learning rate for D")
     parser.add_argument("--lrG", type=float, default=0.00025*DEBUG, help="adam: learning rate for G")
-    parser.add_argument("--do_ian_loss", type=bool, default=True, help="Use the loss from Ian Goodfellow.")
+    parser.add_argument("--G_loss", type=str, default='alternative', help="Use different loss for G.")
     parser.add_argument("--do_whitening", type=bool, default=True, help="Use contrasted images.")
     parser.add_argument("--bn_eps", type=float, default=.5, help="batchnorm: espilon for numerical stability")
     parser.add_argument("--bn_momentum", type=float, default=.1, help="batchnorm: momentum for numerical stability")

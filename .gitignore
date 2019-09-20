@@ -8,3 +8,7 @@ main.bbl
 main.blg
 AEGEAN/__pycache__/
 runs
+losses.png
+min_max.png
+scores.png
+std_cv.png
