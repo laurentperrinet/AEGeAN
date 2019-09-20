@@ -1,8 +1,12 @@
 import os
 import argparse
 
-DEBUG = 4
-DEBUG = 1
+PID, HOST = os.getpid(), os.uname()[1]
+
+if HOST == 'ada':
+    DEBUG = 4
+else:
+    DEBUG = 1
 
 def init():
     parser = argparse.ArgumentParser()
@@ -12,9 +16,11 @@ def init():
     parser.add_argument("--batch_size", type=int, default=64, help="size of the batches")
     parser.add_argument("--lrE", type=float, default=0.00015*DEBUG, help="adam: learning rate for E")
     parser.add_argument("--lrD", type=float, default=0.00005*DEBUG, help="adam: learning rate for D")
+    parser.add_argument("--valid_smooth", type=float, default=1.0, help="Smoothing the results of D on real images")
+    parser.add_argument("--D_noise", type=float, default=.5, help="Add noise to the input images of D")
     parser.add_argument("--lrG", type=float, default=0.00025*DEBUG, help="adam: learning rate for G")
     parser.add_argument("--G_loss", type=str, default='alternative', help="Use different loss for G.")
-    parser.add_argument("--do_whitening", type=bool, default=True, help="Use contrasted images.")
+    parser.add_argument("--do_whitening", type=bool, default=False, help="Use contrasted images.")
     parser.add_argument("--bn_eps", type=float, default=.5, help="batchnorm: espilon for numerical stability")
     parser.add_argument("--bn_momentum", type=float, default=.1, help="batchnorm: momentum for numerical stability")
     parser.add_argument("--b1", type=float, default=0.5, help="adam: decay of first order momentum of gradient")

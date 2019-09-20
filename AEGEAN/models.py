@@ -39,7 +39,7 @@ cuda = True if torch.cuda.is_available() else False
 if cuda:
     KW =  KW.to('cuda')
     Kinv =  Kinv.to('cuda')
-    
+
 class Encoder(nn.Module):
     def __init__(self, opt):
         super(Encoder, self).__init__()
@@ -50,10 +50,9 @@ class Encoder(nn.Module):
                          padding=opt.padding, padding_mode='zeros')
         self.channels = [opt.channel0, opt.channel1, opt.channel2, opt.channel3]
 
-
         def encoder_block(in_filters, out_filters, bn=True):
             block = [nn.Conv2d(in_filters, out_filters, **opts_conv), NL]
-            if bn:
+            if bn and (not opt.bn_eps==np.inf):
                 block.append(nn.BatchNorm2d(out_filters, eps=opt.bn_eps, momentum=opt.bn_momentum))
             return block
 
@@ -106,9 +105,13 @@ class Generator(nn.Module):
                          padding=opt.padding, padding_mode='zeros')
         self.channels = [opt.channel0, opt.channel1, opt.channel2, opt.channel3]
 
-
-        def generator_block(in_filters, out_filters):
-            block = [nn.UpsamplingNearest2d(scale_factor=opts_conv['stride']), nn.Conv2d(in_filters, out_filters, kernel_size=opts_conv['kernel_size'], stride=1, padding=opts_conv['padding'], padding_mode=opts_conv['padding_mode']), nn.BatchNorm2d(out_filters, eps=opt.bn_eps, momentum=opt.bn_momentum), NL]
+        def generator_block(in_filters, out_filters, bn=True):
+            block = [nn.UpsamplingNearest2d(scale_factor=opts_conv['stride']),
+                     nn.Conv2d(in_filters, out_filters, kernel_size=opts_conv['kernel_size'], stride=1, padding=opts_conv['padding'], padding_mode=opts_conv['padding_mode']),
+                     #nn.BatchNorm2d(out_filters, eps=opt.bn_eps, momentum=opt.bn_momentum), 
+                     NL]
+            if bn and (not opt.bn_eps==np.inf):
+                block.append(nn.BatchNorm2d(out_filters, eps=opt.bn_eps, momentum=opt.bn_momentum))
 
             return block
 
@@ -117,7 +120,7 @@ class Generator(nn.Module):
         self.l1 = nn.Sequential(nn.Linear(opt.latent_dim, self.channels[3] * self.init_size ** 2), NL)
 
 
-        self.conv1 = nn.Sequential(*generator_block(self.channels[3], self.channels[2]),)
+        self.conv1 = nn.Sequential(*generator_block(self.channels[3], self.channels[2], bn=False),)
         self.conv2 = nn.Sequential(*generator_block(self.channels[2], self.channels[1]),)
         self.conv3 = nn.Sequential(*generator_block(self.channels[1], self.channels[0]),)
         self.conv_blocks = nn.Sequential(
@@ -167,7 +170,7 @@ class Discriminator(nn.Module):
 
         def discriminator_block(in_filters, out_filters, bn=True):
             block = [nn.Conv2d(in_filters, out_filters, **opts_conv), NL]#, nn.Dropout2d(0.25)
-            if bn:
+            if bn and (not opt.bn_eps==np.inf):
                 # https://pytorch.org/docs/stable/nn.html#torch.nn.BatchNorm2d
                 block.append(nn.BatchNorm2d(out_filters, eps=opt.bn_eps, momentum=opt.bn_momentum))
             return block

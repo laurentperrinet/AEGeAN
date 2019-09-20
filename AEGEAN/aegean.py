@@ -148,7 +148,7 @@ def learn(opt):
             # ---------------------
 
             # Adversarial ground truths
-            valid_smooth = Variable(Tensor(imgs.shape[0], 1).fill_(float(np.random.uniform(0.9, 1.0, 1))), requires_grad=False)
+            valid_smooth = Variable(Tensor(imgs.shape[0], 1).fill_(float(np.random.uniform(opt.valid_smooth, 1.0, 1))), requires_grad=False)
             valid = Variable(Tensor(imgs.size(0), 1).fill_(1), requires_grad=False)
             fake = Variable(Tensor(imgs.size(0), 1).fill_(0), requires_grad=False)
 
