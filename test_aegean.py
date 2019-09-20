@@ -1,7 +1,10 @@
 import os
+PID, HOST = os.getpid(), os.uname()[1]
+
 import AEGEAN as AG
 
-tag = 'maria_64_'
+opt = AG.init()
+tag = f'{HOST}_{opt.img_size}_'
 
 # VANILLA
 opt = AG.init()

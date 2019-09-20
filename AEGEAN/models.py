@@ -35,6 +35,11 @@ Kinv /= np.sqrt(4. * 3)
 # print(conv2d(Kinv, KW, padding=1))
 # print(KW, Kinv, conv2d(KW, Kinv, padding=1), conv2d(Kinv, KW, padding=1))
 
+cuda = True if torch.cuda.is_available() else False
+if cuda:
+    KW =  KW.to('cuda')
+    Kinv =  Kinv.to('cuda')
+    
 class Encoder(nn.Module):
     def __init__(self, opt):
         super(Encoder, self).__init__()
