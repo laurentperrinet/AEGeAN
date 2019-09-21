@@ -98,8 +98,7 @@ def learn(opt):
     #  Tensorboard
     # ----------
     if do_tensorboard:
-
-        # Les runs sont sauvegardés dans un dossiers "runs" à la racine du projet, dans un sous dossiers opt.runs_path.
+        # stats are stored in "runs", within subfolder opt.runs_path.
         os.makedirs(path_data, exist_ok=True)
         writer = SummaryWriter(log_dir=path_data)
 
@@ -110,10 +109,10 @@ def learn(opt):
     nb_batch = len(dataloader)
     nb_epochs = 1 + opt.n_epochs - start_epoch
 
-    hist = init_hist(nb_epochs, nb_batch, lossE=True)
+    hist = init_hist(nb_epochs, nb_batch)
 
-    save_dot = 1 # Nombre d'epochs avant de sauvegarder un point des courbes
-    batch_on_save_dot = save_dot*len(dataloader)
+    # save_dot = 1 # Nombre d'epochs avant de sauvegarder un point des courbes
+    # batch_on_save_dot = save_dot*len(dataloader)
 
     # Vecteur z fixe pour faire les samples
     fixed_noise = Variable(Tensor(np.random.normal(0, 1, (opt.N_samples, opt.latent_dim))))
@@ -259,7 +258,7 @@ def learn(opt):
 
         if epoch % opt.sample_interval == 0:
             sampling(fixed_noise, generator, path_data, epoch, tag)
-            do_plot(hist, start_epoch, epoch, E_losses=True)
+            do_plot(hist, start_epoch, epoch)
 
         # Save models
         if epoch % opt.model_save_interval == 0:

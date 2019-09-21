@@ -19,7 +19,7 @@ Pour ajouter un plot :
 """
 
 
-def init_hist(nb_epochs, nb_batch, lossE=False):
+def init_hist(nb_epochs, nb_batch):
     """
     Initialise et retourne un dictionnaire qui servira à sauvegarder les données que l'on voudrais afficher par la suite.
     """
@@ -32,9 +32,8 @@ def init_hist(nb_epochs, nb_batch, lossE=False):
     hist["D_losses"] = np.zeros(nb_epochs)
     hist["g_losses"] = np.zeros(nb_batch)
     hist["d_losses"] = np.zeros(nb_batch)
-    if lossE:
-        hist["E_losses"] = np.zeros(nb_epochs)
-        hist["e_losses"] = np.zeros(nb_batch)
+    hist["E_losses"] = np.zeros(nb_epochs)
+    hist["e_losses"] = np.zeros(nb_batch)
 
     # Moyenne des réponse D(x) et D(G(z)) moyenner par epochs
     hist["D_x_mean"] = np.zeros(nb_epochs)
@@ -98,15 +97,14 @@ def save_hist_batch(hist, idx_batch, idx_epoch, g_loss, d_loss, d_x, d_g_z, e_lo
         hist["D_G_z_min"][idx_epoch] = d_g_z.min()
 
 
-def save_hist_epoch(hist, idx_epoch, E_losses=False):
+def save_hist_epoch(hist, idx_epoch):
     """
     Sauvegarde les données de l'epoch dans l'historique
     """
 
     hist["G_losses"][idx_epoch] = hist["g_losses"].mean()
     hist["D_losses"][idx_epoch] = hist["d_losses"].mean()
-    if E_losses:
-        hist["E_losses"][idx_epoch] = hist["e_losses"].mean()
+    hist["E_losses"][idx_epoch] = hist["e_losses"].mean()
 
     hist["D_x_mean"][idx_epoch] = hist["d_x_mean"].mean()
     hist["D_G_z_mean"][idx_epoch] = hist["d_g_z_mean"].mean()
@@ -118,12 +116,9 @@ def save_hist_epoch(hist, idx_epoch, E_losses=False):
     hist["D_G_z_cv"][idx_epoch] = hist["d_g_z_cv"].mean()
 
 
-def do_plot(hist, start_epoch, epoch, E_losses=False):
+def do_plot(hist, start_epoch, epoch):
     # Plot losses
-    if E_losses:
-        plot_losses(hist["G_losses"], hist["D_losses"], start_epoch, epoch, E_losses=hist["E_losses"])
-    else:
-        plot_losses(hist["G_losses"], hist["D_losses"], start_epoch, epoch)
+    plot_losses(hist["G_losses"], hist["D_losses"], start_epoch, epoch, E_losses=hist["E_losses"])
     # Plot mean scores
     plot_scores(hist["D_x_mean"], hist["D_G_z_mean"], start_epoch, epoch)
     # Plot std scores
