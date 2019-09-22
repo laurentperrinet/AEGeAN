@@ -50,7 +50,7 @@ def init():
     parser.add_argument('--datapath', type=str, default='../cropped_clear/cp/')
     parser.add_argument('--load_model', action="store_true",
                         help="Load model present in model_save_path/Last_*.pt, if present.")
-    parser.add_argument("--verbose", type=bool, default=False, help="Displays more verbose output.")
+    parser.add_argument("--verbose", type=bool, default=False if DEBUG<4 else True, help="Displays more verbose output.")
     parser.add_argument("--GPU", type=int, default=0, help="Identifiant du GPU à utiliser.")
     opt = parser.parse_args()
 
