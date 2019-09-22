@@ -15,16 +15,16 @@ print(opt)
 AG.learn(opt)
 
 
-for G_loss in ['original', 'wasserstein', 'ian']: #, 'alternative', 'alternativ2']:
+for GAN_loss in ['original', 'wasserstein', 'ian']: #, 'alternative', 'alternativ2']:
     opt = AG.init()
-    opt.runs_path = tag + 'G_loss_' + G_loss
-    opt.G_loss = G_loss
+    opt.runs_path = tag + 'GAN_loss_' + GAN_loss
+    opt.GAN_loss = GAN_loss
     AG.learn(opt)
 
-for G_loss in ['original', 'wasserstein', 'ian']: #, 'alternative', 'alternativ2']:
+for GAN_loss in ['original', 'wasserstein', 'ian']: #, 'alternative', 'alternativ2']:
     opt = AG.init()
-    opt.runs_path = tag + 'G_loss_' + G_loss
-    opt.G_loss = G_loss
+    opt.runs_path = tag + 'GAN_loss_' + GAN_loss
+    opt.GAN_loss = GAN_loss
     opt.runs_path += '_no_bn'
     opt.bn_eps = np.inf
     AG.learn(opt)

@@ -1,33 +1,32 @@
 import os
 import numpy as np
+from torch.autograd import Variable
 
+from .init import init
+from .utils import *
+from .plot import *
+from .models import *
 
 import torchvision.transforms as transforms
 from torchvision.utils import save_image
-try:
-    from torch.utils.tensorboard import SummaryWriter
-    do_tensorboard = True
-except: # ImportError:
-    do_tensorboard = False
-    print("Impossible de charger Tensorboard.")
 
 from torch.utils.data import DataLoader
 from torchvision import datasets
-from torch.autograd import Variable
 
 import torch.nn as nn
 import torch.nn.functional as F
 import torch
 
 import sys
-
-import matplotlib.pyplot as plt
 import time
 import datetime
 
-from .utils import *
-from .plot import *
-from .models import *
+try:
+    from torch.utils.tensorboard import SummaryWriter
+    do_tensorboard = True
+except: # ImportError:
+    do_tensorboard = False
+    print("Impossible de charger Tensorboard.")
 
 def learn(opt):
     print('Starting ', opt.runs_path)
@@ -176,8 +175,9 @@ def learn(opt):
                 # Real batch
                 # Discriminator decision (in logit units)
                 d_x = discriminator(real_imgs)
+
                 # Measure discriminator's ability to classify real from generated samples
-                if opt.G_loss == 'wasserstein':
+                if opt.GAN_loss == 'wasserstein':
                     real_loss = torch.mean(torch.abs(valid_smooth - sigmoid(d_x)))
                 else:
                     real_loss = adversarial_loss(d_x, valid_smooth)
@@ -188,7 +188,7 @@ def learn(opt):
                 # Discriminator decision
                 d_g_z = discriminator(gen_imgs.detach())
                 # Measure discriminator's ability to classify real from generated samples
-                if opt.G_loss == 'wasserstein':
+                if opt.GAN_loss == 'wasserstein':
                     fake_loss = torch.mean(sigmoid(d_g_z))
                 else:
                     fake_loss = adversarial_loss(d_g_z, fake)
@@ -199,26 +199,29 @@ def learn(opt):
 
                 optimizer_D.step()
 
+                # Compensation pour le BCElogits
+                d_x = sigmoid(d_x)
+
             # -----------------
             #  Train Generator
             # -----------------
-            if opt.lrG >0:
+            if opt.lrG > 0:
 
                 optimizer_G.zero_grad()
 
                 # New discriminator descision, Since we just updated D
                 d_g_z = discriminator(gen_imgs)
                 # Loss measures generator's ability to fool the discriminator
-                if opt.G_loss == 'ian':
+                if opt.GAN_loss == 'ian':
                     # eq. 14 in https://arxiv.org/pdf/1701.00160.pdf
                     g_loss = - torch.sum(1 / (1. - 1/sigmoid(d_g_z)))
-                elif opt.G_loss == 'wasserstein':
+                elif opt.GAN_loss == 'wasserstein':
                     g_loss = torch.mean(torch.abs(valid - sigmoid(d_g_z)))
-                elif opt.G_loss == 'alternative':
+                elif opt.GAN_loss == 'alternative':
                     # https://www.inference.vc/an-alternative-update-rule-for-generative-adversarial-networks/
                     #g_loss = - adversarial_loss(1-d_g_z, valid)
                     g_loss = - torch.sum(torch.log(sigmoid(d_g_z)))
-                elif opt.G_loss == 'alternativ2':
+                elif opt.GAN_loss == 'alternativ2':
                     # https://www.inference.vc/an-alternative-update-rule-for-generative-adversarial-networks/
                     g_loss = - torch.sum(torch.log(sigmoid(d_g_z) / (1. - sigmoid(d_g_z))))
                 else:
@@ -227,18 +230,22 @@ def learn(opt):
                 g_loss.backward()
 
                 optimizer_G.step()
+                # Compensation pour le BCElogits
+                d_g_z = sigmoid(d_g_z)
 
             # -----------------
             #  Recording stats
             # -----------------
-            # Compensation pour le BCElogits
-            d_x = sigmoid(d_x)
-            d_g_z = sigmoid(d_g_z)
-
-            print(
-                "[Epoch %d/%d] [Batch %d/%d] [E loss: %f] [D loss: %f] [G loss: %f] [D score %f] [G score %f] [Time: %fs]"
-                % (epoch, opt.n_epochs, i+1, len(dataloader), e_loss.item(), d_loss.item(), g_loss.item(), torch.mean(d_x), torch.mean(d_g_z), time.time()-t_batch)
-            )
+            if opt.lrG > 0 :
+                print(
+                    "[Epoch %d/%d] [Batch %d/%d] [E loss: %f] [D loss: %f] [G loss: %f] [D score %f] [G score %f] [Time: %fs]"
+                    % (epoch, opt.n_epochs, i+1, len(dataloader), e_loss.item(), d_loss.item(), g_loss.item(), torch.mean(d_x), torch.mean(d_g_z), time.time()-t_batch)
+                )
+            else:
+                print(
+                    "[Epoch %d/%d] [Batch %d/%d] [E loss: %f] [Time: %fs]"
+                    % (epoch, opt.n_epochs, i+1, len(dataloader), time.time()-t_batch)
+                )
 
             # Save Losses and scores for Tensorboard
             save_hist_batch(hist, i, j, g_loss, d_loss, d_x, d_g_z)
