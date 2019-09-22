@@ -116,10 +116,12 @@ def learn(opt):
     # batch_on_save_dot = save_dot*len(dataloader)
 
     # Vecteur z fixe pour faire les samples
-    fixed_noise = Variable(Tensor(np.random.normal(0, 1, (opt.N_samples, opt.latent_dim))))
-    zero_target = Variable(Tensor(torch.zeros(opt.batch_size, opt.channels, opt.img_size, opt.img_size)))
+    fixed_noise = Variable(Tensor(np.random.normal(0, 1, (opt.N_samples, opt.latent_dim))), requires_grad=False)
+    zero_target = Variable(Tensor(torch.zeros(opt.batch_size, opt.channels, opt.img_size, opt.img_size)), requires_grad=False)
     z_zeros = Variable(Tensor(opt.batch_size, opt.latent_dim).fill_(0), requires_grad=False)
     z_ones = Variable(Tensor(opt.batch_size, opt.latent_dim).fill_(1), requires_grad=False)
+    valid = Variable(Tensor(opt.batch_size, 1).fill_(1), requires_grad=False)
+    fake = Variable(Tensor(opt.batch_size, 1).fill_(0), requires_grad=False)
 
     t_total = time.time()
     for j, epoch in enumerate(range(start_epoch, opt.n_epochs + 1)):
@@ -159,24 +161,16 @@ def learn(opt):
             #  Train Discriminator
             # ---------------------
             if opt.lrD >0:
+                optimizer_D.zero_grad()
+
                 # Adversarial ground truths
                 valid_smooth = Variable(Tensor(imgs.shape[0], 1).fill_(float(np.random.uniform(opt.valid_smooth, 1.0, 1))), requires_grad=False)
-                valid = Variable(Tensor(opt.batch_size, 1).fill_(1), requires_grad=False)
-                fake = Variable(Tensor(opt.batch_size, 1).fill_(0), requires_grad=False)
 
                 # Configure input
                 real_imgs = Variable(imgs.type(Tensor))
-                # Generate a batch of images
-                z = np.random.normal(0, 1, (imgs.shape[0], opt.latent_dim))
-                z = Variable(Tensor(z))
-                gen_imgs = generator(z)
-
-                optimizer_D.zero_grad()
-
                 # Real batch
                 # Discriminator decision (in logit units)
                 d_x = discriminator(real_imgs)
-
                 # Measure discriminator's ability to classify real from generated samples
                 if opt.GAN_loss == 'wasserstein':
                     real_loss = torch.mean(torch.abs(valid_smooth - sigmoid(d_x)))
@@ -186,6 +180,10 @@ def learn(opt):
                 real_loss.backward()
 
                 # Fake batch
+                # Generate a batch of images
+                z = Variable(Tensor(np.random.normal(0, 1, (opt.batch_size, opt.latent_dim))))
+                gen_imgs = generator(z)
+
                 # Discriminator decision
                 d_g_z = discriminator(gen_imgs.detach())
                 # Measure discriminator's ability to classify real from generated samples
@@ -203,15 +201,17 @@ def learn(opt):
                 # Compensation pour le BCElogits
                 d_x = sigmoid(d_x)
 
-            # -----------------
-            #  Train Generator
-            # -----------------
-            if opt.lrG > 0:
-
+                # -----------------
+                #  Train Generator
+                # -----------------
+                # if opt.lrG > 0:
                 optimizer_G.zero_grad()
 
                 # New discriminator descision, Since we just updated D
+                z = Variable(Tensor(np.random.normal(0, 1, (opt.batch_size, opt.latent_dim))))
+                gen_imgs = generator(z)
                 d_g_z = discriminator(gen_imgs)
+
                 # Loss measures generator's ability to fool the discriminator
                 if opt.GAN_loss == 'ian':
                     # eq. 14 in https://arxiv.org/pdf/1701.00160.pdf
@@ -227,9 +227,9 @@ def learn(opt):
                     g_loss = - torch.sum(torch.log(sigmoid(d_g_z) / (1. - sigmoid(d_g_z))))
                 else:
                     g_loss = adversarial_loss(d_g_z, valid)
+
                 # Backward
                 g_loss.backward()
-
                 optimizer_G.step()
                 # Compensation pour le BCElogits
                 d_g_z = sigmoid(d_g_z)
