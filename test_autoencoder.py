@@ -42,12 +42,6 @@ AG.learn(opt)
 
 opt = AG.init()
 opt.lrG, opt.lrD = 0., 0.
-opt.runs_path = tag + 'big_lrD'
-opt.lrG *= 2
-AG.learn(opt)
-
-opt = AG.init()
-opt.lrG, opt.lrD = 0., 0.
 opt.runs_path = tag + 'small_channel0'
 opt.channel0 //= 2
 AG.learn(opt)
