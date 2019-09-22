@@ -28,6 +28,7 @@ def init():
     parser.add_argument("--G_loss", type=str, default='ian', help="Use different loss for G.")
     parser.add_argument("--do_whitening", type=bool, default=False, help="Use contrasted images.")
     parser.add_argument("--bn_eps", type=float, default=.5, help="batchnorm: espilon for numerical stability")
+    parser.add_argument("--do_joint", type=bool, default=False, help="Do a joint learning of E and G, dude.")
     parser.add_argument("--bn_momentum", type=float, default=.1, help="batchnorm: momentum for numerical stability")
     parser.add_argument("--b1", type=float, default=0.5, help="adam: decay of first order momentum of gradient")
     parser.add_argument("--b2", type=float, default=0.99, help="adam: decay of first order momentum of gradient")

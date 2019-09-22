@@ -7,16 +7,6 @@ import AEGEAN as AG
 opt = AG.init()
 tag = f'{HOST}_{opt.img_size}_'
 
-opt = AG.init()
-opt.runs_path = tag + 'do_whitening'
-opt.do_whitening = True
-AG.learn(opt)
-
-opt = AG.init()
-opt.runs_path = tag + 'no_init_weight'
-opt.init_weight = False
-AG.learn(opt)
-
 # what's the effect of a smaller latent_dim ?
 opt = AG.init()
 opt.latent_dim, opt.runs_path = 4, tag + 'small_latent'
@@ -112,6 +102,16 @@ opt.runs_path = tag + 'high_D_noise'
 opt.D_noise = 0.5
 AG.learn(opt)
 
+
+opt = AG.init()
+opt.runs_path = tag + 'do_whitening'
+opt.do_whitening = True
+AG.learn(opt)
+
+opt = AG.init()
+opt.runs_path = tag + 'no_init_weight'
+opt.init_weight = False
+AG.learn(opt)
 
 opt = AG.init()
 opt.runs_path = tag + 'low_batch_size'

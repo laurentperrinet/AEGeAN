@@ -1,7 +1,6 @@
 import os
 import numpy as np
 
-import itertools
 
 import torchvision.transforms as transforms
 from torchvision.utils import save_image
@@ -82,7 +81,12 @@ def learn(opt):
     # Optimizers
     optimizer_G = torch.optim.Adam(generator.parameters(), lr=opt.lrG, betas=(opt.b1, opt.b2))
     optimizer_D = torch.optim.Adam(discriminator.parameters(), lr=opt.lrD, betas=(opt.b1, opt.b2))
-    optimizer_E = torch.optim.Adam(itertools.chain(encoder.parameters(), generator.parameters()), lr=opt.lrE, betas=(opt.b1, opt.b2))
+    if opt.do_joint:
+        import itertools
+        optimizer_E = torch.optim.Adam(itertools.chain(encoder.parameters(), generator.parameters()), lr=opt.lrE, betas=(opt.b1, opt.b2))
+    else:
+        optimizer_E = torch.optim.Adam(encoder.parameters(), lr=opt.lrE, betas=(opt.b1, opt.b2))
+
 
     Tensor = torch.cuda.FloatTensor if cuda else torch.FloatTensor
 
@@ -132,11 +136,17 @@ def learn(opt):
             z_imgs = encoder(real_imgs)
             decoded_imgs = generator(z_imgs)
 
+
+
             # Loss measures Encoder's ability to generate vectors suitable with the generator
             # DONE add a loss for the distance between of z values
             z_zeros = Variable(Tensor(z_imgs.size(0), z_imgs.size(1)).fill_(0), requires_grad=False)
             z_ones = Variable(Tensor(z_imgs.size(0), z_imgs.size(1)).fill_(1), requires_grad=False)
-            e_loss = MSE_loss(real_imgs, decoded_imgs)
+            if opt.do_joint:
+                e_loss = MSE_loss(real_imgs, decoded_imgs)
+            else:
+                e_loss = MSE_loss(real_imgs, decoded_imgs.detach())
+
             e_loss += opt.lambdaE*MSE_loss(z_imgs, z_zeros)
             e_loss += opt.lambdaE*MSE_loss(z_imgs.pow(2), z_ones).pow(.5)
 
