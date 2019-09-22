@@ -48,7 +48,7 @@ def load_data(path, img_size, batch_size, Fast=True, FDD=False, rand_hflip=False
         transform_tmp.append(transforms.RandomAffine(degrees=rand_affine))
     transform_tmp.append(transforms.ToTensor())
     transform_tmp.append(transforms.Normalize([mean]*3, [std]*3))
-    
+
     transform = transforms.Compose(transform_tmp)
 
     if Fast:
@@ -116,7 +116,7 @@ def sampling(noise, generator, path, epoch, tag='', nrow=5):
     """
     generator.eval()
     gen_imgs = generator(noise)
-    save_image(gen_imgs.data[:], "%s/%s%d.png" % (path, tag, epoch), nrow=nrow, normalize=True)
+    save_image(gen_imgs.data[:], "%s/%s_%d.png" % (path, tag, epoch), nrow=nrow, normalize=True)
     generator.train()
 
 

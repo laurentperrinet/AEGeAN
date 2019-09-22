@@ -158,75 +158,79 @@ def learn(opt):
             # ---------------------
             #  Train Discriminator
             # ---------------------
+            if opt.lrD >0:
+                # Adversarial ground truths
+                valid_smooth = Variable(Tensor(imgs.shape[0], 1).fill_(float(np.random.uniform(opt.valid_smooth, 1.0, 1))), requires_grad=False)
+                valid = Variable(Tensor(imgs.size(0), 1).fill_(1), requires_grad=False)
+                fake = Variable(Tensor(imgs.size(0), 1).fill_(0), requires_grad=False)
 
-            # Adversarial ground truths
-            valid_smooth = Variable(Tensor(imgs.shape[0], 1).fill_(float(np.random.uniform(opt.valid_smooth, 1.0, 1))), requires_grad=False)
-            valid = Variable(Tensor(imgs.size(0), 1).fill_(1), requires_grad=False)
-            fake = Variable(Tensor(imgs.size(0), 1).fill_(0), requires_grad=False)
+                # Configure input
+                real_imgs = Variable(imgs.type(Tensor))
+                # Generate a batch of images
+                z = np.random.normal(0, 1, (imgs.shape[0], opt.latent_dim))
+                z = Variable(Tensor(z))
+                gen_imgs = generator(z)
 
-            # Configure input
-            real_imgs = Variable(imgs.type(Tensor))
-            # Generate a batch of images
-            z = np.random.normal(0, 1, (imgs.shape[0], opt.latent_dim))
-            z = Variable(Tensor(z))
-            gen_imgs = generator(z)
+                optimizer_D.zero_grad()
 
-            optimizer_D.zero_grad()
+                # Real batch
+                # Discriminator decision (in logit units)
+                d_x = discriminator(real_imgs)
+                # Measure discriminator's ability to classify real from generated samples
+                if opt.G_loss == 'wasserstein':
+                    real_loss = torch.mean(torch.abs(valid_smooth - sigmoid(d_x)))
+                else:
+                    real_loss = adversarial_loss(d_x, valid_smooth)
+                # Backward
+                real_loss.backward()
 
-            # Real batch
-            # Discriminator decision (in logit units)
-            d_x = discriminator(real_imgs)
-            # Measure discriminator's ability to classify real from generated samples
-            if opt.G_loss == 'wasserstein':
-                real_loss = torch.mean(torch.abs(valid_smooth - sigmoid(d_x)))
-            else:
-                real_loss = adversarial_loss(d_x, valid_smooth)
-            # Backward
-            real_loss.backward()
+                # Fake batch
+                # Discriminator decision
+                d_g_z = discriminator(gen_imgs.detach())
+                # Measure discriminator's ability to classify real from generated samples
+                if opt.G_loss == 'wasserstein':
+                    fake_loss = torch.mean(sigmoid(d_g_z))
+                else:
+                    fake_loss = adversarial_loss(d_g_z, fake)
+                # Backward
+                fake_loss.backward()
 
-            # Fake batch
-            # Discriminator decision
-            d_g_z = discriminator(gen_imgs.detach())
-            # Measure discriminator's ability to classify real from generated samples
-            if opt.G_loss == 'wasserstein':
-                fake_loss = torch.mean(sigmoid(d_g_z))
-            else:
-                fake_loss = adversarial_loss(d_g_z, fake)
-            # Backward
-            fake_loss.backward()
+                d_loss = real_loss + fake_loss
 
-            d_loss = real_loss + fake_loss
-
-            optimizer_D.step()
+                optimizer_D.step()
 
             # -----------------
             #  Train Generator
             # -----------------
+            if opt.lrG >0:
 
-            optimizer_G.zero_grad()
+                optimizer_G.zero_grad()
 
-            # New discriminator descision, Since we just updated D
-            d_g_z = discriminator(gen_imgs)
-            # Loss measures generator's ability to fool the discriminator
-            if opt.G_loss == 'ian':
-                # eq. 14 in https://arxiv.org/pdf/1701.00160.pdf
-                g_loss = - torch.sum(1 / (1. - 1/sigmoid(d_g_z)))
-            elif opt.G_loss == 'wasserstein':
-                g_loss = torch.mean(torch.abs(valid - sigmoid(d_g_z)))
-            elif opt.G_loss == 'alternative':
-                # https://www.inference.vc/an-alternative-update-rule-for-generative-adversarial-networks/
-                #g_loss = - adversarial_loss(1-d_g_z, valid)
-                g_loss = - torch.sum(torch.log(sigmoid(d_g_z)))
-            elif opt.G_loss == 'alternativ2':
-                # https://www.inference.vc/an-alternative-update-rule-for-generative-adversarial-networks/
-                g_loss = - torch.sum(torch.log(sigmoid(d_g_z) / (1. - sigmoid(d_g_z))))
-            else:
-                g_loss = adversarial_loss(d_g_z, valid)
-            # Backward
-            g_loss.backward()
+                # New discriminator descision, Since we just updated D
+                d_g_z = discriminator(gen_imgs)
+                # Loss measures generator's ability to fool the discriminator
+                if opt.G_loss == 'ian':
+                    # eq. 14 in https://arxiv.org/pdf/1701.00160.pdf
+                    g_loss = - torch.sum(1 / (1. - 1/sigmoid(d_g_z)))
+                elif opt.G_loss == 'wasserstein':
+                    g_loss = torch.mean(torch.abs(valid - sigmoid(d_g_z)))
+                elif opt.G_loss == 'alternative':
+                    # https://www.inference.vc/an-alternative-update-rule-for-generative-adversarial-networks/
+                    #g_loss = - adversarial_loss(1-d_g_z, valid)
+                    g_loss = - torch.sum(torch.log(sigmoid(d_g_z)))
+                elif opt.G_loss == 'alternativ2':
+                    # https://www.inference.vc/an-alternative-update-rule-for-generative-adversarial-networks/
+                    g_loss = - torch.sum(torch.log(sigmoid(d_g_z) / (1. - sigmoid(d_g_z))))
+                else:
+                    g_loss = adversarial_loss(d_g_z, valid)
+                # Backward
+                g_loss.backward()
 
-            optimizer_G.step()
+                optimizer_G.step()
 
+            # -----------------
+            #  Recording stats
+            # -----------------
             # Compensation pour le BCElogits
             d_x = sigmoid(d_x)
             d_g_z = sigmoid(d_g_z)
