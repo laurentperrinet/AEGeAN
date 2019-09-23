@@ -39,7 +39,7 @@ def init():
     parser.add_argument("--channel1", type=int, default=128//DEBUG, help="size of the channel 1")
     parser.add_argument("--channel2", type=int, default=128//DEBUG, help="size of the channel 2")
     parser.add_argument("--channel3", type=int, default=128//DEBUG, help="size of the channel 3")
-    parser.add_argument("--latent_dim", type=int, default=32, help="dimensionality of the latent space")
+    parser.add_argument("--latent_dim", type=int, default=64, help="dimensionality of the latent space")
     parser.add_argument("--img_size", type=int, default=128//DEBUG, help="size of each image dimension")
     parser.add_argument("--channels", type=int, default=3, help="number of input image channels")
     parser.add_argument("--sample_interval", type=int, default=1, help="interval in epochs between image sampling")
