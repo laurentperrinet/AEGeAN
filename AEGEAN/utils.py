@@ -15,7 +15,45 @@ import time
 from itertools import product
 import os
 
-from .SimpsonsDataset import *
+# from .SimpsonsDataset import *
+
+
+class FolderDataset(Dataset):
+    def __init__(self, dir_path, height, width, transform):
+        """
+        Args:
+                dir_path (string): path to dir that contains exclusively png images
+                height (int): image height
+                width (int): image width
+                transform: pytorch transforms for transforms and tensor conversion during training
+        """
+        self.files = glob(dir_path + '*')
+        self.labels = np.zeros(len(self.files))
+        self.height = height
+        self.width = width
+        self.transform = transform
+
+        # Chargement des images
+        self.imgs = list()
+        for img in self.files:
+            #img_as_np = np.asarray(Image.open(img).resize((self.height, self.width))).astype('uint8')
+            img_as_img = Image.open(img).resize((self.height, self.width))
+
+            self.imgs.append(img_as_img)
+
+    def __getitem__(self, index):
+        #print("Image load : ",self.files[index])
+        single_image_label = self.labels[index]
+        img_as_img = self.imgs[index]
+
+        # Transform image to tensor
+        img_as_tensor = self.transform(img_as_img)
+
+        # Return image and the label
+        return (img_as_tensor, single_image_label)
+
+    def __len__(self):
+        return len(self.files)
 
 def weights_init_normal(m, factor=1.0):
     classname = m.__class__.__name__
@@ -36,7 +74,7 @@ def weights_init_normal(m, factor=1.0):
         m.bias.data.zero_()
 
 
-def load_data(path, img_size, batch_size, Fast=True, FDD=False, rand_hflip=False, rand_affine=None, return_dataset=False, mode='RGB', mean=0, std=1):
+def load_data(path, img_size, batch_size, Fast=True, FDD=False, rand_hflip=False, rand_affine=None, return_dataset=False, mean=0, std=1):
     print("Loading data...")
     t_total = time.time()
 
@@ -51,14 +89,14 @@ def load_data(path, img_size, batch_size, Fast=True, FDD=False, rand_hflip=False
 
     transform = transforms.Compose(transform_tmp)
 
-    if Fast:
-        if FDD:
-            dataset = FastFDD(path, img_size, img_size, transform)
-        else:
-            dataset = FastSimpsonsDataset(path, img_size, img_size, transform, mode)
-    else:
-        dataset = SimpsonsDataset(path, img_size, img_size, transform)
-
+    # if Fast:
+    #     if FDD:
+    #         dataset = FastFDD(path, img_size, img_size, transform)
+    #     else:
+    #         dataset = FastSimpsonsDataset(path, img_size, img_size, transform, mode)
+    # else:
+    #     dataset = SimpsonsDataset(path, img_size, img_size, transform)
+    dataset = FolderDataset(path, img_size, img_size, transform)
     dataloader = torch.utils.data.DataLoader(dataset, batch_size=batch_size, shuffle=True, drop_last=True)
 
     print("[Loading Time: ", time.strftime("%Mm:%Ss", time.gmtime(time.time() - t_total)),
@@ -272,7 +310,7 @@ if __name__ == "__main__":
 
     # DataLoader test
     loader, dataset = load_data("../cropped_clear/cp/", 200, 6, Fast=True, rand_hflip=True,
-                                rand_affine=[(-25, 25), (1.0, 1.0)], return_dataset=True, mode='RGB')
+                                rand_affine=[(-25, 25), (1.0, 1.0)], return_dataset=True)
 
     for (imgs, _) in loader:
         show_tensor(imgs[1], 1)
