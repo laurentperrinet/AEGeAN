@@ -66,16 +66,18 @@ class Encoder(nn.Module):
         self.conv4 = nn.Sequential(*encoder_block(self.channels[2], self.channels[3]),)
 
         self.init_size = opt.img_size // opts_conv['stride']**4
-        self.vector = nn.Linear(self.channels[3] * self.init_size ** 2, opt.latent_dim)
-        # self.sigmoid = nn.Sequential(nn.Sigmoid(),)
+        # self.vector = nn.Linear(self.channels[3] * self.init_size ** 2, opt.latent_dim)
+        self.vector = nn.Sequential(
+                        nn.Linear(self.channels[3] * self.init_size ** 2, opt.latent_dim),
+                        nn.Tanh(),
+                        )
+
 
     def forward(self, img):
         if self.opt.verbose: print("Encoder")
         if self.opt.verbose: print("Image shape : ",img.shape)
-        out = img #.copy()
+        out = img
         if self.opt.do_whitening:
-            # for i in range(self.opt.channels):
-            #     out[:, i, :, :] = conv2d(out[:, i, :, :], KW, padding=1)
             out = conv2d(out, KW, padding=1)
         if self.opt.verbose: print("WImage shape : ",out.shape)
         out = self.conv1(img)
@@ -154,7 +156,6 @@ class Generator(nn.Module):
 
         if self.opt.do_whitening:
             img = conv2d(img, Kinv, padding=1)
-
         return img
 
     def _name(self):

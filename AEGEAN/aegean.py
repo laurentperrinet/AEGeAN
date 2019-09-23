@@ -131,14 +131,10 @@ def learn(opt):
             # ---------------------
             #  Train Encoder
             # ---------------------
+            optimizer_E.zero_grad()
 
             real_imgs = Variable(imgs.type(Tensor))
-            # print(zero_target.shape, real_imgs.shape)
-            # zero_target = Variable(Tensor(torch.zeros_like(real_imgs)))
-            # z_zeros = Variable(Tensor(z_imgs.size(0), z_imgs.size(1)).fill_(0), requires_grad=False)
-            # z_ones = Variable(Tensor(z_imgs.size(0), z_imgs.size(1)).fill_(1), requires_grad=False)
-
-            optimizer_E.zero_grad()
+            # TODO add noise here to real_imgs
             z_imgs = encoder(real_imgs)
             decoded_imgs = generator(z_imgs)
 
