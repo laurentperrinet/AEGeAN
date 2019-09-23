@@ -51,9 +51,10 @@ class Encoder(nn.Module):
         self.channels = [opt.channel0, opt.channel1, opt.channel2, opt.channel3]
 
         def encoder_block(in_filters, out_filters, bn=True):
-            block = [nn.Conv2d(in_filters, out_filters, **opts_conv), NL]
+            block = [nn.Conv2d(in_filters, out_filters, **opts_conv),]
             if bn and (not opt.bn_eps==np.inf):
                 block.append(nn.BatchNorm2d(out_filters, eps=opt.bn_eps, momentum=opt.bn_momentum))
+            block.append(NL)
             return block
 
         # use a different layer in the encoder using similarly max_filters
@@ -108,10 +109,10 @@ class Generator(nn.Module):
         def generator_block(in_filters, out_filters, bn=True):
             block = [nn.UpsamplingNearest2d(scale_factor=opts_conv['stride']),
                      nn.Conv2d(in_filters, out_filters, kernel_size=opts_conv['kernel_size'], stride=1, padding=opts_conv['padding'], padding_mode=opts_conv['padding_mode']),
-                     #nn.BatchNorm2d(out_filters, eps=opt.bn_eps, momentum=opt.bn_momentum),
-                     NL]
+                     ]
             if bn and (not opt.bn_eps==np.inf):
                 block.append(nn.BatchNorm2d(out_filters, eps=opt.bn_eps, momentum=opt.bn_momentum))
+            block.append(NL)
 
             return block
 
@@ -167,12 +168,12 @@ class Discriminator(nn.Module):
                          padding=opt.padding, padding_mode='zeros')
         self.channels = [opt.channel0, opt.channel1, opt.channel2, opt.channel3]
 
-
         def discriminator_block(in_filters, out_filters, bn=True):
-            block = [nn.Conv2d(in_filters, out_filters, **opts_conv), NL]#, nn.Dropout2d(0.25)
+            block = [nn.Conv2d(in_filters, out_filters, **opts_conv), ]#, nn.Dropout2d(0.25)
             if bn and (not opt.bn_eps==np.inf):
                 # https://pytorch.org/docs/stable/nn.html#torch.nn.BatchNorm2d
                 block.append(nn.BatchNorm2d(out_filters, eps=opt.bn_eps, momentum=opt.bn_momentum))
+            block.append(NL)
             return block
 
         self.opt = opt
@@ -184,7 +185,8 @@ class Discriminator(nn.Module):
 
         # The height and width of downsampled image
         self.init_size = opt.img_size // opts_conv['stride']**4
-        self.adv_layer = nn.Sequential(nn.Linear(self.channels[3] * self.init_size ** 2, 1))#, nn.Sigmoid()
+        # self.adv_layer = nn.Sequential(nn.Linear(self.channels[3] * self.init_size ** 2, 1))#, nn.Sigmoid()
+        self.adv_layer = nn.Linear(self.channels[3] * self.init_size ** 2, 1)
 
     def forward(self, img):
         if self.opt.verbose:
