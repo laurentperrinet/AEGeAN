@@ -14,7 +14,7 @@ opt.runs_path = tag + 'vanilla'
 print(opt)
 AG.learn(opt)
 
-GAN_losses = ['original', 'wasserstein', 'ian', 'alternative']: #, 'alternativ2']:
+GAN_losses = ['original', 'wasserstein', 'ian', 'alternative'] #, 'alternativ2'
 
 for GAN_loss in GAN_losses:
     opt = AG.init()
