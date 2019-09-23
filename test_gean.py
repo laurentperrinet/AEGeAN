@@ -5,7 +5,7 @@ import numpy as np
 import AEGEAN as AG
 
 opt = AG.init()
-tag = f'{HOST}_{opt.img_size}_'
+tag = f'GEAN_{HOST}_{opt.img_size}_'
 
 
 # VANILLA
@@ -14,14 +14,15 @@ opt.runs_path = tag + 'vanilla'
 print(opt)
 AG.learn(opt)
 
+GAN_losses = ['original', 'wasserstein', 'ian', 'alternative']: #, 'alternativ2']:
 
-for GAN_loss in ['original', 'wasserstein', 'ian']: #, 'alternative', 'alternativ2']:
+for GAN_loss in GAN_losses:
     opt = AG.init()
     opt.runs_path = tag + 'GAN_loss_' + GAN_loss
     opt.GAN_loss = GAN_loss
     AG.learn(opt)
 
-for GAN_loss in ['original', 'wasserstein', 'ian']: #, 'alternative', 'alternativ2']:
+for GAN_loss in GAN_losses:
     opt = AG.init()
     opt.runs_path = tag + 'GAN_loss_' + GAN_loss
     opt.GAN_loss = GAN_loss

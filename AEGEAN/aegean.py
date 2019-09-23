@@ -251,7 +251,10 @@ def learn(opt):
                 # Tensorboard save
                 iteration = i + nb_batch * j
                 writer.add_scalar('e_loss', e_loss.item(), global_step=iteration)
-                writer.add_histogram('E(x)', z_imgs, global_step=iteration)
+                try:
+                    writer.add_histogram('E(x)', z_imgs, global_step=iteration)
+                except:
+                    pass
                 if opt.lrD > 0 :
                     writer.add_scalar('g_loss', g_loss.item(), global_step=iteration)
                     writer.add_scalar('d_loss', d_loss.item(), global_step=iteration)
