@@ -281,12 +281,12 @@ def learn(opt):
                 tensorboard_sampling(fixed_noise, generator, writer, epoch)
                 tensorboard_AE_comparator(real_imgs[:opt.N_samples], generator, encoder, writer, epoch)
 
-        if epoch % opt.sample_interval == 0:
+        if epoch % opt.sample_interval == 0 and  self.opt.latent_dim > 0:
             sampling(fixed_noise, generator, path_data, epoch, tag)
             do_plot(hist, start_epoch, epoch)
 
         # Save models
-        if epoch % opt.model_save_interval == 0:
+        if epoch % opt.model_save_interval == 0 and  self.opt.latent_dim > 0:
             num = str(int(epoch / opt.model_save_interval))
             save_model(discriminator, optimizer_D, epoch, opt.model_save_path + "/" + num + "_D.pt")
             save_model(generator, optimizer_G, epoch, opt.model_save_path + "/" + num + "_G.pt")
