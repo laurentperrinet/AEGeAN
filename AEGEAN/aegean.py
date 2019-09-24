@@ -252,7 +252,8 @@ def learn(opt):
                 iteration = i + nb_batch * j
                 writer.add_scalar('e_loss', e_loss.item(), global_step=iteration)
                 try:
-                    writer.add_histogram('E(x)', z_imgs, global_step=iteration)
+                    if self.opt.latent_dim > 0:
+                        writer.add_histogram('E(x)', z_imgs, global_step=iteration)
                 except:
                     pass
                 if opt.lrD > 0 :
@@ -276,7 +277,7 @@ def learn(opt):
             writer.add_scalar('D_G_z_max', hist["D_G_z_max"][j], global_step=epoch)
 
             # Save samples
-            if epoch % opt.sample_interval == 0:
+            if epoch % opt.sample_interval == 0 and  self.opt.latent_dim > 0:
                 tensorboard_sampling(fixed_noise, generator, writer, epoch)
                 tensorboard_AE_comparator(real_imgs[:opt.N_samples], generator, encoder, writer, epoch)
 
