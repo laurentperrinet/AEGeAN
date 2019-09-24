@@ -137,7 +137,7 @@ def learn(opt):
             # TODO add noise here to real_imgs
             z_imgs = encoder(real_imgs)
             decoded_imgs = generator(z_imgs)
-            # Loss measures Encoder's ability to generate vectors suitable with the generator
+                # Loss measures Encoder's ability to generate vectors suitable with the generator
             if opt.do_joint:
                 e_loss = MSE_loss(real_imgs, decoded_imgs)
             else:
