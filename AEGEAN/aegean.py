@@ -252,7 +252,7 @@ def learn(opt):
                 iteration = i + nb_batch * j
                 writer.add_scalar('e_loss', e_loss.item(), global_step=iteration)
                 try:
-                    if self.opt.latent_dim > 0:
+                    if opt.latent_dim > 0:
                         writer.add_histogram('E(x)', z_imgs, global_step=iteration)
                 except:
                     pass
@@ -277,16 +277,16 @@ def learn(opt):
             writer.add_scalar('D_G_z_max', hist["D_G_z_max"][j], global_step=epoch)
 
             # Save samples
-            if epoch % opt.sample_interval == 0 and  self.opt.latent_dim > 0:
+            if epoch % opt.sample_interval == 0 and opt.latent_dim > 0:
                 tensorboard_sampling(fixed_noise, generator, writer, epoch)
                 tensorboard_AE_comparator(real_imgs[:opt.N_samples], generator, encoder, writer, epoch)
 
-        if epoch % opt.sample_interval == 0 and  self.opt.latent_dim > 0:
+        if epoch % opt.sample_interval == 0 and opt.latent_dim > 0:
             sampling(fixed_noise, generator, path_data, epoch, tag)
             do_plot(hist, start_epoch, epoch)
 
         # Save models
-        if epoch % opt.model_save_interval == 0 and  self.opt.latent_dim > 0:
+        if epoch % opt.model_save_interval == 0 and opt.latent_dim > 0:
             num = str(int(epoch / opt.model_save_interval))
             save_model(discriminator, optimizer_D, epoch, opt.model_save_path + "/" + num + "_D.pt")
             save_model(generator, optimizer_G, epoch, opt.model_save_path + "/" + num + "_G.pt")
