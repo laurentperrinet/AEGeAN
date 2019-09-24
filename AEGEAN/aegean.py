@@ -137,7 +137,6 @@ def learn(opt):
             # TODO add noise here to real_imgs
             z_imgs = encoder(real_imgs)
             decoded_imgs = generator(z_imgs)
-
             # Loss measures Encoder's ability to generate vectors suitable with the generator
             if opt.do_joint:
                 e_loss = MSE_loss(real_imgs, decoded_imgs)
@@ -145,9 +144,10 @@ def learn(opt):
                 e_loss = MSE_loss(real_imgs, decoded_imgs.detach())
 
             e_loss /= MSE_loss(real_imgs, zero_target) # normalize on the energy of imgs
-            # add a loss for the distance between of z values
-            e_loss += opt.lambdaE * MSE_loss(z_imgs, z_zeros)/opt.batch_size/opt.latent_dim
-            e_loss += opt.lambdaE * MSE_loss(z_imgs.pow(2), z_ones).pow(.5)/opt.batch_size/opt.latent_dim
+            if opt.lambdaE > 0:
+                # add a loss for the distance between of z values
+                e_loss += opt.lambdaE * MSE_loss(z_imgs, z_zeros)/opt.batch_size/opt.latent_dim
+                e_loss += opt.lambdaE * MSE_loss(z_imgs.pow(2), z_ones).pow(.5)/opt.batch_size/opt.latent_dim
 
             # Backward
             e_loss.backward()

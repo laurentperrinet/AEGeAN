@@ -65,8 +65,8 @@ class Encoder(nn.Module):
         self.conv3 = nn.Sequential(*encoder_block(self.channels[1], self.channels[2]),)
         self.conv4 = nn.Sequential(*encoder_block(self.channels[2], self.channels[3]),)
 
-        self.init_size = opt.img_size // opts_conv['stride']**4
         if opt.latent_dim > 0:
+            self.init_size = opt.img_size // opts_conv['stride']**4
             # self.vector = nn.Linear(self.channels[3] * self.init_size ** 2, opt.latent_dim)
             self.vector = nn.Sequential(
                             nn.Linear(self.channels[3] * self.init_size ** 2, opt.latent_dim),
@@ -88,13 +88,13 @@ class Encoder(nn.Module):
         out = self.conv3(out)
         if self.opt.verbose: print("Conv3 out : ",out.shape)
         out = self.conv4(out)
-        if self.opt.verbose: print("Conv4 out : ",out.shape, " init_size=", self.init_size)
+        if self.opt.verbose: print("Conv4 out : ",out.shape)
 
         if self.opt.latent_dim > 0:
             out = out.view(out.shape[0], -1)
-            if self.opt.verbose: print("View out : ",out.shape)
+            if self.opt.verbose: print("View out : ",out.shape, " init_size=", self.init_size)
             out = self.vector(out)
-            if self.opt.verbose: print("Z : ",z.shape)
+            if self.opt.verbose: print("Z : ",out.shape)
 
         return out
 
@@ -124,17 +124,17 @@ class Generator(nn.Module):
         if self.opt.latent_dim > 0:
             self.l1 = nn.Sequential(nn.Linear(opt.latent_dim, self.channels[3] * self.init_size ** 2), NL)
 
-
         self.conv1 = nn.Sequential(*generator_block(self.channels[3], self.channels[2], bn=False),)
         self.conv2 = nn.Sequential(*generator_block(self.channels[2], self.channels[1]),)
         self.conv3 = nn.Sequential(*generator_block(self.channels[1], self.channels[0]),)
         self.conv_blocks = nn.Sequential(
+            nn.UpsamplingNearest2d(scale_factor=opts_conv['stride']),
             nn.Conv2d(self.channels[0], opt.channels, 3, stride=1, padding=1),
             nn.Tanh(),
         )
 
     def forward(self, z):
-        if self.opt.verbose: print("G")
+        if self.opt.verbose: print("Generator")
         if self.opt.latent_dim > 0:
             # Dim : opt.latent_dim
             out = self.l1(z)
@@ -155,13 +155,13 @@ class Generator(nn.Module):
         # Dim : (self.channels[3]/8, opt.img_size, opt.img_size)
         if self.opt.verbose: print("Conv3 out : ",out.shape)
 
-        img = self.conv_blocks(out)
+        out = self.conv_blocks(out)
         # Dim : (opt.chanels, opt.img_size, opt.img_size)
-        if self.opt.verbose: print("img out : ", img.shape)
+        if self.opt.verbose: print("img out : ", out.shape)
 
         if self.opt.do_whitening:
-            img = conv2d(img, Kinv, padding=1)
-        return img
+            out = conv2d(out, Kinv, padding=1)
+        return out
 
     def _name(self):
         return "Generator"
