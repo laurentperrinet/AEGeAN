@@ -265,8 +265,8 @@ def learn(opt):
                     writer.add_scalar('d_x_cv', hist["d_x_cv"][i], global_step=iteration)
                     writer.add_scalar('d_g_z_cv', hist["d_g_z_cv"][i], global_step=iteration)
 
-                    writer.add_histogram('D(x)', d_x, global_step=iteration)
-                    writer.add_histogram('D(G(z))', d_g_z, global_step=iteration)
+                    writer.add_histogram('D(x)', d_x, global_step=iteration, bins=np.linspace(0, 1, 20))
+                    writer.add_histogram('D(G(z))', d_g_z, global_step=iteration, bins=np.linspace(0, 1, 20))
 
 
         if do_tensorboard:

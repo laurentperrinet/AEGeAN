@@ -66,11 +66,12 @@ class Encoder(nn.Module):
         self.conv4 = nn.Sequential(*encoder_block(self.channels[2], self.channels[3]),)
 
         self.init_size = opt.img_size // opts_conv['stride']**4
-        # self.vector = nn.Linear(self.channels[3] * self.init_size ** 2, opt.latent_dim)
-        self.vector = nn.Sequential(
-                        nn.Linear(self.channels[3] * self.init_size ** 2, opt.latent_dim),
-                        nn.Tanh(),
-                        )
+        if opt.latent_dim > 0:
+            # self.vector = nn.Linear(self.channels[3] * self.init_size ** 2, opt.latent_dim)
+            self.vector = nn.Sequential(
+                            nn.Linear(self.channels[3] * self.init_size ** 2, opt.latent_dim),
+                            nn.Tanh(),
+                            )
 
 
     def forward(self, img):
@@ -89,13 +90,13 @@ class Encoder(nn.Module):
         out = self.conv4(out)
         if self.opt.verbose: print("Conv4 out : ",out.shape, " init_size=", self.init_size)
 
-        out = out.view(out.shape[0], -1)
-        if self.opt.verbose: print("View out : ",out.shape)
-        z = self.vector(out)
-        # z = self.sigmoid(z)
-        if self.opt.verbose: print("Z : ",z.shape)
+        if self.opt.latent_dim > 0:
+            out = out.view(out.shape[0], -1)
+            if self.opt.verbose: print("View out : ",out.shape)
+            out = self.vector(out)
+            if self.opt.verbose: print("Z : ",z.shape)
 
-        return z
+        return out
 
     def _name(self):
         return "Encoder"
@@ -120,7 +121,8 @@ class Generator(nn.Module):
 
         self.opt = opt
         self.init_size = opt.img_size // opts_conv['stride']**3
-        self.l1 = nn.Sequential(nn.Linear(opt.latent_dim, self.channels[3] * self.init_size ** 2), NL)
+        if self.opt.latent_dim > 0:
+            self.l1 = nn.Sequential(nn.Linear(opt.latent_dim, self.channels[3] * self.init_size ** 2), NL)
 
 
         self.conv1 = nn.Sequential(*generator_block(self.channels[3], self.channels[2], bn=False),)
@@ -133,12 +135,15 @@ class Generator(nn.Module):
 
     def forward(self, z):
         if self.opt.verbose: print("G")
-        # Dim : opt.latent_dim
-        out = self.l1(z)
-        if self.opt.verbose: print("l1 out : ",out.shape)
-        out = out.view(out.shape[0], self.channels[3], self.init_size, self.init_size)
-        # Dim : (self.channels[3], opt.img_size/8, opt.img_size/8)
-        if self.opt.verbose: print("View out : ",out.shape)
+        if self.opt.latent_dim > 0:
+            # Dim : opt.latent_dim
+            out = self.l1(z)
+            if self.opt.verbose: print("l1 out : ",out.shape)
+            out = out.view(out.shape[0], self.channels[3], self.init_size, self.init_size)
+            # Dim : (self.channels[3], opt.img_size/8, opt.img_size/8)
+            if self.opt.verbose: print("View out : ",out.shape)
+        else:
+            out = z
 
         out = self.conv1(out)
         # Dim : (self.channels[3]/2, opt.img_size/4, opt.img_size/4)
