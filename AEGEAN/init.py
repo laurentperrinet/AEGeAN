@@ -25,7 +25,7 @@ def init():
     parser.add_argument("--D_noise", type=float, default=0.3, help="Add noise to the input images of D")
     parser.add_argument("--lrG", type=float, default=0.0005*DEBUG, help="learning rate for G")
     parser.add_argument("--GAN_loss", type=str, default='alternativ2', help="Use different losses for G.")
-    parser.add_argument("--do_whitening", type=bool, default=False, help="Use contrasted images.")
+    parser.add_argument("--do_whitening", type=bool, default=True, help="Use contrasted images.")
     parser.add_argument("--bn_eps", type=float, default=.5, help="batchnorm: espilon for numerical stability")
     parser.add_argument("--do_joint", type=bool, default=True, help="Do a joint learning of E and G, dude.")
     parser.add_argument("--bn_momentum", type=float, default=.1, help="batchnorm: momentum for numerical stability")
