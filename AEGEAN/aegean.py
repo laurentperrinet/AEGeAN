@@ -250,35 +250,35 @@ def learn(opt):
             if do_tensorboard:
                 # Tensorboard save
                 iteration = i + nb_batch * j
-                writer.add_scalar('e_loss', e_loss.item(), global_step=iteration)
+                writer.add_scalar('loss/E', e_loss.item(), global_step=iteration)
                 try:
                     if opt.latent_dim > 0:
                         writer.add_histogram('E(x)', z_imgs, global_step=iteration)
                 except:
                     pass
                 if opt.lrD > 0 :
-                    writer.add_scalar('g_loss', g_loss.item(), global_step=iteration)
-                    writer.add_scalar('d_loss', d_loss.item(), global_step=iteration)
+                    writer.add_scalar('loss/G', g_loss.item(), global_step=iteration)
+                    writer.add_scalar('loss/D', d_loss.item(), global_step=iteration)
 
                     writer.add_scalar('d_x_mean', hist["d_x_mean"][i], global_step=iteration)
                     writer.add_scalar('d_g_z_mean', hist["d_g_z_mean"][i], global_step=iteration)
 
-                    writer.add_scalar('d_x_cv', hist["d_x_cv"][i], global_step=iteration)
-                    writer.add_scalar('d_g_z_cv', hist["d_g_z_cv"][i], global_step=iteration)
+                    # writer.add_scalar('d_x_cv', hist["d_x_cv"][i], global_step=iteration)
+                    # writer.add_scalar('d_g_z_cv', hist["d_g_z_cv"][i], global_step=iteration)
 
                     writer.add_histogram('D(x)', d_x, global_step=iteration, bins=np.linspace(0, 1, 20))
                     writer.add_histogram('D(G(z))', d_g_z, global_step=iteration, bins=np.linspace(0, 1, 20))
 
 
         if do_tensorboard:
-            writer.add_scalar('D_x_max', hist["D_x_max"][j], global_step=epoch)
-            writer.add_scalar('D_x_min', hist["D_x_min"][j], global_step=epoch)
-            writer.add_scalar('D_G_z_min', hist["D_G_z_min"][j], global_step=epoch)
-            writer.add_scalar('D_G_z_max', hist["D_G_z_max"][j], global_step=epoch)
+            writer.add_scalar('D_x/max', hist["D_x_max"][j], global_step=epoch)
+            writer.add_scalar('D_x/min', hist["D_x_min"][j], global_step=epoch)
+            writer.add_scalar('D_G_z/min', hist["D_G_z_min"][j], global_step=epoch)
+            writer.add_scalar('D_G_z/max', hist["D_G_z_max"][j], global_step=epoch)
 
             # Save samples
-            if epoch % opt.sample_interval == 0 and opt.latent_dim > 0:
-                tensorboard_sampling(fixed_noise, generator, writer, epoch)
+            if epoch % opt.sample_interval == 0 :
+                if opt.latent_dim > 0 : tensorboard_sampling(fixed_noise, generator, writer, epoch)
                 tensorboard_AE_comparator(real_imgs[:opt.N_samples], generator, encoder, writer, epoch)
 
         if epoch % opt.sample_interval == 0 and opt.latent_dim > 0:
