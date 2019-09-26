@@ -54,7 +54,7 @@ class Encoder(nn.Module):
         self.conv4 = nn.Sequential(*encoder_block(self.channels[2], self.channels[3]),)
 
         if opt.latent_dim > 0:
-            self.init_size = opt.img_size // self.opt.stride**4
+            self.init_size = opt.img_size // opt.stride**4
             self.vector = nn.Linear(self.channels[3] * self.init_size ** 2, opt.latent_dim)
             # self.vector = nn.Sequential(
             #     nn.Linear(self.channels[3] * self.init_size ** 2, opt.latent_dim),
@@ -119,7 +119,7 @@ class Generator(nn.Module):
             return block
 
         self.init_size = opt.img_size // opt.stride**4
-        if self.opt.latent_dim > 0:
+        if opt.latent_dim > 0:
             self.l1 = nn.Sequential(
                 nn.Linear(opt.latent_dim, self.channels[3] * self.init_size ** 2), NL)
 
