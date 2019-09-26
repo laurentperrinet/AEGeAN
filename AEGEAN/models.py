@@ -2,15 +2,6 @@ import os
 import numpy as np
 
 import itertools
-
-# import torchvision.transforms as transforms
-# from torchvision.utils import save_image
-# from torch.utils.tensorboard import SummaryWriter
-#
-# from torch.utils.data import DataLoader
-# from torchvision import datasets
-# from torch.autograd import Variable
-
 import torch.nn as nn
 import torch.nn.functional as F
 import torch
@@ -45,7 +36,6 @@ class Encoder(nn.Module):
     def __init__(self, opt):
         super(Encoder, self).__init__()
 
-        self.opt = opt
         NL = nn.LeakyReLU(opt.lrelu, inplace=True)
         opts_conv = dict(kernel_size=opt.kernel_size, stride=opt.stride,
                          padding=opt.padding, padding_mode='zeros', bias=opt.do_bias)
@@ -58,9 +48,6 @@ class Encoder(nn.Module):
             block.append(NL)
             return block
 
-        # use a different layer in the encoder using similarly max_filters
-        # self.channels[3] = 512
-
         self.conv1 = nn.Sequential(*encoder_block(opt.channels, self.channels[0], bn=False),)
         self.conv2 = nn.Sequential(*encoder_block(self.channels[0], self.channels[1]),)
         self.conv3 = nn.Sequential(*encoder_block(self.channels[1], self.channels[2]),)
@@ -68,11 +55,13 @@ class Encoder(nn.Module):
 
         if opt.latent_dim > 0:
             self.init_size = opt.img_size // self.opt.stride**4
-            # self.vector = nn.Linear(self.channels[3] * self.init_size ** 2, opt.latent_dim)
-            self.vector = nn.Sequential(
-                nn.Linear(self.channels[3] * self.init_size ** 2, opt.latent_dim),
-                nn.Tanh(),
-            )
+            self.vector = nn.Linear(self.channels[3] * self.init_size ** 2, opt.latent_dim)
+            # self.vector = nn.Sequential(
+            #     nn.Linear(self.channels[3] * self.init_size ** 2, opt.latent_dim),
+            #     nn.Tanh(),
+            # )
+
+        self.opt = opt
 
     def forward(self, img):
         if self.opt.verbose:
@@ -84,7 +73,7 @@ class Encoder(nn.Module):
             out = conv2d(out, KW, padding=1)
         if self.opt.verbose:
             print("WImage shape : ", out.shape)
-        out = self.conv1(img)
+        out = self.conv1(out)
         if self.opt.verbose:
             print("Conv1 out : ", out.shape)
         out = self.conv2(out)
@@ -115,8 +104,8 @@ class Generator(nn.Module):
     def __init__(self, opt):
         super(Generator, self).__init__()
         NL = nn.LeakyReLU(opt.lrelu, inplace=True)
-        opts_conv = dict(kernel_size=opt.kernel_size, #stride=opt.stride,
-                         padding=opt.padding, padding_mode='zeros', bias=opt.do_bias)
+        opts_conv = dict(kernel_size=opt.kernel_size, bias=opt.do_bias,
+                         padding=opt.padding, padding_mode='zeros')
         self.channels = [opt.channel0, opt.channel1, opt.channel2, opt.channel3]
 
         def generator_block(in_filters, out_filters, bn=True):
@@ -129,7 +118,6 @@ class Generator(nn.Module):
 
             return block
 
-        self.opt = opt
         self.init_size = opt.img_size // opt.stride**4
         if self.opt.latent_dim > 0:
             self.l1 = nn.Sequential(
@@ -144,6 +132,7 @@ class Generator(nn.Module):
                       bias=opts_conv['bias']),
             nn.Tanh(),
         )
+        self.opt = opt
 
     def forward(self, z):
         if self.opt.verbose:
@@ -230,7 +219,7 @@ class Discriminator(nn.Module):
         if self.opt.do_whitening:
             out = conv2d(out, KW, padding=1)
 
-        out = self.conv1(img)
+        out = self.conv1(out)
         if self.opt.verbose:
             print("Conv1 out : ", out.shape)
 
