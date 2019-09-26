@@ -117,6 +117,8 @@ def learn(opt):
 
     # Vecteur z fixe pour faire les samples
     fixed_noise = Variable(Tensor(np.random.normal(0, 1, (opt.N_samples, opt.latent_dim))), requires_grad=False)
+    real_imgs_samples = None
+
     zero_target = Variable(Tensor(torch.zeros(opt.batch_size, opt.channels, opt.img_size, opt.img_size)), requires_grad=False)
     z_zeros = Variable(Tensor(opt.batch_size, opt.latent_dim).fill_(0), requires_grad=False)
     z_ones = Variable(Tensor(opt.batch_size, opt.latent_dim).fill_(1), requires_grad=False)
@@ -134,6 +136,9 @@ def learn(opt):
             optimizer_E.zero_grad()
 
             real_imgs = Variable(imgs.type(Tensor))
+            # init samples used in the AE
+            if real_imgs_samples is None: real_imgs_samples = real_imgs[:opt.N_samples]
+
             # TODO add noise here to real_imgs
             z_imgs = encoder(real_imgs)
             decoded_imgs = generator(z_imgs)
@@ -279,7 +284,7 @@ def learn(opt):
             # Save samples
             if epoch % opt.sample_interval == 0 :
                 if opt.latent_dim > 0 : tensorboard_sampling(fixed_noise, generator, writer, epoch)
-                tensorboard_AE_comparator(real_imgs[:opt.N_samples], generator, encoder, writer, epoch)
+                tensorboard_AE_comparator(real_imgs_samples, generator, encoder, writer, epoch)
 
         if epoch % opt.sample_interval == 0 and opt.latent_dim > 0:
             sampling(fixed_noise, generator, path_data, epoch, tag)
