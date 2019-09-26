@@ -1,8 +1,8 @@
+import AEGEAN as AG
+import numpy as np
 import os
 PID, HOST = os.getpid(), os.uname()[1]
 
-import numpy as np
-import AEGEAN as AG
 
 opt = AG.init()
 opt.lrG, opt.lrD = 0., 0.

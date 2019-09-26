@@ -1,3 +1,12 @@
+import os
+from itertools import product
+import time
+import torch
+import random
+import numpy as np
+import datetime
+from glob import glob
+import matplotlib.pyplot as plt
 from torch.utils.data.dataset import Dataset
 from torchvision import transforms
 import torchvision
@@ -5,15 +14,6 @@ from torchvision.utils import save_image
 from PIL import Image
 import matplotlib
 matplotlib.use('Agg')
-import matplotlib.pyplot as plt
-from glob import glob
-import datetime
-import numpy as np
-import random
-import torch
-import time
-from itertools import product
-import os
 
 # from .SimpsonsDataset import *
 
@@ -54,6 +54,7 @@ class FolderDataset(Dataset):
 
     def __len__(self):
         return len(self.files)
+
 
 def weights_init_normal(m, factor=1.0):
     classname = m.__class__.__name__
@@ -97,7 +98,8 @@ def load_data(path, img_size, batch_size, Fast=True, FDD=False, rand_hflip=False
     # else:
     #     dataset = SimpsonsDataset(path, img_size, img_size, transform)
     dataset = FolderDataset(path, img_size, img_size, transform)
-    dataloader = torch.utils.data.DataLoader(dataset, batch_size=batch_size, shuffle=True, drop_last=True)
+    dataloader = torch.utils.data.DataLoader(
+        dataset, batch_size=batch_size, shuffle=True, drop_last=True)
 
     print("[Loading Time: ", time.strftime("%Mm:%Ss", time.gmtime(time.time() - t_total)),
           "] [Numbers of samples :", len(dataset), " ]\n")
@@ -138,13 +140,14 @@ def load_models(discriminator, optimizer_D, generator, optimizer_G, n_epochs, mo
 
     if start_epochG is not start_epochD:
         print("Something seems wrong : epochs used to train G and D are different !!")
-        #exit(0)
+        # exit(0)
     start_epoch = start_epochD
-    #if start_epoch >= n_epochs:
+    # if start_epoch >= n_epochs:
     #    print("Something seems wrong : you epochs demander inférieur au nombre d'epochs déjà effectuer !!")
     #    #exit(0)
 
     return start_epoch + 1  # Last epoch already done
+
 
 def sampling(noise, generator, path, epoch, tag='', nrow=8):
     """
@@ -154,7 +157,8 @@ def sampling(noise, generator, path, epoch, tag='', nrow=8):
     """
     generator.eval()
     gen_imgs = generator(noise)
-    save_image(gen_imgs.data[:], "%s/%s_%d.png" % (path, tag, epoch), nrow=nrow, normalize=True, range=(0, 1))
+    save_image(gen_imgs.data[:], "%s/%s_%d.png" %
+               (path, tag, epoch), nrow=nrow, normalize=True, range=(0, 1))
     generator.train()
 
 
@@ -168,6 +172,7 @@ def tensorboard_sampling(noise, generator, writer, epoch, nrow=8, image_type='Ge
     grid = torchvision.utils.make_grid(gen_imgs, normalize=True, nrow=nrow, range=(0, 1))
     writer.add_image(image_type, grid, epoch)
     generator.train()
+
 
 def tensorboard_AE_comparator(imgs, generator, encoder, writer, epoch):
     """
@@ -186,6 +191,7 @@ def tensorboard_AE_comparator(imgs, generator, encoder, writer, epoch):
     writer.add_image('Images/auto-encoded', grid_dec, epoch)
     generator.train()
     encoder.train()
+
 
 def tensorboard_LSD_comparator(imgs, vectors, generator, writer, epoch):
     """
@@ -207,8 +213,10 @@ def AE_sampling(imgs, encoder, generator, path, epoch):
     generator.eval()
     enc_imgs = encoder(imgs)
     dec_imgs = generator(enc_imgs)
-    save_image(imgs.data[:16], "%s/%d_img.png" % (path, epoch), nrow=8, normalize=True, range=(0, 1))
-    save_image(dec_imgs.data[:16], "%s/%d_dec.png" % (path, epoch), nrow=8, normalize=True, range=(0, 1))
+    save_image(imgs.data[:16], "%s/%d_img.png" %
+               (path, epoch), nrow=8, normalize=True, range=(0, 1))
+    save_image(dec_imgs.data[:16], "%s/%d_dec.png" %
+               (path, epoch), nrow=8, normalize=True, range=(0, 1))
     generator.train()
 
 
@@ -227,10 +235,11 @@ def generate_animation(path, fps=1):
     images_path = sorted(images_path, key=comp)
     images = []
     for i in images_path:
-        #print(i)
+        # print(i)
         images.append(imageio.imread(i))
 
     imageio.mimsave(path + 'training.gif', images, fps=fps)
+
 
 def scan(exp_name, params, permutation=True, gpu_repart=False):
     """
@@ -254,7 +263,7 @@ def scan(exp_name, params, permutation=True, gpu_repart=False):
         perm = list(product(*val_tab))
     else:
         perm = list(zip(*val_tab))
-    #print(perm)
+    # print(perm)
 
     # Construction du noms de chaque test en fonction des paramètre qui la compose
     names = list()
@@ -264,7 +273,7 @@ def scan(exp_name, params, permutation=True, gpu_repart=False):
         l = list(zip(e, b))
         l_str = [str(ele) for el in l for ele in el]
         names.append(''.join(l_str).replace('-', ''))
-    #print(names)
+    # print(names)
 
     # Construction de toutes les commandes à lancer
     base = "python3 dcgan.py -r " + exp_name + "/"
@@ -288,13 +297,13 @@ def scan(exp_name, params, permutation=True, gpu_repart=False):
     # Appelle successif des script avec différents paramètres
     log = list()
     for com in commandes:
-        print("Lancement de : ",com)
+        print("Lancement de : ", com)
         ret = os.system(com)
         log.append(ret)
 
     # Récapitulatif
-    for idx,com in enumerate(commandes):
-        print("Code retour : ",log[idx],"\t| Commandes ", com)
+    for idx, com in enumerate(commandes):
+        print("Code retour : ", log[idx], "\t| Commandes ", com)
 
 
 if __name__ == "__main__":

@@ -37,8 +37,9 @@ Kinv /= np.sqrt(4. * 3)
 
 cuda = True if torch.cuda.is_available() else False
 if cuda:
-    KW =  KW.to('cuda')
-    Kinv =  Kinv.to('cuda')
+    KW = KW.to('cuda')
+    Kinv = Kinv.to('cuda')
+
 
 class Encoder(nn.Module):
     def __init__(self, opt):
@@ -51,8 +52,8 @@ class Encoder(nn.Module):
         self.channels = [opt.channel0, opt.channel1, opt.channel2, opt.channel3]
 
         def encoder_block(in_filters, out_filters, bn=True):
-            block = [nn.Conv2d(in_filters, out_filters, **opts_conv),]
-            if bn and (not opt.bn_eps==np.inf):
+            block = [nn.Conv2d(in_filters, out_filters, **opts_conv), ]
+            if bn and (not opt.bn_eps == np.inf):
                 block.append(nn.BatchNorm2d(out_filters, eps=opt.bn_eps, momentum=opt.bn_momentum))
             block.append(NL)
             return block
@@ -69,37 +70,46 @@ class Encoder(nn.Module):
             self.init_size = opt.img_size // opts_conv['stride']**4
             # self.vector = nn.Linear(self.channels[3] * self.init_size ** 2, opt.latent_dim)
             self.vector = nn.Sequential(
-                            nn.Linear(self.channels[3] * self.init_size ** 2, opt.latent_dim),
-                            nn.Tanh(),
-                            )
-
+                nn.Linear(self.channels[3] * self.init_size ** 2, opt.latent_dim),
+                nn.Tanh(),
+            )
 
     def forward(self, img):
-        if self.opt.verbose: print("Encoder")
-        if self.opt.verbose: print("Image shape : ",img.shape)
+        if self.opt.verbose:
+            print("Encoder")
+        if self.opt.verbose:
+            print("Image shape : ", img.shape)
         out = img
         if self.opt.do_whitening:
             out = conv2d(out, KW, padding=1)
-        if self.opt.verbose: print("WImage shape : ",out.shape)
+        if self.opt.verbose:
+            print("WImage shape : ", out.shape)
         out = self.conv1(img)
-        if self.opt.verbose: print("Conv1 out : ",out.shape)
+        if self.opt.verbose:
+            print("Conv1 out : ", out.shape)
         out = self.conv2(out)
-        if self.opt.verbose: print("Conv2 out : ",out.shape)
+        if self.opt.verbose:
+            print("Conv2 out : ", out.shape)
         out = self.conv3(out)
-        if self.opt.verbose: print("Conv3 out : ",out.shape)
+        if self.opt.verbose:
+            print("Conv3 out : ", out.shape)
         out = self.conv4(out)
-        if self.opt.verbose: print("Conv4 out : ",out.shape)
+        if self.opt.verbose:
+            print("Conv4 out : ", out.shape)
 
         if self.opt.latent_dim > 0:
             out = out.view(out.shape[0], -1)
-            if self.opt.verbose: print("View out : ",out.shape, " init_size=", self.init_size)
+            if self.opt.verbose:
+                print("View out : ", out.shape, " init_size=", self.init_size)
             out = self.vector(out)
-            if self.opt.verbose: print("Z : ",out.shape)
+            if self.opt.verbose:
+                print("Z : ", out.shape)
 
         return out
 
     def _name(self):
         return "Encoder"
+
 
 class Generator(nn.Module):
     def __init__(self, opt):
@@ -111,9 +121,10 @@ class Generator(nn.Module):
 
         def generator_block(in_filters, out_filters, bn=True):
             block = [nn.UpsamplingNearest2d(scale_factor=opts_conv['stride']),
-                     nn.Conv2d(in_filters, out_filters, kernel_size=opts_conv['kernel_size'], stride=1, padding=opts_conv['padding'], padding_mode=opts_conv['padding_mode']),
+                     nn.Conv2d(in_filters, out_filters, kernel_size=opts_conv['kernel_size'], stride=1,
+                               padding=opts_conv['padding'], padding_mode=opts_conv['padding_mode']),
                      ]
-            if bn and (not opt.bn_eps==np.inf):
+            if bn and (not opt.bn_eps == np.inf):
                 block.append(nn.BatchNorm2d(out_filters, eps=opt.bn_eps, momentum=opt.bn_momentum))
             block.append(NL)
 
@@ -122,7 +133,8 @@ class Generator(nn.Module):
         self.opt = opt
         self.init_size = opt.img_size // opts_conv['stride']**3
         if self.opt.latent_dim > 0:
-            self.l1 = nn.Sequential(nn.Linear(opt.latent_dim, self.channels[3] * self.init_size ** 2), NL)
+            self.l1 = nn.Sequential(
+                nn.Linear(opt.latent_dim, self.channels[3] * self.init_size ** 2), NL)
 
         self.conv1 = nn.Sequential(*generator_block(self.channels[3], self.channels[2], bn=False),)
         self.conv2 = nn.Sequential(*generator_block(self.channels[2], self.channels[1]),)
@@ -134,30 +146,37 @@ class Generator(nn.Module):
         )
 
     def forward(self, z):
-        if self.opt.verbose: print("Generator")
+        if self.opt.verbose:
+            print("Generator")
         if self.opt.latent_dim > 0:
             # Dim : opt.latent_dim
             out = self.l1(z)
-            if self.opt.verbose: print("l1 out : ",out.shape)
+            if self.opt.verbose:
+                print("l1 out : ", out.shape)
             out = out.view(out.shape[0], self.channels[3], self.init_size, self.init_size)
             # Dim : (self.channels[3], opt.img_size/8, opt.img_size/8)
-            if self.opt.verbose: print("View out : ",out.shape)
+            if self.opt.verbose:
+                print("View out : ", out.shape)
         else:
             out = z
 
         out = self.conv1(out)
         # Dim : (self.channels[3]/2, opt.img_size/4, opt.img_size/4)
-        if self.opt.verbose: print("Conv1 out : ",out.shape)
+        if self.opt.verbose:
+            print("Conv1 out : ", out.shape)
         out = self.conv2(out)
         # Dim : (self.channels[3]/4, opt.img_size/2, opt.img_size/2)
-        if self.opt.verbose: print("Conv2 out : ",out.shape)
+        if self.opt.verbose:
+            print("Conv2 out : ", out.shape)
         out = self.conv3(out)
         # Dim : (self.channels[3]/8, opt.img_size, opt.img_size)
-        if self.opt.verbose: print("Conv3 out : ",out.shape)
+        if self.opt.verbose:
+            print("Conv3 out : ", out.shape)
 
         out = self.conv_blocks(out)
         # Dim : (opt.chanels, opt.img_size, opt.img_size)
-        if self.opt.verbose: print("img out : ", out.shape)
+        if self.opt.verbose:
+            print("img out : ", out.shape)
 
         if self.opt.do_whitening:
             out = conv2d(out, Kinv, padding=1)
@@ -165,6 +184,7 @@ class Generator(nn.Module):
 
     def _name(self):
         return "Generator"
+
 
 class Discriminator(nn.Module):
     def __init__(self, opt):
@@ -175,8 +195,8 @@ class Discriminator(nn.Module):
         self.channels = [opt.channel0, opt.channel1, opt.channel2, opt.channel3]
 
         def discriminator_block(in_filters, out_filters, bn=True):
-            block = [nn.Conv2d(in_filters, out_filters, **opts_conv), ]#, nn.Dropout2d(0.25)
-            if bn and (not opt.bn_eps==np.inf):
+            block = [nn.Conv2d(in_filters, out_filters, **opts_conv), ]  # , nn.Dropout2d(0.25)
+            if bn and (not opt.bn_eps == np.inf):
                 # https://pytorch.org/docs/stable/nn.html#torch.nn.BatchNorm2d
                 block.append(nn.BatchNorm2d(out_filters, eps=opt.bn_eps, momentum=opt.bn_momentum))
             block.append(NL)
@@ -197,40 +217,41 @@ class Discriminator(nn.Module):
     def forward(self, img):
         if self.opt.verbose:
             print("D")
-            print("Image shape : ",img.shape)
+            print("Image shape : ", img.shape)
             # Dim : (opt.chanels, opt.img_size, opt.img_size)
 
         out = img
-        if self.opt.D_noise>0:
+        if self.opt.D_noise > 0:
             n = self.opt.D_noise * torch.randn(img.shape)
-            if cuda: n =n.to('cuda')
+            if cuda:
+                n = n.to('cuda')
             out += n
         if self.opt.do_whitening:
             out = conv2d(out, KW, padding=1)
 
         out = self.conv1(img)
         if self.opt.verbose:
-            print("Conv1 out : ",out.shape)
+            print("Conv1 out : ", out.shape)
 
         out = self.conv2(out)
         if self.opt.verbose:
-            print("Conv2 out : ",out.shape)
+            print("Conv2 out : ", out.shape)
 
         out = self.conv3(out)
         if self.opt.verbose:
-            print("Conv3 out : ",out.shape)
+            print("Conv3 out : ", out.shape)
 
         out = self.conv4(out)
         if self.opt.verbose:
-            print("Conv4 out : ",out.shape)
+            print("Conv4 out : ", out.shape)
 
         out = out.view(out.shape[0], -1)
         if self.opt.verbose:
-            print("View out : ",out.shape)
+            print("View out : ", out.shape)
 
         validity = self.adv_layer(out)
         if self.opt.verbose:
-            print("Val out : ",validity.shape)
+            print("Val out : ", validity.shape)
             # Dim : (1)
 
         return validity

@@ -24,9 +24,10 @@ import datetime
 try:
     from torch.utils.tensorboard import SummaryWriter
     do_tensorboard = True
-except: # ImportError:
+except:  # ImportError:
     do_tensorboard = False
     print("Impossible de charger Tensorboard.")
+
 
 def learn(opt):
     print('Starting ', opt.runs_path)
@@ -38,12 +39,12 @@ def learn(opt):
         # Python 3.5 and below
         # 'timespec' is an invalid keyword argument for this function
         tag = datetime.datetime.now().replace(microsecond=0).isoformat(sep='_')
-    tag = tag.replace(':','-')
+    tag = tag.replace(':', '-')
 
     cuda = True if torch.cuda.is_available() else False
 
     # Loss function
-    adversarial_loss = torch.nn.BCEWithLogitsLoss() # eq. 8 in https://arxiv.org/pdf/1701.00160.pdf
+    adversarial_loss = torch.nn.BCEWithLogitsLoss()  # eq. 8 in https://arxiv.org/pdf/1701.00160.pdf
     MSE_loss = torch.nn.MSELoss(reduction='sum')
     sigmoid = nn.Sigmoid()
 
@@ -83,7 +84,8 @@ def learn(opt):
     optimizer_D = torch.optim.Adam(discriminator.parameters(), lr=opt.lrD, betas=(opt.b1, opt.b2))
     if opt.do_joint:
         import itertools
-        optimizer_E = torch.optim.Adam(itertools.chain(encoder.parameters(), generator.parameters()), lr=opt.lrE, betas=(opt.b1, opt.b2))
+        optimizer_E = torch.optim.Adam(itertools.chain(
+            encoder.parameters(), generator.parameters()), lr=opt.lrE, betas=(opt.b1, opt.b2))
     else:
         optimizer_E = torch.optim.Adam(encoder.parameters(), lr=opt.lrE, betas=(opt.b1, opt.b2))
 
@@ -92,7 +94,8 @@ def learn(opt):
     # ----------
     start_epoch = 1
     if opt.load_model == True:
-        start_epoch = load_models(discriminator, optimizer_D, generator, optimizer_G, opt.n_epochs, opt.model_save_path, encoder, optimizer_E)
+        start_epoch = load_models(discriminator, optimizer_D, generator,
+                                  optimizer_G, opt.n_epochs, opt.model_save_path, encoder, optimizer_E)
 
     path_data = os.path.join("./runs", opt.runs_path + '_' + tag)
     # ----------
@@ -116,10 +119,12 @@ def learn(opt):
     # batch_on_save_dot = save_dot*len(dataloader)
 
     # Vecteur z fixe pour faire les samples
-    fixed_noise = Variable(Tensor(np.random.normal(0, 1, (opt.N_samples, opt.latent_dim))), requires_grad=False)
+    fixed_noise = Variable(Tensor(np.random.normal(
+        0, 1, (opt.N_samples, opt.latent_dim))), requires_grad=False)
     real_imgs_samples = None
 
-    zero_target = Variable(Tensor(torch.zeros(opt.batch_size, opt.channels, opt.img_size, opt.img_size)), requires_grad=False)
+    zero_target = Variable(Tensor(torch.zeros(opt.batch_size, opt.channels,
+                                              opt.img_size, opt.img_size)), requires_grad=False)
     z_zeros = Variable(Tensor(opt.batch_size, opt.latent_dim).fill_(0), requires_grad=False)
     z_ones = Variable(Tensor(opt.batch_size, opt.latent_dim).fill_(1), requires_grad=False)
     valid = Variable(Tensor(opt.batch_size, 1).fill_(1), requires_grad=False)
@@ -137,22 +142,24 @@ def learn(opt):
 
             real_imgs = Variable(imgs.type(Tensor))
             # init samples used in the AE
-            if real_imgs_samples is None: real_imgs_samples = real_imgs[:opt.N_samples]
+            if real_imgs_samples is None:
+                real_imgs_samples = real_imgs[:opt.N_samples]
 
             # TODO add noise here to real_imgs
             z_imgs = encoder(real_imgs)
             decoded_imgs = generator(z_imgs)
-                # Loss measures Encoder's ability to generate vectors suitable with the generator
+            # Loss measures Encoder's ability to generate vectors suitable with the generator
             if opt.do_joint:
                 e_loss = MSE_loss(real_imgs, decoded_imgs)
             else:
                 e_loss = MSE_loss(real_imgs, decoded_imgs.detach())
 
-            e_loss /= MSE_loss(real_imgs, zero_target) # normalize on the energy of imgs
+            e_loss /= MSE_loss(real_imgs, zero_target)  # normalize on the energy of imgs
             if opt.lambdaE > 0:
                 # add a loss for the distance between of z values
                 e_loss += opt.lambdaE * MSE_loss(z_imgs, z_zeros)/opt.batch_size/opt.latent_dim
-                e_loss += opt.lambdaE * MSE_loss(z_imgs.pow(2), z_ones).pow(.5)/opt.batch_size/opt.latent_dim
+                e_loss += opt.lambdaE * \
+                    MSE_loss(z_imgs.pow(2), z_ones).pow(.5)/opt.batch_size/opt.latent_dim
 
             # Backward
             e_loss.backward()
@@ -161,11 +168,12 @@ def learn(opt):
             # ---------------------
             #  Train Discriminator
             # ---------------------
-            if opt.lrD >0:
+            if opt.lrD > 0:
                 optimizer_D.zero_grad()
 
                 # Adversarial ground truths
-                valid_smooth = Variable(Tensor(imgs.shape[0], 1).fill_(float(np.random.uniform(opt.valid_smooth, 1.0, 1))), requires_grad=False)
+                valid_smooth = Variable(Tensor(imgs.shape[0], 1).fill_(
+                    float(np.random.uniform(opt.valid_smooth, 1.0, 1))), requires_grad=False)
 
                 # Configure input
                 real_imgs = Variable(imgs.type(Tensor))
@@ -238,7 +246,7 @@ def learn(opt):
             # -----------------
             #  Recording stats
             # -----------------
-            if opt.lrG > 0 :
+            if opt.lrG > 0:
                 print(
                     "[Epoch %d/%d] [Batch %d/%d] [E loss: %f] [D loss: %f] [G loss: %f] [D score %f] [G score %f] [Time: %fs]"
                     % (epoch, opt.n_epochs, i+1, len(dataloader), e_loss.item(), d_loss.item(), g_loss.item(), torch.mean(d_x), torch.mean(d_g_z), time.time()-t_batch)
@@ -251,7 +259,6 @@ def learn(opt):
                     % (epoch, opt.n_epochs, i+1, len(dataloader), e_loss.item(), time.time()-t_batch)
                 )
 
-
             if do_tensorboard:
                 # Tensorboard save
                 iteration = i + nb_batch * j
@@ -261,7 +268,7 @@ def learn(opt):
                         writer.add_histogram('E(x)', z_imgs, global_step=iteration)
                 except:
                     pass
-                if opt.lrD > 0 :
+                if opt.lrD > 0:
                     writer.add_scalar('loss/G', g_loss.item(), global_step=iteration)
                     writer.add_scalar('loss/D', d_loss.item(), global_step=iteration)
 
@@ -271,9 +278,10 @@ def learn(opt):
                     # writer.add_scalar('d_x_cv', hist["d_x_cv"][i], global_step=iteration)
                     # writer.add_scalar('d_g_z_cv', hist["d_g_z_cv"][i], global_step=iteration)
 
-                    writer.add_histogram('D(x)', d_x, global_step=iteration, bins=np.linspace(0, 1, 20))
-                    writer.add_histogram('D(G(z))', d_g_z, global_step=iteration, bins=np.linspace(0, 1, 20))
-
+                    writer.add_histogram('D(x)', d_x, global_step=iteration,
+                                         bins=np.linspace(0, 1, 20))
+                    writer.add_histogram('D(G(z))', d_g_z, global_step=iteration,
+                                         bins=np.linspace(0, 1, 20))
 
         if do_tensorboard:
             writer.add_scalar('D_x/max', hist["D_x_max"][j], global_step=epoch)
@@ -282,8 +290,9 @@ def learn(opt):
             writer.add_scalar('D_G_z/max', hist["D_G_z_max"][j], global_step=epoch)
 
             # Save samples
-            if epoch % opt.sample_interval == 0 :
-                if opt.latent_dim > 0 : tensorboard_sampling(fixed_noise, generator, writer, epoch)
+            if epoch % opt.sample_interval == 0:
+                if opt.latent_dim > 0:
+                    tensorboard_sampling(fixed_noise, generator, writer, epoch)
                 tensorboard_AE_comparator(real_imgs_samples, generator, encoder, writer, epoch)
 
         if epoch % opt.sample_interval == 0 and opt.latent_dim > 0:
@@ -300,7 +309,8 @@ def learn(opt):
         print("[Epoch Time: ", time.time() - t_epoch, "s]")
 
     t_final = time.gmtime(time.time() - t_total)
-    print("[Total Time: ", t_final.tm_mday - 1, "j:", time.strftime("%Hh:%Mm:%Ss", t_final), "]", sep='')
+    print("[Total Time: ", t_final.tm_mday - 1, "j:",
+          time.strftime("%Hh:%Mm:%Ss", t_final), "]", sep='')
 
     # Save model for futur training
     if opt.model_save_interval < opt.n_epochs + 1:
@@ -308,4 +318,5 @@ def learn(opt):
         save_model(generator, optimizer_G, epoch, opt.model_save_path + "/last_G.pt")
         save_model(encoder, optimizer_E, epoch, opt.model_save_path + "/last_E.pt")
 
-    if do_tensorboard: writer.close()
+    if do_tensorboard:
+        writer.close()
