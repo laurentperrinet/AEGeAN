@@ -48,7 +48,7 @@ class Encoder(nn.Module):
         self.opt = opt
         NL = nn.LeakyReLU(opt.lrelu, inplace=True)
         opts_conv = dict(kernel_size=opt.kernel_size, stride=opt.stride,
-                         padding=opt.padding, padding_mode='zeros')
+                         padding=opt.padding, padding_mode='zeros', bias=opt.do_bias)
         self.channels = [opt.channel0, opt.channel1, opt.channel2, opt.channel3]
 
         def encoder_block(in_filters, out_filters, bn=True):
@@ -67,7 +67,7 @@ class Encoder(nn.Module):
         self.conv4 = nn.Sequential(*encoder_block(self.channels[2], self.channels[3]),)
 
         if opt.latent_dim > 0:
-            self.init_size = opt.img_size // opts_conv['stride']**4
+            self.init_size = opt.img_size // self.opt.stride**4
             # self.vector = nn.Linear(self.channels[3] * self.init_size ** 2, opt.latent_dim)
             self.vector = nn.Sequential(
                 nn.Linear(self.channels[3] * self.init_size ** 2, opt.latent_dim),
@@ -115,14 +115,13 @@ class Generator(nn.Module):
     def __init__(self, opt):
         super(Generator, self).__init__()
         NL = nn.LeakyReLU(opt.lrelu, inplace=True)
-        opts_conv = dict(kernel_size=opt.kernel_size, stride=opt.stride,
-                         padding=opt.padding, padding_mode='zeros')
+        opts_conv = dict(kernel_size=opt.kernel_size, #stride=opt.stride,
+                         padding=opt.padding, padding_mode='zeros', bias=opt.do_bias)
         self.channels = [opt.channel0, opt.channel1, opt.channel2, opt.channel3]
 
         def generator_block(in_filters, out_filters, bn=True):
-            block = [nn.UpsamplingNearest2d(scale_factor=opts_conv['stride']),
-                     nn.Conv2d(in_filters, out_filters, kernel_size=opts_conv['kernel_size'], stride=1,
-                               padding=opts_conv['padding'], padding_mode=opts_conv['padding_mode']),
+            block = [nn.UpsamplingNearest2d(scale_factor=opt.stride),
+                     nn.Conv2d(in_filters, out_filters, **opts_conv),
                      ]
             if bn and (not opt.bn_eps == np.inf):
                 block.append(nn.BatchNorm2d(out_filters, eps=opt.bn_eps, momentum=opt.bn_momentum))
@@ -131,7 +130,7 @@ class Generator(nn.Module):
             return block
 
         self.opt = opt
-        self.init_size = opt.img_size // opts_conv['stride']**4
+        self.init_size = opt.img_size // opt.stride**4
         if self.opt.latent_dim > 0:
             self.l1 = nn.Sequential(
                 nn.Linear(opt.latent_dim, self.channels[3] * self.init_size ** 2), NL)
@@ -140,8 +139,9 @@ class Generator(nn.Module):
         self.conv2 = nn.Sequential(*generator_block(self.channels[2], self.channels[1]),)
         self.conv3 = nn.Sequential(*generator_block(self.channels[1], self.channels[0]),)
         self.conv_blocks = nn.Sequential(
-            nn.UpsamplingNearest2d(scale_factor=opts_conv['stride']),
-            nn.Conv2d(self.channels[0], opt.channels, kernel_size=3, stride=1, padding=1),
+            nn.UpsamplingNearest2d(scale_factor=opt.stride), #opts_conv['stride']),
+            nn.Conv2d(self.channels[0], opt.channels, kernel_size=3, stride=1, padding=1,
+                      bias=opts_conv['bias']),
             nn.Tanh(),
         )
 
@@ -191,7 +191,8 @@ class Discriminator(nn.Module):
         super(Discriminator, self).__init__()
         NL = nn.LeakyReLU(opt.lrelu, inplace=True)
         opts_conv = dict(kernel_size=opt.kernel_size, stride=opt.stride,
-                         padding=opt.padding, padding_mode='zeros')
+                         padding=opt.padding, padding_mode='zeros',
+                         bias=opt.do_bias)
         self.channels = [opt.channel0, opt.channel1, opt.channel2, opt.channel3]
 
         def discriminator_block(in_filters, out_filters, bn=True):
@@ -210,7 +211,7 @@ class Discriminator(nn.Module):
         self.conv4 = nn.Sequential(*discriminator_block(self.channels[2], self.channels[3]),)
 
         # The height and width of downsampled image
-        self.init_size = opt.img_size // opts_conv['stride']**4
+        self.init_size = opt.img_size // opt.stride**4
         # self.adv_layer = nn.Sequential(nn.Linear(self.channels[3] * self.init_size ** 2, 1))#, nn.Sigmoid()
         self.adv_layer = nn.Linear(self.channels[3] * self.init_size ** 2, 1)
 

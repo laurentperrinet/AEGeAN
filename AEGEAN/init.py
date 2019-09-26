@@ -33,6 +33,7 @@ def init():
     parser.add_argument("--lrG", type=float, default=0.0005*DEBUG, help="learning rate for G")
     parser.add_argument("--GAN_loss", type=str, default='ian', help="Use different losses for G.")
     parser.add_argument("--do_whitening", type=bool, default=True, help="Use contrasted images.")
+    parser.add_argument("--do_bias", type=bool, default=False, help="Should we use biases in convolutions?")
     parser.add_argument("--bn_eps", type=float, default=.5,
                         help="batchnorm: espilon for numerical stability")
     parser.add_argument("--do_joint", type=bool, default=True,
