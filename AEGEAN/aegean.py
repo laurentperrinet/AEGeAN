@@ -16,7 +16,7 @@ from torchvision import datasets
 import torch.nn as nn
 import torch.nn.functional as F
 import torch
-
+import os
 import sys
 import time
 import datetime
@@ -28,8 +28,11 @@ except:  # ImportError:
     do_tensorboard = False
     print("Impossible de charger Tensorboard.")
 
-
 def learn(opt):
+    path_data = os.path.join("./runs", opt.runs_path)
+    if not os.path.isdir(path_data): do_learn(opt)
+
+def do_learn(opt):
     print('Starting ', opt.runs_path)
 
     # Create a time tag
@@ -80,14 +83,14 @@ def learn(opt):
                            rand_hflip=opt.rand_hflip, rand_affine=opt.rand_affine)
 
     # Optimizers
-    optimizer_G = torch.optim.Adam(generator.parameters(), lr=opt.lrG, betas=(opt.b1, opt.b2))
-    optimizer_D = torch.optim.Adam(discriminator.parameters(), lr=opt.lrD, betas=(opt.b1, opt.b2))
+    optimizer_G = torch.optim.Adam(generator.parameters(), lr=opt.lrG, betas=(opt.beta1, opt.beta2))
+    optimizer_D = torch.optim.Adam(discriminator.parameters(), lr=opt.lrD, betas=(opt.beta1, opt.beta2))
     if opt.do_joint:
         import itertools
         optimizer_E = torch.optim.Adam(itertools.chain(
-            encoder.parameters(), generator.parameters()), lr=opt.lrE, betas=(opt.b1, opt.b2))
+            encoder.parameters(), generator.parameters()), lr=opt.lrE, betas=(opt.beta1, opt.beta2))
     else:
-        optimizer_E = torch.optim.Adam(encoder.parameters(), lr=opt.lrE, betas=(opt.b1, opt.b2))
+        optimizer_E = torch.optim.Adam(encoder.parameters(), lr=opt.lrE, betas=(opt.beta1, opt.beta2))
 
     # ----------
     #  Load models
@@ -97,7 +100,7 @@ def learn(opt):
         start_epoch = load_models(discriminator, optimizer_D, generator,
                                   optimizer_G, opt.n_epochs, opt.model_save_path, encoder, optimizer_E)
 
-    path_data = os.path.join("./runs", opt.runs_path + '_' + tag)
+    path_data = os.path.join("./runs", opt.runs_path) # + '_' + tag)
     # ----------
     #  Tensorboard
     # ----------

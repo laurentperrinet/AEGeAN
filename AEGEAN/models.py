@@ -111,6 +111,7 @@ class Generator(nn.Module):
         def generator_block(in_filters, out_filters, bn=True):
             block = [nn.UpsamplingNearest2d(scale_factor=opt.stride),
                      nn.Conv2d(in_filters, out_filters, **opts_conv),
+                     #nn.ConvTranspose2d(in_filters, out_filters, stride=opt.stride, **opts_conv),
                      ]
             if bn and (not opt.bn_eps == np.inf):
                 block.append(nn.BatchNorm2d(out_filters, eps=opt.bn_eps, momentum=opt.bn_momentum))
@@ -130,6 +131,7 @@ class Generator(nn.Module):
             nn.UpsamplingNearest2d(scale_factor=opt.stride), #opts_conv['stride']),
             nn.Conv2d(self.channels[0], opt.channels, kernel_size=3, stride=1, padding=1,
                       bias=opts_conv['bias']),
+            # nn.ConvTranspose2d(self.channels[0], opt.channels, kernel_size=3, stride=1, padding=1, bias=opt.do_bias),
             nn.Tanh(),
         )
         self.opt = opt

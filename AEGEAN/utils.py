@@ -55,27 +55,36 @@ class FolderDataset(Dataset):
     def __len__(self):
         return len(self.files)
 
+import torch.nn as nn
 
 def weights_init_normal(m, factor=1.0):
+    # see https://pytorch.org/tutorials/beginner/dcgan_faces_tutorial.html#weight-initialization
     classname = m.__class__.__name__
+    #print('classname', classname)
     if classname.find("Conv") != -1:
-        n = float(m.in_channels * m.kernel_size[0] * m.kernel_size[1])
-        n += float(m.kernel_size[0] * m.kernel_size[1] * m.out_channels)
-        n = n / 2.0
-        m.weight.data.normal_(0, np.sqrt(factor / n))
-        m.bias.data.zero_()
-        #torch.nn.init.normal_(m.weight.data, 0.0, 0.02)
+        # n = float(m.in_channels * m.kernel_size[0] * m.kernel_size[1])
+        # n += float(m.kernel_size[0] * m.kernel_size[1] * m.out_channels)
+        # n = n / 2.0
+        # m.weight.data.normal_(0, np.sqrt(factor / n))
+        # m.bias.data.zero_()
+        nn.init.normal_(m.weight.data, 0.0, 0.02)
+    #
+    # elif classname.find('Conv2d') != -1:
+    #     print('classname', classname)
+    #     nn.init.normal_(m.weight.data, 0.0, 0.02)
     elif classname.find("Linear") != -1:
         n = float(m.in_features + m.out_features)
         n = n / 2.0
         m.weight.data.normal_(0, np.sqrt(factor / n))
         m.bias.data.zero_()
     elif classname.find("BatchNorm2d") != -1:
-        m.weight.data.fill_(1.0)
-        m.bias.data.zero_()
+        nn.init.normal_(m.weight.data, 1.0, 0.02)
+        nn.init.constant_(m.bias.data, 0)
+        # m.weight.data.fill_(1.0)
+        # m.bias.data.zero_()
 
 
-def load_data(path, img_size, batch_size, Fast=True, FDD=False, rand_hflip=False, rand_affine=None, return_dataset=False, mean=0, std=1):
+def load_data(path, img_size, batch_size, Fast=True, FDD=False, rand_hflip=False, rand_affine=None, mean=0., std=1.):
     print("Loading data...")
     t_total = time.time()
 
@@ -89,23 +98,14 @@ def load_data(path, img_size, batch_size, Fast=True, FDD=False, rand_hflip=False
     transform_tmp.append(transforms.Normalize([mean]*3, [std]*3))
 
     transform = transforms.Compose(transform_tmp)
-
-    # if Fast:
-    #     if FDD:
-    #         dataset = FastFDD(path, img_size, img_size, transform)
-    #     else:
-    #         dataset = FastSimpsonsDataset(path, img_size, img_size, transform, mode)
-    # else:
-    #     dataset = SimpsonsDataset(path, img_size, img_size, transform)
     dataset = FolderDataset(path, img_size, img_size, transform)
+
     dataloader = torch.utils.data.DataLoader(
         dataset, batch_size=batch_size, shuffle=True, drop_last=True)
 
     print("[Loading Time: ", time.strftime("%Mm:%Ss", time.gmtime(time.time() - t_total)),
           "] [Numbers of samples :", len(dataset), " ]\n")
 
-    if return_dataset == True:
-        return dataloader, dataset
     return dataloader
 
 

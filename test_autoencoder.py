@@ -8,7 +8,6 @@ opt = AG.init()
 opt.lrG, opt.lrD = 0., 0.
 tag = f'AE_{HOST}_{opt.img_size}_'
 
-
 # VANILLA
 opt = AG.init()
 opt.lrG, opt.lrD = 0., 0.
@@ -19,13 +18,13 @@ AG.learn(opt)
 # what's the effect of a smaller latent_dim ?
 opt = AG.init()
 opt.lrG, opt.lrD = 0., 0.
-opt.latent_dim, opt.runs_path = 4, tag + 'small_latent'
+opt.latent_dim, opt.runs_path = opt.latent_dim//2, tag + 'small_latent'
 AG.learn(opt)
 
 # what's the effect of a smaller latent_dim ?
 opt = AG.init()
 opt.lrG, opt.lrD = 0., 0.
-opt.latent_dim, opt.runs_path = 54, tag + 'large_latent'
+opt.latent_dim, opt.runs_path = opt.latent_dim*2, tag + 'large_latent'
 AG.learn(opt)
 
 opt = AG.init()
@@ -91,8 +90,11 @@ AG.learn(opt)
 
 opt = AG.init()
 opt.lrG, opt.lrD = 0., 0.
-opt.runs_path = tag + 'do_whitening'
-opt.do_whitening = True
+if opt.do_whitening:
+    opt.runs_path = tag + 'no_whitening'
+else:
+    opt.runs_path = tag + 'do_whitening'
+opt.do_whitening = not opt.do_whitening
 AG.learn(opt)
 
 opt = AG.init()
@@ -115,26 +117,26 @@ AG.learn(opt)
 
 opt = AG.init()
 opt.lrG, opt.lrD = 0., 0.
-opt.runs_path = tag + 'low_adam_b1'
-opt.b1 = 0.3
+opt.runs_path = tag + 'low_adam_beta1'
+opt.beta1 = 0.3
 AG.learn(opt)
 
 opt = AG.init()
 opt.lrG, opt.lrD = 0., 0.
-opt.runs_path = tag + 'low_adam_b2'
-opt.b2 = 0.8
+opt.runs_path = tag + 'low_adam_beta2'
+opt.beta2 = 0.99
 AG.learn(opt)
 
 opt = AG.init()
 opt.lrG, opt.lrD = 0., 0.
-opt.runs_path = tag + 'high_adam_b1'
-opt.b1 = 0.999
+opt.runs_path = tag + 'high_adam_beta1'
+opt.beta1 = 0.999
 AG.learn(opt)
 
 opt = AG.init()
 opt.lrG, opt.lrD = 0., 0.
-opt.runs_path = tag + 'high_adam_b2'
-opt.b2 = 0.999
+opt.runs_path = tag + 'high_adam_beta2'
+opt.beta2 = 0.9999
 AG.learn(opt)
 
 opt = AG.init()
@@ -146,8 +148,8 @@ AG.learn(opt)
 
 opt = AG.init()
 opt.lrG, opt.lrD = 0., 0.
-opt.runs_path = tag + 'relu'
-opt.lrelu = 0.
+opt.runs_path = tag + 'relu' if opt.lrelu==0. else tag + 'lrelu'
+opt.lrelu = 0.02 if opt.lrelu==0. else 0.
 AG.learn(opt)
 
 
