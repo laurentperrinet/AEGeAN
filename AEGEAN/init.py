@@ -7,7 +7,7 @@ if HOST in ['ada', 'ekla']:
 elif HOST == 'fortytwo':
     DEBUG = 2
 else:
-    DEBUG = 1
+    DEBUG = 2
 
 
 def init():
