@@ -158,7 +158,7 @@ def sampling(noise, generator, path, epoch, tag='', nrow=8):
     generator.eval()
     gen_imgs = generator(noise)
     save_image(gen_imgs.data[:], "%s/%s_%d.png" %
-               (path, tag, epoch), nrow=nrow, normalize=True, range=(0, 1))
+               (path, tag, epoch), normalize=True, nrow=nrow, range=(0, 1))
     generator.train()
 
 
@@ -174,26 +174,26 @@ def tensorboard_sampling(noise, generator, writer, epoch, nrow=8, image_type='Ge
     generator.train()
 
 
-def tensorboard_AE_comparator(imgs, generator, encoder, writer, epoch):
+def tensorboard_AE_comparator(imgs, generator, encoder, writer, epoch, nrow=8):
     """
     Use auto-encoder model and original images to generate images.
     Save them to tensorboard
 
     """
-    grid_imgs = torchvision.utils.make_grid(imgs, normalize=True, range=(0, 1))
+    grid_imgs = torchvision.utils.make_grid(imgs, normalize=True, nrow=nrow, range=(0, 1))
     writer.add_image('Images/original', grid_imgs, epoch)
 
     generator.eval()
     encoder.eval()
     enc_imgs = encoder(imgs)
     dec_imgs = generator(enc_imgs)
-    grid_dec = torchvision.utils.make_grid(dec_imgs, normalize=True, range=(0, 1))
+    grid_dec = torchvision.utils.make_grid(dec_imgs, normalize=True, nrow=nrow, range=(0, 1))
     writer.add_image('Images/auto-encoded', grid_dec, epoch)
     generator.train()
     encoder.train()
 
 
-def tensorboard_LSD_comparator(imgs, vectors, generator, writer, epoch):
+def tensorboard_LSD_comparator(imgs, vectors, generator, writer, epoch, nrow=8):
     """
     Use auto-encoder model and noise vector to generate images.
     Save them to tensorboard
@@ -203,20 +203,20 @@ def tensorboard_LSD_comparator(imgs, vectors, generator, writer, epoch):
 
     generator.eval()
     g_v = generator(vectors)
-    grid_imgs = torchvision.utils.make_grid(imgs, normalize=True, range=(0, 1))
-    grid_g_v = torchvision.utils.make_grid(g_v, normalize=True, range=(0, 1))
+    grid_imgs = torchvision.utils.make_grid(imgs, normalize=True, nrow=nrow, range=(0, 1))
+    grid_g_v = torchvision.utils.make_grid(g_v, normalize=True, nrow=nrow, range=(0, 1))
     writer.add_image('Images/generated', grid_g_v, epoch)
     generator.train()
 
 
-def AE_sampling(imgs, encoder, generator, path, epoch):
+def AE_sampling(imgs, encoder, generator, path, epoch, nrow=8):
     generator.eval()
     enc_imgs = encoder(imgs)
     dec_imgs = generator(enc_imgs)
     save_image(imgs.data[:16], "%s/%d_img.png" %
-               (path, epoch), nrow=8, normalize=True, range=(0, 1))
+               (path, epoch), nrow=nrow, normalize=True, range=(0, 1))
     save_image(dec_imgs.data[:16], "%s/%d_dec.png" %
-               (path, epoch), nrow=8, normalize=True, range=(0, 1))
+               (path, epoch), nrow=nrow, normalize=True, range=(0, 1))
     generator.train()
 
 

@@ -144,6 +144,7 @@ def do_learn(opt):
             optimizer_E.zero_grad()
 
             real_imgs = Variable(imgs.type(Tensor))
+
             # init samples used in the AE
             if real_imgs_samples is None:
                 real_imgs_samples = real_imgs[:opt.N_samples]
@@ -151,6 +152,7 @@ def do_learn(opt):
             # TODO add noise here to real_imgs
             z_imgs = encoder(real_imgs)
             decoded_imgs = generator(z_imgs)
+            decoded_imgs_samples = decoded_imgs[:opt.N_samples]
             # Loss measures Encoder's ability to generate vectors suitable with the generator
             if opt.do_joint:
                 e_loss = MSE_loss(real_imgs, decoded_imgs)
@@ -296,7 +298,7 @@ def do_learn(opt):
             if epoch % opt.sample_interval == 0:
                 if opt.latent_dim > 0:
                     tensorboard_sampling(fixed_noise, generator, writer, epoch)
-                tensorboard_AE_comparator(real_imgs_samples, generator, encoder, writer, epoch)
+                tensorboard_AE_comparator(real_imgs_samples, generator, encoder, writer, epoch) # TODO use decoded_imgs_samples
 
         if epoch % opt.sample_interval == 0 and opt.latent_dim > 0:
             sampling(fixed_noise, generator, path_data, epoch, tag)
