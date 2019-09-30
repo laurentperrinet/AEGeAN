@@ -111,12 +111,12 @@ def save_hist_epoch(hist, idx_epoch):
 
     hist["D_x_mean"][idx_epoch] = hist["d_x_mean"].mean()
     hist["D_G_z_mean"][idx_epoch] = hist["d_g_z_mean"].mean()
-
-    hist["D_x_std"][idx_epoch] = hist["d_x_std"].mean()
-    hist["D_G_z_std"][idx_epoch] = hist["d_g_z_std"].mean()
-
-    hist["D_x_cv"][idx_epoch] = hist["d_x_cv"].mean()
-    hist["D_G_z_cv"][idx_epoch] = hist["d_g_z_cv"].mean()
+    #
+    # hist["D_x_std"][idx_epoch] = hist["d_x_std"].mean()
+    # hist["D_G_z_std"][idx_epoch] = hist["d_g_z_std"].mean()
+    #
+    # hist["D_x_cv"][idx_epoch] = hist["d_x_cv"].mean()
+    # hist["D_G_z_cv"][idx_epoch] = hist["d_g_z_cv"].mean()
 
 #
 # def do_plot(hist, start_epoch, epoch):

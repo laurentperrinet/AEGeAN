@@ -213,6 +213,7 @@ def do_learn(opt):
                 optimizer_D.step()
 
                 # Compensation pour le BCElogits
+                d_fake = sigmoid(d_g_z)
                 d_x = sigmoid(d_x)
 
                 # -----------------
@@ -253,11 +254,11 @@ def do_learn(opt):
             # -----------------
             if opt.lrG > 0:
                 print(
-                    "[Epoch %d/%d] [Batch %d/%d] [E loss: %f] [D loss: %f] [G loss: %f] [D score %f] [G score %f] [Time: %fs]"
-                    % (epoch, opt.n_epochs, i+1, len(dataloader), e_loss.item(), d_loss.item(), g_loss.item(), torch.mean(d_x), torch.mean(d_g_z), time.time()-t_batch)
+                    "[Epoch %d/%d] [Batch %d/%d] [E loss: %f] [D loss: %f] [G loss: %f] [D real score %f] [D fake score %f] [G score %f] [Time: %fs]"
+                    % (epoch, opt.n_epochs, i+1, len(dataloader), e_loss.item(), d_loss.item(), g_loss.item(), torch.mean(d_x), torch.mean(d_fake), torch.mean(d_g_z), time.time()-t_batch)
                 )
                 # Save Losses and scores for Tensorboard
-                save_hist_batch(hist, i, j, g_loss, d_loss, d_x, d_g_z)
+                save_hist_batch(hist, i, j, g_loss, d_loss, e_loss, d_x, d_fake, d_g_z)
             else:
                 print(
                     "[Epoch %d/%d] [Batch %d/%d] [E loss: %f] [Time: %fs]"
@@ -277,8 +278,8 @@ def do_learn(opt):
                     writer.add_scalar('loss/G', g_loss.item(), global_step=iteration)
                     writer.add_scalar('loss/D', d_loss.item(), global_step=iteration)
 
-                    writer.add_scalar('d_x_mean', hist["d_x_mean"][i], global_step=iteration)
-                    writer.add_scalar('d_g_z_mean', hist["d_g_z_mean"][i], global_step=iteration)
+                    writer.add_scalar('score/D_x', hist["d_x_mean"][i], global_step=iteration)
+                    writer.add_scalar('score/D_g_z', hist["d_g_z_mean"][i], global_step=iteration)
 
                     # writer.add_scalar('d_x_cv', hist["d_x_cv"][i], global_step=iteration)
                     # writer.add_scalar('d_g_z_cv', hist["d_g_z_cv"][i], global_step=iteration)
@@ -289,10 +290,10 @@ def do_learn(opt):
                                          bins=np.linspace(0, 1, 20))
 
         if do_tensorboard:
-            writer.add_scalar('D_x/max', hist["D_x_max"][j], global_step=epoch)
-            writer.add_scalar('D_x/min', hist["D_x_min"][j], global_step=epoch)
-            writer.add_scalar('D_G_z/min', hist["D_G_z_min"][j], global_step=epoch)
-            writer.add_scalar('D_G_z/max', hist["D_G_z_max"][j], global_step=epoch)
+            # writer.add_scalar('D_x/max', hist["D_x_max"][j], global_step=epoch)
+            # writer.add_scalar('D_x/min', hist["D_x_min"][j], global_step=epoch)
+            # writer.add_scalar('D_G_z/min', hist["D_G_z_min"][j], global_step=epoch)
+            # writer.add_scalar('D_G_z/max', hist["D_G_z_max"][j], global_step=epoch)
 
             # Save samples
             if epoch % opt.sample_interval == 0:
