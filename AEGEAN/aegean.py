@@ -302,7 +302,7 @@ def do_learn(opt):
 
         if epoch % opt.sample_interval == 0 and opt.latent_dim > 0:
             sampling(fixed_noise, generator, path_data, epoch, tag)
-            do_plot(hist, start_epoch, epoch)
+            # do_plot(hist, start_epoch, epoch)
 
         # Save models
         if epoch % opt.model_save_interval == 0 and opt.latent_dim > 0:
