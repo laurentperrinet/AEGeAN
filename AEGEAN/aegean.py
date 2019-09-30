@@ -22,7 +22,6 @@ import sys
 import time
 import datetime
 
-
 # see research/UniStellar/AlignAndStack/2019-06-27-B1c_linear_inverter-decorrelation.ipynb
 KW = torch.zeros(size=(1, 1, 3, 3))
 KW[0, 0, :, 0] = torch.Tensor([0, -1, 0])
@@ -56,10 +55,19 @@ except:  # ImportError:
 
 def learn(opt):
     path_data = os.path.join("./runs", opt.runs_path)
-    if not os.path.isdir(path_data): do_learn(opt)
+    if not os.path.isdir(path_data):
+        os.makedirs(path_data, exist_ok=True)
+        do_learn(opt)
 
 def do_learn(opt):
     print('Starting ', opt.runs_path)
+    path_data = os.path.join("./runs", opt.runs_path) # + '_' + tag)
+    # ----------
+    #  Tensorboard
+    # ----------
+    if do_tensorboard:
+        # stats are stored in "runs", within subfolder opt.runs_path.
+        writer = SummaryWriter(log_dir=path_data)
 
     # Create a time tag
     try:
@@ -126,14 +134,6 @@ def do_learn(opt):
         start_epoch = load_models(discriminator, optimizer_D, generator,
                                   optimizer_G, opt.n_epochs, opt.model_save_path, encoder, optimizer_E)
 
-    path_data = os.path.join("./runs", opt.runs_path) # + '_' + tag)
-    # ----------
-    #  Tensorboard
-    # ----------
-    if do_tensorboard:
-        # stats are stored in "runs", within subfolder opt.runs_path.
-        os.makedirs(path_data, exist_ok=True)
-        writer = SummaryWriter(log_dir=path_data)
 
     # ----------
     #  Training

@@ -31,8 +31,8 @@ def init():
     parser.add_argument("--D_noise", type=float, default=0.3,
                         help="Add noise to the input images of D")
     parser.add_argument("--lrG", type=float, default=0.0001*DEBUG, help="learning rate for G")
-    parser.add_argument("--GAN_loss", type=str, default='ian', help="Use different losses for G.")
-    parser.add_argument("--do_whitening", type=bool, default=False, help="Use contrasted images.")
+    parser.add_argument("--GAN_loss", type=str, default='original', help="Use different losses for G.")
+    parser.add_argument("--do_whitening", type=bool, default=True, help="Use contrasted images.")
     parser.add_argument("--do_bias", type=bool, default=False, help="Should we use biases in convolutions?")
     parser.add_argument("--bn_eps", type=float, default=.5,
                         help="batchnorm: espilon for numerical stability")
