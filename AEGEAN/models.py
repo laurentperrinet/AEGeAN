@@ -6,31 +6,6 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch
 
-# see research/UniStellar/AlignAndStack/2019-06-27-B1c_linear_inverter-decorrelation.ipynb
-from torch.nn.functional import conv2d
-KW = torch.zeros(size=(1, 1, 3, 3))
-KW[0, 0, :, 0] = torch.Tensor([0, -1, 0])
-KW[0, 0, :, 1] = torch.Tensor([-1, 4, -1])
-KW[0, 0, :, 2] = torch.Tensor([0, -1, 0])
-# KW = KW * torch.ones(1, 3, 1, 1)
-KW = KW * torch.eye(3).view(3, 3, 1, 1)
-KW /= np.sqrt(4. * 3)
-Kinv = torch.zeros((1, 1, 3, 3))
-Kinv[0, 0, :, 0] = torch.Tensor([.75, 1.5, .75])
-Kinv[0, 0, :, 1] = torch.Tensor([1.5, 4.5, 1.5])
-Kinv[0, 0, :, 2] = torch.Tensor([.75, 1.5, .75])
-# Kinv = Kinv * torch.ones(1, 3, 1, 1)
-Kinv = Kinv * torch.eye(3).view(3, 3, 1, 1)
-Kinv /= np.sqrt(4. * 3)
-# print(conv2d(KW, Kinv, padding=1))
-# print(conv2d(Kinv, KW, padding=1))
-# print(KW, Kinv, conv2d(KW, Kinv, padding=1), conv2d(Kinv, KW, padding=1))
-
-cuda = True if torch.cuda.is_available() else False
-if cuda:
-    KW = KW.to('cuda')
-    Kinv = Kinv.to('cuda')
-
 
 class Encoder(nn.Module):
     def __init__(self, opt):
@@ -69,8 +44,8 @@ class Encoder(nn.Module):
         if self.opt.verbose:
             print("Image shape : ", img.shape)
         out = img
-        if self.opt.do_whitening:
-            out = conv2d(out, KW, padding=1)
+        # if self.opt.do_whitening:
+        #     out = conv2d(out, KW, padding=1)
         if self.opt.verbose:
             print("WImage shape : ", out.shape)
         out = self.conv1(out)
@@ -169,8 +144,8 @@ class Generator(nn.Module):
         if self.opt.verbose:
             print("img out : ", out.shape)
 
-        if self.opt.do_whitening:
-            out = conv2d(out, Kinv, padding=1)
+        # if self.opt.do_whitening:
+        #     out = conv2d(out, Kinv, padding=1)
         return out
 
     def _name(self):
@@ -218,8 +193,8 @@ class Discriminator(nn.Module):
             if cuda:
                 n = n.to('cuda')
             out += n
-        if self.opt.do_whitening:
-            out = conv2d(out, KW, padding=1)
+        # if self.opt.do_whitening:
+        #     out = conv2d(out, KW, padding=1)
 
         out = self.conv1(out)
         if self.opt.verbose:

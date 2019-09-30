@@ -148,7 +148,7 @@ AG.learn(opt)
 
 opt = AG.init()
 opt.runs_path = tag + 'high_adam_beta1'
-opt.beta1 = 0.999
+opt.beta1 = 0.99
 AG.learn(opt)
 
 opt = AG.init()
