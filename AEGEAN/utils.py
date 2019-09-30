@@ -94,10 +94,10 @@ def load_data(path, img_size, batch_size, Fast=True, FDD=False, rand_hflip=False
         transform_tmp.append(transforms.RandomHorizontalFlip(p=0.5))
     if rand_affine != None:
         transform_tmp.append(transforms.RandomAffine(degrees=rand_affine))
-    transform_tmp.append(transforms.ColorJitter(brightness=0, contrast=(0.9, 1.0), saturation=0, hue=0))
+    # transform_tmp.append(transforms.ColorJitter(brightness=0, contrast=(0.9, 1.0), saturation=0, hue=0))
     transform_tmp.append(transforms.ToTensor())
     # transform_tmp.append(transforms.Normalize([mean]*3, [std]*3))
-    
+
     transform = transforms.Compose(transform_tmp)
     dataset = FolderDataset(path, img_size, img_size, transform)
 
