@@ -1,12 +1,13 @@
 import AEGEAN as AG
 import numpy as np
-import os
-PID, HOST = os.getpid(), os.uname()[1]
+# import os
+# PID, HOST = os.getpid(), os.uname()[1]
 
 
 opt = AG.init()
 opt.lrG, opt.lrD = 0., 0.
-tag = f'AE_{HOST}_{opt.img_size}_'
+# tag = f'AE_{HOST}_{opt.img_size}_'
+tag = f'AE_{opt.img_size}_'
 
 # VANILLA
 opt = AG.init()
@@ -82,14 +83,17 @@ opt.D_noise = 0.05
 AG.learn(opt)
 
 opt = AG.init()
+print('DEBUG opt.D_noise = ', opt.D_noise)
 opt.lrG, opt.lrD = 0., 0.
 opt.runs_path = tag + 'high_D_noise'
 opt.D_noise = 0.5
+print('DEBUG opt.D_noise = ', opt.D_noise)
 AG.learn(opt)
 
 
 opt = AG.init()
 opt.lrG, opt.lrD = 0., 0.
+print('DEBUG opt.D_noise = ', opt.D_noise)
 if opt.do_whitening:
     opt.runs_path = tag + 'no_whitening'
 else:

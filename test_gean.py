@@ -1,12 +1,13 @@
-import os
-PID, HOST = os.getpid(), os.uname()[1]
-
-import numpy as np
 import AEGEAN as AG
+import numpy as np
+# import os
+# PID, HOST = os.getpid(), os.uname()[1]
+
 
 opt = AG.init()
-tag = f'GEAN_{HOST}_{opt.img_size}_'
-
+opt.lrG, opt.lrD = 0., 0.
+# tag = f'AE_{HOST}_{opt.img_size}_'
+tag = f'AE_{opt.img_size}_'
 
 # VANILLA
 opt = AG.init()
