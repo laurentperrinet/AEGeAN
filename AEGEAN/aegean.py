@@ -309,8 +309,7 @@ def do_learn(opt):
                 iteration = i + nb_batch * j
                 writer.add_scalar('loss/E', e_loss.item(), global_step=iteration)
                 try:
-                    if opt.latent_dim > 0:
-                        writer.add_histogram('E(x)', z_imgs, global_step=iteration)
+                    writer.add_histogram('E(x)', z_imgs, global_step=iteration)
                 except:
                     pass
                 if opt.lrD > 0:
@@ -318,6 +317,7 @@ def do_learn(opt):
                     writer.add_scalar('loss/D', d_loss.item(), global_step=iteration)
 
                     writer.add_scalar('score/D_x', hist["d_x_mean"][i], global_step=iteration)
+                    writer.add_scalar('score/D_fake', hist["d_fake_mean"][i], global_step=iteration)
                     writer.add_scalar('score/D_g_z', hist["d_g_z_mean"][i], global_step=iteration)
 
                     # writer.add_scalar('d_x_cv', hist["d_x_cv"][i], global_step=iteration)
@@ -336,16 +336,15 @@ def do_learn(opt):
 
             # Save samples
             if epoch % opt.sample_interval == 0:
-                if opt.latent_dim > 0:
-                    tensorboard_sampling(fixed_noise, generator, writer, epoch)
+                tensorboard_sampling(fixed_noise, generator, writer, epoch)
                 tensorboard_AE_comparator(real_imgs_samples, generator, encoder, writer, epoch) # TODO use decoded_imgs_samples
 
-        if epoch % opt.sample_interval == 0 and opt.latent_dim > 0:
+        if epoch % opt.sample_interval == 0 :
             sampling(fixed_noise, generator, path_data, epoch, tag)
             # do_plot(hist, start_epoch, epoch)
 
         # Save models
-        if epoch % opt.model_save_interval == 0 and opt.latent_dim > 0:
+        if epoch % opt.model_save_interval == 0 :
             num = str(int(epoch / opt.model_save_interval))
             save_model(discriminator, optimizer_D, epoch, opt.model_save_path + "/" + num + "_D.pt")
             save_model(generator, optimizer_G, epoch, opt.model_save_path + "/" + num + "_G.pt")
