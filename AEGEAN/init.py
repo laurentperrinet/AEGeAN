@@ -4,8 +4,8 @@ import argparse
 PID, HOST = os.getpid(), os.uname()[1]
 if HOST in ['ada', 'ekla']:
     DEBUG = 4
-elif HOST == 'fortytwo':
-    DEBUG = 1
+    # elif HOST == 'fortytwo':
+    #     DEBUG = 2
 else:
     DEBUG = 1
 
@@ -14,7 +14,7 @@ def init():
     parser = argparse.ArgumentParser()
     parser.add_argument("--runs_path", type=str, default='vanilla',
                         help="folder to save samples data and statistics")
-    parser.add_argument("--n_epochs", type=int, default=64,
+    parser.add_argument("--n_epochs", type=int, default=32,
                         help="number of epochs of training")
     parser.add_argument("--batch_size", type=int, default=32, help="size of the batches")
     parser.add_argument("--rand_hflip", type=bool, default=True,
@@ -49,12 +49,12 @@ def init():
     parser.add_argument("--stride", type=int, default=2, help="stride")
     parser.add_argument("--padding", type=int, default=4, help="padding")
     parser.add_argument("--channel0", type=int, default=32//DEBUG, help="size of the channel 0")
-    parser.add_argument("--channel1", type=int, default=64//DEBUG, help="size of the channel 1")
-    parser.add_argument("--channel2", type=int, default=128//DEBUG, help="size of the channel 2")
-    parser.add_argument("--channel3", type=int, default=256//DEBUG, help="size of the channel 3")
+    parser.add_argument("--channel1", type=int, default=32//DEBUG, help="size of the channel 1")
+    parser.add_argument("--channel2", type=int, default=64//DEBUG, help="size of the channel 2")
+    parser.add_argument("--channel3", type=int, default=64//DEBUG, help="size of the channel 3")
     parser.add_argument("--latent_dim", type=int, default=100,
                         help="dimensionality of the latent space")
-    parser.add_argument("--img_size", type=int, default=64//DEBUG,
+    parser.add_argument("--img_size", type=int, default=128//DEBUG,
                         help="size of each image dimension")
     parser.add_argument("--channels", type=int, default=3, help="number of input image channels")
     parser.add_argument("--sample_interval", type=int, default=1,
@@ -64,7 +64,8 @@ def init():
     parser.add_argument("--model_save_interval", type=int, default=5000,
                         help="interval between image sampling. If model_save_interval > n_epochs : no save")
     parser.add_argument('--model_save_path', type=str, default='models')
-    parser.add_argument('--datapath', type=str, default='../database/Simpsons-Face_clear/cp/')  #TODO try /database/CFD\ Version\ 2.0.3/CFD\ 2.0.3\ Images
+    # parser.add_argument('--datapath', type=str, default='../database/Simpsons-Face_clear/cp/')
+    parser.add_argument('--datapath', type=str, default='../database/CFD Version 2.0.3/CFD 2.0.3 Images')
     parser.add_argument('--load_model', action="store_true",
                         help="Load model present in model_save_path/Last_*.pt, if present.")
     parser.add_argument("--verbose", type=bool, default=False if DEBUG <
