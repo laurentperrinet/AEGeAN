@@ -2,7 +2,7 @@ import AEGEAN as AG
 import numpy as np
 # import os
 # PID, HOST = os.getpid(), os.uname()[1]
-
+base = 4
 
 opt = AG.init()
 opt.lrG, opt.lrD = 0., 0.
@@ -31,65 +31,74 @@ AG.learn(opt)
 opt = AG.init()
 opt.lrG, opt.lrD = 0., 0.
 opt.runs_path = tag + 'small_lrE'
-opt.lrE /= 2
+opt.lrE /= base
 AG.learn(opt)
 
 opt = AG.init()
 opt.lrG, opt.lrD = 0., 0.
 opt.runs_path = tag + 'big_lrE'
-opt.lrE *= 2
+opt.lrE *= base
+AG.learn(opt)
+
+opt = AG.init()
+opt.lrG, opt.lrD = 0., 0.
+opt.runs_path = tag + 'small_lambdaE'
+opt.lambdaE /= base
+AG.learn(opt)
+
+opt = AG.init()
+opt.lrG, opt.lrD = 0., 0.
+opt.runs_path = tag + 'big_lambdaE'
+opt.lambdaE *= base
 AG.learn(opt)
 
 opt = AG.init()
 opt.lrG, opt.lrD = 0., 0.
 opt.runs_path = tag + 'small_channel0'
-opt.channel0 //= 2
+opt.channel0 //= base
 AG.learn(opt)
 
 opt = AG.init()
 opt.lrG, opt.lrD = 0., 0.
 opt.runs_path = tag + 'big_channel0'
-opt.channel0 *= 2
+opt.channel0 *= base
 AG.learn(opt)
 
 opt = AG.init()
 opt.lrG, opt.lrD = 0., 0.
 opt.runs_path = tag + 'small_channel1'
-opt.channel1 //= 2
+opt.channel1 //= base
 AG.learn(opt)
 
 opt = AG.init()
 opt.lrG, opt.lrD = 0., 0.
 opt.runs_path = tag + 'big_channel1'
-opt.channel1 *= 2
+opt.channel1 *= base
 AG.learn(opt)
 
 opt = AG.init()
 opt.lrG, opt.lrD = 0., 0.
 opt.runs_path = tag + 'small_channel2'
-opt.channel2 //= 2
+opt.channel2 //= base
 AG.learn(opt)
 
 opt = AG.init()
 opt.lrG, opt.lrD = 0., 0.
 opt.runs_path = tag + 'big_channel2'
-opt.channel2 *= 2
+opt.channel2 *= base
 AG.learn(opt)
 
 opt = AG.init()
 opt.lrG, opt.lrD = 0., 0.
 opt.runs_path = tag + 'low_D_noise'
-opt.D_noise = 0.05
+opt.D_noise /= base
 AG.learn(opt)
 
 opt = AG.init()
-print('DEBUG opt.D_noise = ', opt.D_noise)
 opt.lrG, opt.lrD = 0., 0.
 opt.runs_path = tag + 'high_D_noise'
-opt.D_noise = 0.5
-print('DEBUG opt.D_noise = ', opt.D_noise)
+opt.D_noise *= base
 AG.learn(opt)
-
 
 opt = AG.init()
 opt.lrG, opt.lrD = 0., 0.
@@ -103,20 +112,23 @@ AG.learn(opt)
 
 opt = AG.init()
 opt.lrG, opt.lrD = 0., 0.
-opt.runs_path = tag + 'no_init_weight'
-opt.init_weight = False
+if opt.init_weight:
+    opt.runs_path = tag + 'no_init_weight'
+else:
+    opt.runs_path = tag + 'do_init_weight'
+opt.init_weight = not opt.init_weight
 AG.learn(opt)
 
 opt = AG.init()
 opt.lrG, opt.lrD = 0., 0.
 opt.runs_path = tag + 'low_batch_size'
-opt.batch_size //= 2
+opt.batch_size //= base
 AG.learn(opt)
 
 opt = AG.init()
 opt.lrG, opt.lrD = 0., 0.
 opt.runs_path = tag + 'high_batch_size'
-opt.batch_size *= 2
+opt.batch_size *= base
 AG.learn(opt)
 
 opt = AG.init()
@@ -149,13 +161,17 @@ opt.runs_path = tag + 'no_affine'
 opt.rand_affine = 0.
 AG.learn(opt)
 
-
 opt = AG.init()
 opt.lrG, opt.lrD = 0., 0.
 opt.runs_path = tag + 'relu' if opt.lrelu==0. else tag + 'lrelu'
 opt.lrelu = 0.02 if opt.lrelu==0. else 0.
 AG.learn(opt)
 
+opt = AG.init()
+opt.lrG, opt.lrD = 0., 0.
+opt.runs_path = tag + 'valid_smooth'
+opt.valid_smooth = 0.9
+AG.learn(opt)
 
 opt = AG.init()
 opt.lrG, opt.lrD = 0., 0.
@@ -166,13 +182,13 @@ AG.learn(opt)
 opt = AG.init()
 opt.lrG, opt.lrD = 0., 0.
 opt.runs_path = tag + 'small_eps'
-opt.bn_eps = 1e-10
+opt.bn_eps /= base
 AG.learn(opt)
 
 opt = AG.init()
 opt.lrG, opt.lrD = 0., 0.
 opt.runs_path = tag + 'big_eps'
-opt.bn_eps = 1e-2
+opt.bn_eps *= base
 AG.learn(opt)
 
 opt = AG.init()

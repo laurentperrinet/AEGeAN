@@ -5,7 +5,7 @@ PID, HOST = os.getpid(), os.uname()[1]
 if HOST in ['ada', 'ekla']:
     DEBUG = 4
 elif HOST == 'fortytwo':
-    DEBUG = 2
+    DEBUG = 1
 else:
     DEBUG = 1
 
@@ -14,7 +14,7 @@ def init():
     parser = argparse.ArgumentParser()
     parser.add_argument("--runs_path", type=str, default='vanilla',
                         help="folder to save samples data and statistics")
-    parser.add_argument("--n_epochs", type=int, default=64//DEBUG,
+    parser.add_argument("--n_epochs", type=int, default=64,
                         help="number of epochs of training")
     parser.add_argument("--batch_size", type=int, default=32, help="size of the batches")
     parser.add_argument("--rand_hflip", type=bool, default=True,
@@ -23,16 +23,16 @@ def init():
                         help="data augmentation: angle in degrees")
     parser.add_argument("--init_weight", type=bool, default=True,
                         help="initialize weights to normal")
-    parser.add_argument("--lrE", type=float, default=0.001*DEBUG, help="learning rate for E")
+    parser.add_argument("--lrE", type=float, default=0.0001, help="learning rate for E")
     parser.add_argument("--lambdaE", type=float, default=0.1, help="regularization parameter for E")
-    parser.add_argument("--lrD", type=float, default=0.0001*DEBUG, help="learning rate for D")
+    parser.add_argument("--lrD", type=float, default=0.00001, help="learning rate for D")
     parser.add_argument("--valid_smooth", type=float, default=0.95,
                         help="Smoothing the results of D on real images")
     parser.add_argument("--D_noise", type=float, default=0.3,
                         help="Add noise to the input images of D")
     parser.add_argument("--lrG", type=float, default=0.0001*DEBUG, help="learning rate for G")
     parser.add_argument("--GAN_loss", type=str, default='original', help="Use different losses for G.")
-    parser.add_argument("--do_whitening", type=bool, default=True, help="Use contrasted images.")
+    parser.add_argument("--do_whitening", type=bool, default=True, help="Use contrasted images for the cost of E.")
     parser.add_argument("--do_bias", type=bool, default=False, help="Should we use biases in convolutions?")
     parser.add_argument("--bn_eps", type=float, default=.5,
                         help="batchnorm: espilon for numerical stability")
