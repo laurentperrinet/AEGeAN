@@ -5,6 +5,7 @@ import torch
 import random
 import numpy as np
 import datetime
+# import pathlib
 from glob import glob
 import matplotlib.pyplot as plt
 from torch.utils.data.dataset import Dataset
@@ -27,30 +28,37 @@ class FolderDataset(Dataset):
                 width (int): image width
                 transform: pytorch transforms for transforms and tensor conversion during training
         """
-        self.files = glob(dir_path + '*')
-        self.labels = np.zeros(len(self.files))
+        files = glob(os.path.join(dir_path, '*'))
+        files.extend(glob(os.path.join(dir_path, '**/*')))
+        #self.files = list(pathlib.Path(dir_path).rglob("*.png"))#".[png|jpg]")
+        # print(self.files, os.path.join(dir_path, '**/*'))
+        # self.labels = np.zeros(len(self.files))
         self.height = height
         self.width = width
         self.transform = transform
 
         # Chargement des images
         self.imgs = list()
-        for img in self.files:
-            #img_as_np = np.asarray(Image.open(img).resize((self.height, self.width))).astype('uint8')
-            img_as_img = Image.open(img).resize((self.height, self.width))
+        self.files = list()
+        for fname in files:
+            if os.path.isfile(fname):
+                #img_as_np = np.asarray(Image.open(img).resize((self.height, self.width))).astype('uint8')
+                img_as_pil = Image.open(fname).resize((self.height, self.width))
 
-            self.imgs.append(img_as_img)
+                self.imgs.append(img_as_pil)
+                self.files.append(fname)
 
     def __getitem__(self, index):
         #print("Image load : ",self.files[index])
-        single_image_label = self.labels[index]
-        img_as_img = self.imgs[index]
+        #single_image_label = self.labels[index]
+        filename = self.files[index]
+        img_as_pil = self.imgs[index]
 
         # Transform image to tensor
-        img_as_tensor = self.transform(img_as_img)
+        img_as_tensor = self.transform(img_as_pil)
 
         # Return image and the label
-        return (img_as_tensor, single_image_label)
+        return (img_as_tensor, filename)
 
     def __len__(self):
         return len(self.files)
@@ -96,7 +104,7 @@ def load_data(path, img_size, batch_size, Fast=True, FDD=False, rand_hflip=False
         transform_tmp.append(transforms.RandomAffine(degrees=rand_affine))
     # transform_tmp.append(transforms.ColorJitter(brightness=0, contrast=(0.9, 1.0), saturation=0, hue=0))
     transform_tmp.append(transforms.ToTensor())
-    # transform_tmp.append(transforms.Normalize([mean]*3, [std]*3))
+    transform_tmp.append(transforms.Normalize([mean]*3, [std]*3))
 
     transform = transforms.Compose(transform_tmp)
     dataset = FolderDataset(path, img_size, img_size, transform)
