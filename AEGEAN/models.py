@@ -105,7 +105,7 @@ class Generator(nn.Module):
             nn.Conv2d(self.channels[0], opt.channels, kernel_size=3, stride=1, padding=1,
                       bias=opts_conv['bias']),
             # nn.ConvTranspose2d(self.channels[0], opt.channels, kernel_size=3, stride=1, padding=1, bias=opt.do_bias),
-            nn.Tanh()
+            # nn.Tanh()
             # nn.Sigmoid()
         )
         self.opt = opt
