@@ -10,7 +10,12 @@ pep8:
 	autopep8 $(DIR)/*.py -r -i --max-line-length 120 --ignore E402
 
 maria_rsync:
-	rsync --progress -avhuz --exclude-from=.ExclusionRSync  laurent@10.164.6.243:science/GAN-SDPC/GAN-SDPC/ .
+	rsync --progress -avhuz --exclude-from=.ExclusionRSync  laurent@10.164.6.243:research/GAN-SDPC/GAN-SDPC/ .
 
+MESO = lperrinet@login.mesocentre.univ-amu.fr:/scratch/lperrinet/SDPC/2019_AEGeAN/
 meso_rsync:
-	rsync --progress -avhuz --exclude-from=.ExclusionRSync lperrinet@login.mesocentre.univ-amu.fr:/scratch/lperrinet/SDPC/2019_AEGeAN/ .
+	rsync --progress -avhuz --exclude-from=.ExclusionRSync $(MESO) .
+
+meso_sync:
+	rsync --progress -avhuz --exclude-from=.ExclusionRSync runs $(MESO)
+	rsync --progress -avhuz --exclude-from=.ExclusionRSync $(MESO)/runs .
