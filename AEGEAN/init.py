@@ -1,11 +1,13 @@
 import os
+import numpy as np
 import argparse
 
 PID, HOST = os.getpid(), os.uname()[1]
 if HOST in ['ada', 'ekla']:
     DEBUG = 4
-    # elif HOST == 'fortytwo':
-    #     DEBUG = 2
+elif HOST == 'fortytwo':
+    DEBUG = 4
+    DEBUG = 1
 else:
     DEBUG = 1
 
@@ -19,20 +21,20 @@ def init():
     parser.add_argument("--batch_size", type=int, default=32, help="size of the batches")
     parser.add_argument("--rand_hflip", type=bool, default=True,
                         help="data augmentation: horizontal flip")
-    parser.add_argument("--rand_affine", type=float, default=None,
+    parser.add_argument("--rand_affine", type=float, default=2.,
                         help="data augmentation: angle in degrees")
     parser.add_argument("--init_weight", type=bool, default=False,
                         help="initialize weights to normal")
-    parser.add_argument("--lrE", type=float, default=0.0001, help="learning rate for E")
     parser.add_argument("--lambdaE", type=float, default=0.1, help="regularization parameter for E")
+    parser.add_argument("--lrE", type=float, default=0.0001, help="learning rate for E")
     parser.add_argument("--lrD", type=float, default=0.0001, help="learning rate for D")
+    parser.add_argument("--lrG", type=float, default=0.0001, help="learning rate for G")
     parser.add_argument("--valid_smooth", type=float, default=0.95,
                         help="Smoothing the results of D on real images")
     parser.add_argument("--D_noise", type=float, default=0.05,
                         help="Add noise to the input images of D")
-    parser.add_argument("--lrG", type=float, default=0.0001, help="learning rate for G")
-    parser.add_argument("--GAN_loss", type=str, default='wasserstein', help="Use different losses for G.")
-    parser.add_argument("--do_whitening", type=bool, default=True, help="Use contrasted images for the cost of E.")
+    parser.add_argument("--GAN_loss", type=str, default='original', help="Use different losses for G.")
+    parser.add_argument("--do_whitening", type=bool, default=False, help="Use contrasted images for the cost of E.")
     parser.add_argument("--do_bias", type=bool, default=False, help="Should we use biases in convolutions?")
     parser.add_argument("--bn_eps", type=float, default=np.inf,
                         help="batchnorm: espilon for numerical stability")
@@ -44,14 +46,14 @@ def init():
                         help="adam: decay of first order momentum of gradient")
     parser.add_argument("--beta2", type=float, default=0.999,
                         help="adam: decay of first order momentum of gradient")
-    parser.add_argument("--lrelu", type=float, default=0.0, help="LeakyReLU : alpha")
+    parser.add_argument("--lrelu", type=float, default=0.02, help="LeakyReLU : alpha")
     parser.add_argument("--kernel_size", type=int, default=9, help="size of the kernels")
     parser.add_argument("--stride", type=int, default=2, help="stride")
     parser.add_argument("--padding", type=int, default=4, help="padding")
-    parser.add_argument("--channel0", type=int, default=32//DEBUG, help="size of the channel 0")
+    parser.add_argument("--channel0", type=int, default=16//DEBUG, help="size of the channel 0")
     parser.add_argument("--channel1", type=int, default=32//DEBUG, help="size of the channel 1")
     parser.add_argument("--channel2", type=int, default=64//DEBUG, help="size of the channel 2")
-    parser.add_argument("--channel3", type=int, default=64//DEBUG, help="size of the channel 3")
+    parser.add_argument("--channel3", type=int, default=128//DEBUG, help="size of the channel 3")
     parser.add_argument("--latent_dim", type=int, default=100,
                         help="dimensionality of the latent space")
     parser.add_argument("--img_size", type=int, default=128//DEBUG,
