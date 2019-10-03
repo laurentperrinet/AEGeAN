@@ -2,6 +2,7 @@ import os
 import numpy as np
 from torch.autograd import Variable
 
+
 from .init import init
 from .utils import *
 from .plot import *
@@ -14,6 +15,7 @@ from torch.utils.data import DataLoader
 from torchvision import datasets
 
 import torch
+torch.autograd.set_detect_anomaly(True)
 import torch.nn as nn
 import torch.nn.functional as F
 from torch.nn.functional import conv2d
@@ -209,10 +211,10 @@ def do_learn(opt):
             e_loss.backward()
             optimizer_E.step()
 
-            # ---------------------
-            #  Train Discriminator
-            # ---------------------
             if opt.lrD > 0:
+                # ---------------------
+                #  Train Discriminator
+                # ---------------------
                 optimizer_D.zero_grad()
 
                 # Adversarial ground truths
@@ -263,8 +265,8 @@ def do_learn(opt):
 
                 # New discriminator decision, Since we just updated D
                 z = Variable(Tensor(np.random.normal(0, 1, (opt.batch_size, opt.latent_dim))))
-                gen_imgs = generator(z)
-                d_g_z = discriminator(gen_imgs)
+                # gen_imgs = generator(z)
+                d_g_z = discriminator(generator(z))
 
                 # Loss measures generator's ability to fool the discriminator
                 if opt.GAN_loss == 'ian':

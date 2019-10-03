@@ -107,7 +107,9 @@ class Generator(nn.Module):
             # nn.ConvTranspose2d(self.channels[0], opt.channels, kernel_size=3, stride=1, padding=1, bias=opt.do_bias),
             # nn.Tanh()
             # nn.Sigmoid()
+            # nn.ReLU(inplace=False)
         )
+        self.out_NL = nn.Tanh()
         self.opt = opt
 
     def forward(self, z):
@@ -136,6 +138,7 @@ class Generator(nn.Module):
             print("Conv3 out : ", out.shape)
 
         out = self.conv_blocks(out)
+        out = self.out_NL(out)
         # Dim : (opt.chanels, opt.img_size, opt.img_size)
         if self.opt.verbose:
             print("img out : ", out.shape)
@@ -143,7 +146,7 @@ class Generator(nn.Module):
         # if self.opt.do_whitening:
         #     out = conv2d(out, Kinv, padding=1)
         return out
-        
+
 
     def _name(self):
         return "Generator"
