@@ -143,6 +143,7 @@ class Generator(nn.Module):
         # if self.opt.do_whitening:
         #     out = conv2d(out, Kinv, padding=1)
         return out
+        
 
     def _name(self):
         return "Generator"

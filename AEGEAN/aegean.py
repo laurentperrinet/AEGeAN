@@ -261,7 +261,7 @@ def do_learn(opt):
                 # if opt.lrG > 0:
                 optimizer_G.zero_grad()
 
-                # New discriminator descision, Since we just updated D
+                # New discriminator decision, Since we just updated D
                 z = Variable(Tensor(np.random.normal(0, 1, (opt.batch_size, opt.latent_dim))))
                 gen_imgs = generator(z)
                 d_g_z = discriminator(gen_imgs)

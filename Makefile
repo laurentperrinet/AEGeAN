@@ -17,6 +17,6 @@ meso_rsync:
 	rsync --progress -avhuz --exclude-from=.ExclusionRSync $(URL) .
 
 meso_sync:
-	rsync --progress -avhuz --exclude-from=.ExclusionRSync runs $(URL)
-	rsync --progress -avhuz --exclude-from=.ExclusionRSync $(URL)/runs .
+	rsync --progress -avhuz runs $(URL)
+	rsync --progress -avhuz $(URL)/runs .
 	# rsync --progress -avhuz --exclude-from=.ExclusionRSync ../database $(URL)/..
