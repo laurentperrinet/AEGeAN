@@ -172,10 +172,14 @@ opt.runs_path = tag + 'valid_smooth'
 opt.valid_smooth = 0.9
 AG.learn(opt)
 
-
 opt = AG.init()
-opt.runs_path = tag + 'no_bn'
-opt.bn_eps = np.inf
+opt.lrG, opt.lrD = 0., 0.
+if opt.bn_eps == np.inf:
+    opt.runs_path = tag + 'do_bn'
+    opt.bn_eps = .1
+else:
+    opt.runs_path = tag + 'no_bn'
+    opt.bn_eps = np.inf
 AG.learn(opt)
 
 opt = AG.init()
