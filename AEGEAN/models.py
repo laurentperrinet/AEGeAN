@@ -30,11 +30,11 @@ class Encoder(nn.Module):
         self.conv4 = nn.Sequential(*encoder_block(self.channels[2], self.channels[3]),)
 
         self.init_size = opt.img_size // opt.stride**4
-        self.vector = nn.Linear(self.channels[3] * self.init_size ** 2, opt.latent_dim)
-        # self.vector = nn.Sequential(
-        #     nn.Linear(self.channels[3] * self.init_size ** 2, opt.latent_dim),
-        #     nn.Tanh(),
-        # )
+        # self.vector = nn.Linear(self.channels[3] * self.init_size ** 2, opt.latent_dim)
+        self.vector = nn.Sequential(
+            nn.Linear(self.channels[3] * self.init_size ** 2, opt.latent_dim),
+            nn.Tanh(),
+        )
 
         self.opt = opt
 
@@ -90,26 +90,28 @@ class Generator(nn.Module):
             if bn and (not opt.bn_eps == np.inf):
                 block.append(nn.BatchNorm2d(out_filters, eps=opt.bn_eps, momentum=opt.bn_momentum))
             block.append(NL)
-
             return block
 
-        self.init_size = opt.img_size // opt.stride**4
+        self.init_size = opt.img_size // opt.stride**3
         self.l1 = nn.Sequential(
             nn.Linear(opt.latent_dim, self.channels[3] * self.init_size ** 2), NL)
 
         self.conv1 = nn.Sequential(*generator_block(self.channels[3], self.channels[2], bn=False),)
         self.conv2 = nn.Sequential(*generator_block(self.channels[2], self.channels[1]),)
         self.conv3 = nn.Sequential(*generator_block(self.channels[1], self.channels[0]),)
-        self.conv_blocks = nn.Sequential(
-            nn.UpsamplingNearest2d(scale_factor=opt.stride), #opts_conv['stride']),
-            nn.Conv2d(self.channels[0], opt.channels, kernel_size=3, stride=1, padding=1,
-                      bias=opts_conv['bias']),
-            # nn.ConvTranspose2d(self.channels[0], opt.channels, kernel_size=3, stride=1, padding=1, bias=opt.do_bias),
-            # nn.Tanh()
-            # nn.Sigmoid()
-            # nn.ReLU(inplace=False)
-        )
+
+        self.conv_blocks = nn.Conv2d(self.channels[0], opt.channels, kernel_size=3, stride=1, padding=1)
+        # self.conv_blocks = nn.Sequential(
+        #     nn.UpsamplingNearest2d(scale_factor=opt.stride), #opts_conv['stride']),
+        #     nn.Conv2d(self.channels[0], opt.channels, kernel_size=3, stride=1, padding=1) #, bias=opts_conv['bias']),
+        #     # nn.ConvTranspose2d(self.channels[0], opt.channels, kernel_size=3, stride=opt.stride, padding=2, bias=opt.do_bias),
+        #     # nn.Tanh(),
+        #     # nn.Sigmoid()
+        #     # nn.ReLU(inplace=True)
+        # )
         self.out_NL = nn.Tanh()
+
+
         self.opt = opt
 
     def forward(self, z):
@@ -132,19 +134,21 @@ class Generator(nn.Module):
         # Dim : (self.channels[3]/4, opt.img_size/2, opt.img_size/2)
         if self.opt.verbose:
             print("Conv2 out : ", out.shape)
+
         out = self.conv3(out)
         # Dim : (self.channels[3]/8, opt.img_size, opt.img_size)
         if self.opt.verbose:
             print("Conv3 out : ", out.shape)
 
         out = self.conv_blocks(out)
-        out = self.out_NL(out)
+        # out = self.out_NL(out)
         # Dim : (opt.chanels, opt.img_size, opt.img_size)
         if self.opt.verbose:
             print("img out : ", out.shape)
 
         # if self.opt.do_whitening:
         #     out = conv2d(out, Kinv, padding=1)
+        # return F.tanh(out)
         return out
 
 

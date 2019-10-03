@@ -80,9 +80,12 @@ def do_learn(opt):
         tag = datetime.datetime.now().replace(microsecond=0).isoformat(sep='_')
     tag = tag.replace(':', '-')
 
-    cuda = True if torch.cuda.is_available() else False
 
-    # Loss function
+    # Configure data loader
+    dataloader = load_data(opt.datapath, opt.img_size, opt.batch_size,
+                           rand_hflip=opt.rand_hflip, rand_affine=opt.rand_affine)
+
+    # Loss functions
     adversarial_loss = torch.nn.BCEWithLogitsLoss()  # eq. 8 in https://arxiv.org/pdf/1701.00160.pdf
     MSE_loss = torch.nn.MSELoss(reduction='sum')
     sigmoid = nn.Sigmoid()
@@ -97,6 +100,7 @@ def do_learn(opt):
         print_network(discriminator)
         print_network(encoder)
 
+    cuda = True if torch.cuda.is_available() else False
     if cuda:
         #print("Nombre de GPU : ",torch.cuda.device_count())
         if torch.cuda.device_count() > opt.GPU:
@@ -114,9 +118,6 @@ def do_learn(opt):
         discriminator.apply(weights_init_normal)
         encoder.apply(weights_init_normal)
 
-    # Configure data loader
-    dataloader = load_data(opt.datapath, opt.img_size, opt.batch_size,
-                           rand_hflip=opt.rand_hflip, rand_affine=opt.rand_affine)
 
     # Optimizers
     optimizer_G = torch.optim.Adam(generator.parameters(), lr=opt.lrG, betas=(opt.beta1, opt.beta2))
@@ -166,12 +167,8 @@ def do_learn(opt):
         t_epoch = time.time()
         for i, (imgs, _) in enumerate(dataloader):
             t_batch = time.time()
-            # ---------------------
-            #  Train Encoder
-            # ---------------------
-            optimizer_E.zero_grad()
 
-            real_imgs = Variable(imgs.type(Tensor))
+            real_imgs = Variable(imgs.type(Tensor), requires_grad=False)
 
             # init samples used in the AE
             if real_imgs_samples is None:
@@ -182,6 +179,11 @@ def do_learn(opt):
             decoded_imgs = generator(z_imgs)
             decoded_imgs_samples = decoded_imgs[:opt.N_samples]
 
+
+            # ---------------------
+            #  Train Encoder
+            # ---------------------
+            optimizer_E.zero_grad()
 
             # Loss measures Encoder's ability to generate vectors suitable with the generator
             energy = MSE_loss(real_imgs, zero_target)  # normalize on the energy of imgs
@@ -212,6 +214,10 @@ def do_learn(opt):
             optimizer_E.step()
 
             if opt.lrD > 0:
+                z = Variable(Tensor(np.random.normal(0, 1, (opt.batch_size, opt.latent_dim))), requires_grad=False)
+                # Generate a batch of fake images
+                gen_imgs = generator(z)
+
                 # ---------------------
                 #  Train Discriminator
                 # ---------------------
@@ -235,17 +241,15 @@ def do_learn(opt):
                 real_loss.backward()
 
                 # Fake batch
-                # Generate a batch of images
-                z = Variable(Tensor(np.random.normal(0, 1, (opt.batch_size, opt.latent_dim))))
-                gen_imgs = generator(z)
+                # z = Variable(Tensor(np.random.normal(0, 1, (opt.batch_size, opt.latent_dim))))
 
-                # Discriminator decision
-                d_g_z = discriminator(gen_imgs.detach())
+                # Discriminator decision for fake data
+                d_fake = discriminator(gen_imgs.detach())
                 # Measure discriminator's ability to classify real from generated samples
                 if opt.GAN_loss == 'wasserstein':
-                    fake_loss = torch.mean(sigmoid(d_g_z))
+                    fake_loss = torch.mean(sigmoid(d_fake))
                 else:
-                    fake_loss = adversarial_loss(d_g_z, fake)
+                    fake_loss = adversarial_loss(d_fake, fake)
                 # Backward
                 fake_loss.backward()
 
@@ -253,20 +257,15 @@ def do_learn(opt):
 
                 optimizer_D.step()
 
-                # Compensation pour le BCElogits
-                d_fake = sigmoid(d_g_z)
-                d_x = sigmoid(d_x)
-
                 # -----------------
                 #  Train Generator
                 # -----------------
-                # if opt.lrG > 0:
                 optimizer_G.zero_grad()
+                # if opt.lrG > 0:
 
                 # New discriminator decision, Since we just updated D
-                z = Variable(Tensor(np.random.normal(0, 1, (opt.batch_size, opt.latent_dim))))
                 # gen_imgs = generator(z)
-                d_g_z = discriminator(generator(z))
+                d_g_z = discriminator(gen_imgs)
 
                 # Loss measures generator's ability to fool the discriminator
                 if opt.GAN_loss == 'ian':
@@ -287,13 +286,15 @@ def do_learn(opt):
                 # Backward
                 g_loss.backward()
                 optimizer_G.step()
-                # Compensation pour le BCElogits
-                d_g_z = sigmoid(d_g_z)
 
             # -----------------
             #  Recording stats
             # -----------------
-            if opt.lrG > 0:
+            if opt.lrD > 0:
+                # Compensation pour le BCElogits
+                d_fake = sigmoid(d_fake)
+                d_x = sigmoid(d_x)
+                d_g_z = sigmoid(d_g_z)
                 print(
                     "[Epoch %d/%d] [Batch %d/%d] [E loss: %f] [D loss: %f] [G loss: %f] [D real score %f] [D fake score %f] [G score %f] [Time: %fs]"
                     % (epoch, opt.n_epochs, i+1, len(dataloader), e_loss.item(), d_loss.item(), g_loss.item(), torch.mean(d_x), torch.mean(d_fake), torch.mean(d_g_z), time.time()-t_batch)
@@ -329,6 +330,7 @@ def do_learn(opt):
                                          bins=np.linspace(0, 1, 20))
                     writer.add_histogram('D(G(z))', d_g_z, global_step=iteration,
                                          bins=np.linspace(0, 1, 20))
+
 
         if do_tensorboard:
             # writer.add_scalar('D_x/max', hist["D_x_max"][j], global_step=epoch)

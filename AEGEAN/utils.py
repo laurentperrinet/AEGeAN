@@ -101,7 +101,8 @@ def load_data(path, img_size, batch_size, Fast=True, FDD=False, rand_hflip=False
     if rand_hflip:
         transform_tmp.append(transforms.RandomHorizontalFlip(p=0.5))
     if rand_affine != None:
-        transform_tmp.append(transforms.RandomAffine(degrees=rand_affine))
+        # https://pytorch.org/docs/stable/torchvision/transforms.html#torchvision.transforms.RandomAffine
+        transform_tmp.append(transforms.RandomAffine(degrees=rand_affine, fillcolor=1))
     # transform_tmp.append(transforms.ColorJitter(brightness=0, contrast=(0.9, 1.0), saturation=0, hue=0))
     transform_tmp.append(transforms.ToTensor())
     transform_tmp.append(transforms.Normalize([mean]*3, [std]*3))
