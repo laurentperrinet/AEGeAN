@@ -83,18 +83,18 @@ class Generator(nn.Module):
         self.channels = [opt.channel0, opt.channel1, opt.channel2, opt.channel3]
 
         # def generator_block(in_filters, out_filters, bn=True):
-        #     block = [nn.UpsamplingNearest2d(scale_factor=opt.stride),
-        #              nn.Conv2d(in_filters, out_filters, **opts_conv),
-        #              #nn.ConvTranspose2d(in_filters, out_filters, stride=opt.stride, **opts_conv),
-        #              ]
-        #     if bn and (not opt.bn_eps == np.inf):
-        #         block.append(nn.BatchNorm2d(out_filters, eps=opt.bn_eps, momentum=opt.bn_momentum))
-        #     block.append(NL)
+        #     block = [nn.UpsamplingNearest2d(scale_factor=opt.stride), nn.Conv2d(in_filters, out_filters, **opts_conv), nn.BatchNorm2d(out_filters, eps=opt.bn_eps, momentum=opt.bn_momentum), NL]
+        #
         #     return block
 
         def generator_block(in_filters, out_filters, bn=True):
-            block = [nn.UpsamplingNearest2d(scale_factor=opt.stride), nn.Conv2d(in_filters, out_filters, **opts_conv), nn.BatchNorm2d(out_filters, eps=opt.bn_eps, momentum=opt.bn_momentum), NL]
-
+            block = [nn.UpsamplingNearest2d(scale_factor=opt.stride),
+                     nn.Conv2d(in_filters, out_filters, **opts_conv),
+                     #nn.ConvTranspose2d(in_filters, out_filters, stride=opt.stride, **opts_conv),
+                     ]
+            if bn and (not opt.bn_eps == np.inf):
+                block.append(nn.BatchNorm2d(out_filters, eps=opt.bn_eps, momentum=opt.bn_momentum))
+            block.append(NL)
             return block
 
         self.init_size = opt.img_size // opt.stride**3
@@ -105,8 +105,9 @@ class Generator(nn.Module):
         self.conv2 = nn.Sequential(*generator_block(self.channels[2], self.channels[1]),)
         self.conv3 = nn.Sequential(*generator_block(self.channels[1], self.channels[0]),)
 
+
         self.conv_blocks = nn.Sequential(
-            nn.Conv2d(self.channels[0], opt.channels, kernel_size=3, stride=1, padding=1),
+            nn.Conv2d(self.channels[0], opt.channels, 3, stride=1, padding=1),
             nn.Tanh(),
         )
 
@@ -138,15 +139,17 @@ class Generator(nn.Module):
         if self.opt.verbose:
             print("Conv3 out : ", out.shape)
 
-        out = self.conv_blocks(out)
+        # out = self.out_NL(out)
+        img = self.conv_blocks(out)
+        # out = self.out_NL(out)
         # Dim : (opt.chanels, opt.img_size, opt.img_size)
         if self.opt.verbose:
-            print("img out : ", out.shape)
+            print("img out : ", img.shape)
 
         # if self.opt.do_whitening:
         #     out = conv2d(out, Kinv, padding=1)
-
-        return out
+        # return F.tanh(out)
+        return img
 
 
     def _name(self):
@@ -188,7 +191,7 @@ class Discriminator(nn.Module):
             print("Image shape : ", img.shape)
             # Dim : (opt.chanels, opt.img_size, opt.img_size)
 
-        out = img#*1.
+        out = img*1.
         if self.opt.D_noise > 0:
             n = self.opt.D_noise * torch.randn(img.shape)
             if cuda:
