@@ -140,16 +140,16 @@ class Generator(nn.Module):
             print("Conv3 out : ", out.shape)
 
         # out = self.out_NL(out)
-        img = self.conv_blocks(out)
+        out = self.conv_blocks(out)
         # out = self.out_NL(out)
         # Dim : (opt.chanels, opt.img_size, opt.img_size)
         if self.opt.verbose:
-            print("img out : ", img.shape)
+            print("img out : ", out.shape)
 
         # if self.opt.do_whitening:
         #     out = conv2d(out, Kinv, padding=1)
         # return F.tanh(out)
-        return img
+        return out
 
 
     def _name(self):
