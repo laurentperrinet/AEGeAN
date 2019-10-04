@@ -120,7 +120,40 @@ class RotoTransform(object):
         return Image.fromarray(shifted_img)
 
     def __repr__(self):
-        return self.__class__.__name__ + "(x: {}, y: {})".format(self.x, self.y)
+        return self.__class__.__name__ + "(theta: {})".format(self.theta)
+
+
+
+class Normalize(object):
+    def __init__(self, mean, max, do_median=True):
+        """
+        :param max(float): max value
+        """
+        super(Normalize, self).__init__()
+        self.mean, self.max = mean, mean
+        self.do_median = do_median
+
+    def __call__(self, img):
+        """
+        :param img: PIL Image
+        :return: PIL Image
+
+        TODO: determine a contrast
+        """
+        tmp_img = np.array(img).astype(np.float)
+        # print(tmp_img.min(), tmp_img.max())
+        if self.do_median:
+            tmp_img -= np.median(tmp_img)
+        else:
+            tmp_img -= np.mean(tmp_img)
+        tmp_img = tmp_img / np.abs(tmp_img).max()
+        # tmp_img = tmp_img.astype(tmp_img.dtype)
+        # print(tmp_img.min(), tmp_img.max())
+        # return Image.fromarray(tmp_img)
+        return 2*tmp_img - 1
+
+    def __repr__(self):
+        return self.__class__.__name__ + "(mean: {}, max: {})".format(self.mean, self.max)
 
 
 import torch.nn as nn
@@ -152,7 +185,7 @@ def weights_init_normal(m, factor=1.0):
         # m.bias.data.zero_()
 
 
-def load_data(path, img_size, batch_size, Fast=True, FDD=False, rand_hflip=False, rand_affine=None, mean=0., std=1.):
+def load_data(path, img_size, batch_size, Fast=True, FDD=False, rand_hflip=False, rand_affine=None, mean=0., max=1.):
     print("Loading data...")
     t_total = time.time()
 
@@ -166,8 +199,9 @@ def load_data(path, img_size, batch_size, Fast=True, FDD=False, rand_hflip=False
         # transform_tmp.append(transforms.RandomAffine(degrees=rand_affine, fillcolor=1))
         transform_tmp.append(RotoTransform(theta=rand_affine))
     # transform_tmp.append(transforms.ColorJitter(brightness=0, contrast=(0.9, 1.0), saturation=0, hue=0))
+    # transform_tmp.append(transforms.Normalize([mean]*3, [std]*3))
+    transform_tmp.append(Normalize(mean, max))
     transform_tmp.append(transforms.ToTensor())
-    transform_tmp.append(transforms.Normalize([mean]*3, [std]*3))
 
     transform = transforms.Compose(transform_tmp)
     dataset = FolderDataset(path, img_size, img_size, transform)
