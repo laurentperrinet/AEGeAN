@@ -82,22 +82,24 @@ class Generator(nn.Module):
                          padding=opt.padding, padding_mode='zeros')
         self.channels = [opt.channel0, opt.channel1, opt.channel2, opt.channel3]
 
-        # def generator_block(in_filters, out_filters):
-        #
+        # def generator_block(in_filters, out_filters, bn=True):
+        #     block = [nn.UpsamplingNearest2d(scale_factor=opt.stride),
+        #              nn.Conv2d(in_filters, out_filters, **opts_conv),
+        #              #nn.ConvTranspose2d(in_filters, out_filters, stride=opt.stride, **opts_conv),
+        #              ]
+        #     if bn and (not opt.bn_eps == np.inf):
+        #         block.append(nn.BatchNorm2d(out_filters, eps=opt.bn_eps, momentum=opt.bn_momentum))
+        #     block.append(NL)
         #     return block
 
         def generator_block(in_filters, out_filters, bn=True):
-            block = [nn.UpsamplingNearest2d(scale_factor=opt.stride),
-                     nn.Conv2d(in_filters, out_filters, **opts_conv),
-                     #nn.ConvTranspose2d(in_filters, out_filters, stride=opt.stride, **opts_conv),
-                     ]
-            if bn and (not opt.bn_eps == np.inf):
-                block.append(nn.BatchNorm2d(out_filters, eps=opt.bn_eps, momentum=opt.bn_momentum))
-            block.append(NL)
+            block = [nn.UpsamplingNearest2d(scale_factor=opt.stride), nn.Conv2d(in_filters, out_filters, **opts_conv), nn.BatchNorm2d(out_filters, eps=opt.bn_eps, momentum=opt.bn_momentum), NL]
+
             return block
 
         self.init_size = opt.img_size // opt.stride**3
         self.l1 = nn.Sequential(
+            nn.Linear(opt.latent_dim, self.channels[3] * self.init_size ** 2), NL,)
 
         self.conv1 = nn.Sequential(*generator_block(self.channels[3], self.channels[2], bn=False),)
         self.conv2 = nn.Sequential(*generator_block(self.channels[2], self.channels[1]),)
@@ -136,16 +138,14 @@ class Generator(nn.Module):
         if self.opt.verbose:
             print("Conv3 out : ", out.shape)
 
-        # out = self.out_NL(out)
         out = self.conv_blocks(out)
-        # out = self.out_NL(out)
         # Dim : (opt.chanels, opt.img_size, opt.img_size)
         if self.opt.verbose:
             print("img out : ", out.shape)
 
         # if self.opt.do_whitening:
         #     out = conv2d(out, Kinv, padding=1)
-        # return F.tanh(out)
+
         return out
 
 
