@@ -63,6 +63,66 @@ class FolderDataset(Dataset):
     def __len__(self):
         return len(self.files)
 
+# https://github.com/Kenneth111/pytorch_tutorial_exercises/blob/master/image_transforms.py
+
+from random import random
+import numpy as np
+from skimage.transform import AffineTransform, warp
+from PIL import Image
+
+class ShiftTransform(object):
+    def __init__(self, x, y):
+        """
+        :param x(float): fraction of total width, 0 < x < 1.0
+        :param y(float): fraction of total height, 0 < y < 1.0
+        """
+        super(ShiftTransform, self).__init__()
+        self.x = x
+        self.y = y
+
+    def __call__(self, img):
+        """
+        :param img: PIL Image
+        :return: PIL Image
+        """
+        x = int((random() - 0.5) / 0.5 * self.x * img.size[0])
+        y = int((random() - 0.5) / 0.5 * self.y * img.size[1])
+        tmp_img = np.array(img)
+        transform = AffineTransform(translation=(x, y))
+        shifted_img = warp(tmp_img, transform, mode="edge", preserve_range=True)
+        shifted_img = shifted_img.astype(tmp_img.dtype)
+        return Image.fromarray(shifted_img)
+
+    def __repr__(self):
+        return self.__class__.__name__ + "(x: {}, y: {})".format(self.x, self.y)
+
+
+class RotoTransform(object):
+    def __init__(self, theta):
+        """
+        :param theta(float): angle in degrees
+        """
+        super(RotoTransform, self).__init__()
+        self.theta = theta
+
+    def __call__(self, img):
+        """
+        :param img: PIL Image
+        :return: PIL Image
+        """
+        theta = 2*(np.random.rand() - 0.5) * self.theta
+        tmp_img = np.array(img)
+        # https://scikit-image.org/docs/dev/api/skimage.transform.html?highlight=affine#skimage.transform.AffineTransform
+        transform = AffineTransform(rotation=theta*np.pi/180)
+        # https://scikit-image.org/docs/dev/api/skimage.transform.html?highlight=affine#skimage.transform.warp
+        shifted_img = warp(tmp_img, transform, mode="edge", preserve_range=True)
+        shifted_img = shifted_img.astype(tmp_img.dtype)
+        return Image.fromarray(shifted_img)
+
+    def __repr__(self):
+        return self.__class__.__name__ + "(x: {}, y: {})".format(self.x, self.y)
+
+
 import torch.nn as nn
 
 def weights_init_normal(m, factor=1.0):
@@ -100,9 +160,11 @@ def load_data(path, img_size, batch_size, Fast=True, FDD=False, rand_hflip=False
     transform_tmp = []
     if rand_hflip:
         transform_tmp.append(transforms.RandomHorizontalFlip(p=0.5))
+        # transform_tmp.append(ShiftTransform(x=0.05, y=0.05))
     if rand_affine != None:
         # https://pytorch.org/docs/stable/torchvision/transforms.html#torchvision.transforms.RandomAffine
-        transform_tmp.append(transforms.RandomAffine(degrees=rand_affine, fillcolor=1))
+        # transform_tmp.append(transforms.RandomAffine(degrees=rand_affine, fillcolor=1))
+        transform_tmp.append(RotoTransform(theta=rand_affine))
     # transform_tmp.append(transforms.ColorJitter(brightness=0, contrast=(0.9, 1.0), saturation=0, hue=0))
     transform_tmp.append(transforms.ToTensor())
     transform_tmp.append(transforms.Normalize([mean]*3, [std]*3))
