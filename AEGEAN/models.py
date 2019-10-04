@@ -191,7 +191,7 @@ class Discriminator(nn.Module):
             print("Image shape : ", img.shape)
             # Dim : (opt.chanels, opt.img_size, opt.img_size)
 
-        out = img*1.
+        out = img#*1.
         if self.opt.D_noise > 0:
             n = self.opt.D_noise * torch.randn(img.shape)
             if cuda:
