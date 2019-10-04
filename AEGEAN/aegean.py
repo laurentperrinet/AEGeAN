@@ -15,7 +15,7 @@ from torch.utils.data import DataLoader
 from torchvision import datasets
 
 import torch
-torch.autograd.set_detect_anomaly(True)
+# torch.autograd.set_detect_anomaly(True)
 import torch.nn as nn
 import torch.nn.functional as F
 from torch.nn.functional import conv2d
