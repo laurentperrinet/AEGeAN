@@ -102,7 +102,7 @@ AG.learn(opt)
 
 opt = AG.init()
 opt.lrG, opt.lrD = 0., 0.
-print('DEBUG opt.D_noise = ', opt.D_noise)
+# print('DEBUG opt.D_noise = ', opt.D_noise)
 if opt.do_whitening:
     opt.runs_path = tag + 'no_whitening'
 else:
