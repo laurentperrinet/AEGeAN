@@ -185,7 +185,7 @@ def weights_init_normal(m, factor=1.0):
         # m.bias.data.zero_()
 
 
-def load_data(path, img_size, batch_size, Fast=True, FDD=False, rand_hflip=False, rand_affine=None, mean=0., max=1.):
+def load_data(path, img_size, batch_size, Fast=True, FDD=False, rand_hflip=False, rand_affine=None, mean=0., max=1., std=.7):
     print("Loading data...")
     t_total = time.time()
 
@@ -199,9 +199,9 @@ def load_data(path, img_size, batch_size, Fast=True, FDD=False, rand_hflip=False
         # transform_tmp.append(transforms.RandomAffine(degrees=rand_affine, fillcolor=1))
         transform_tmp.append(RotoTransform(theta=rand_affine))
     # transform_tmp.append(transforms.ColorJitter(brightness=0, contrast=(0.9, 1.0), saturation=0, hue=0))
-    # transform_tmp.append(transforms.Normalize([mean]*3, [std]*3))
-    transform_tmp.append(Normalize(mean, max))
+    # transform_tmp.append(Normalize(mean, max))
     transform_tmp.append(transforms.ToTensor())
+    transform_tmp.append(transforms.Normalize([mean]*3, [std]*3))
 
     transform = transforms.Compose(transform_tmp)
     dataset = FolderDataset(path, img_size, img_size, transform)
