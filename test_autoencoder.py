@@ -166,12 +166,12 @@ opt.lrG, opt.lrD = 0., 0.
 opt.runs_path = tag + 'relu' if opt.lrelu==0. else tag + 'lrelu'
 opt.lrelu = 0.02 if opt.lrelu==0. else 0.
 AG.learn(opt)
-
-opt = AG.init()
-opt.lrG, opt.lrD = 0., 0.
-opt.runs_path = tag + 'valid_smooth'
-opt.valid_smooth = 0.9
-AG.learn(opt)
+#
+# opt = AG.init()
+# opt.lrG, opt.lrD = 0., 0.
+# opt.runs_path = tag + 'valid_smooth'
+# opt.valid_smooth = 0.9
+# AG.learn(opt)
 
 opt = AG.init()
 opt.lrG, opt.lrD = 0., 0.
@@ -198,11 +198,11 @@ AG.learn(opt)
 opt = AG.init()
 opt.lrG, opt.lrD = 0., 0.
 opt.runs_path = tag + 'small_momentum'
-opt.bn_momentum = .01
+opt.bn_momentum = .1
 AG.learn(opt)
 
 opt = AG.init()
 opt.lrG, opt.lrD = 0., 0.
 opt.runs_path = tag + 'big_momentum'
-opt.bn_momentum = .5
+opt.bn_momentum = .9
 AG.learn(opt)

@@ -34,19 +34,19 @@ def init():
     parser.add_argument("--D_noise", type=float, default=0.05,
                         help="Add noise to the input images of D")
     parser.add_argument("--GAN_loss", type=str, default='original', help="Use different losses for G.")
-    parser.add_argument("--do_whitening", type=bool, default=False, help="Use contrasted images for the cost of E.")
+    parser.add_argument("--do_whitening", type=bool, default=True, help="Use contrasted images for the cost of E.")
     parser.add_argument("--do_bias", type=bool, default=False, help="Should we use biases in convolutions?")
     parser.add_argument("--bn_eps", type=float, default=0.15,
                         help="batchnorm: espilon for numerical stability")
     parser.add_argument("--do_joint", type=bool, default=True,
                         help="Do a joint learning of E and G, dude.")
-    parser.add_argument("--bn_momentum", type=float, default=.1,
+    parser.add_argument("--bn_momentum", type=float, default=.3,
                         help="batchnorm: momentum for numerical stability")
     parser.add_argument("--beta1", type=float, default=0.5,
                         help="adam: decay of first order momentum of gradient")
     parser.add_argument("--beta2", type=float, default=0.999,
                         help="adam: decay of first order momentum of gradient")
-    parser.add_argument("--lrelu", type=float, default=0.02, help="LeakyReLU : alpha")
+    parser.add_argument("--lrelu", type=float, default=0.0, help="LeakyReLU : alpha - zero for a standard ReLU")
     parser.add_argument("--kernel_size", type=int, default=9, help="size of the kernels")
     parser.add_argument("--stride", type=int, default=2, help="stride")
     parser.add_argument("--padding", type=int, default=4, help="padding")

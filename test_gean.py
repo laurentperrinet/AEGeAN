@@ -192,12 +192,15 @@ opt.runs_path = tag + 'big_eps'
 opt.bn_eps *= base
 AG.learn(opt)
 
+
 opt = AG.init()
+opt.lrG, opt.lrD = 0., 0.
 opt.runs_path = tag + 'small_momentum'
-opt.bn_momentum = .01
+opt.bn_momentum = .1
 AG.learn(opt)
 
 opt = AG.init()
+opt.lrG, opt.lrD = 0., 0.
 opt.runs_path = tag + 'big_momentum'
-opt.bn_momentum = .5
+opt.bn_momentum = .9
 AG.learn(opt)
