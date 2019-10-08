@@ -79,11 +79,6 @@ class Generator(nn.Module):
                          padding=opt.padding, padding_mode='zeros')
         self.channels = [opt.channel0, opt.channel1, opt.channel2, opt.channel3]
 
-        # def generator_block(in_filters, out_filters, bn=True):
-        #     block = [nn.UpsamplingNearest2d(scale_factor=opt.stride), nn.Conv2d(in_filters, out_filters, **opts_conv), nn.BatchNorm2d(out_filters, eps=opt.bn_eps, momentum=opt.bn_momentum), NL]
-        #
-        #     return block
-
         def generator_block(in_filters, out_filters, bn=True):
             block = [nn.UpsamplingNearest2d(scale_factor=opt.stride),
                      nn.Conv2d(in_filters, out_filters, **opts_conv),
@@ -142,8 +137,6 @@ class Generator(nn.Module):
         if self.opt.verbose:
             print("img out : ", out.shape)
 
-        # if self.opt.do_whitening:
-        #     out = conv2d(out, Kinv, padding=1)
         return out
 
     def _name(self):
@@ -155,12 +148,11 @@ class Discriminator(nn.Module):
         super(Discriminator, self).__init__()
         NL = nn.LeakyReLU(opt.lrelu, inplace=True)
         opts_conv = dict(kernel_size=opt.kernel_size, stride=opt.stride,
-                         padding=opt.padding, padding_mode='zeros',
-                         bias=opt.do_bias)
+                         padding=opt.padding, padding_mode='zeros')#,bias=opt.do_bias)
         self.channels = [opt.channel0, opt.channel1, opt.channel2, opt.channel3]
 
-        def discriminator_block(in_filters, out_filters, bn=True):
-            block = [nn.Conv2d(in_filters, out_filters, **opts_conv), ]  # , nn.Dropout2d(0.25)
+        def discriminator_block(in_filters, out_filters, bn=True, bias=False):
+            block = [nn.Conv2d(in_filters, out_filters, bias=bias, **opts_conv), ]  # , nn.Dropout2d(0.25)
             if bn and (not opt.bn_eps == np.inf):
                 # https://pytorch.org/docs/stable/nn.html#torch.nn.BatchNorm2d
                 block.append(nn.BatchNorm2d(out_filters, eps=opt.bn_eps, momentum=opt.bn_momentum))
@@ -169,10 +161,10 @@ class Discriminator(nn.Module):
 
         self.opt = opt
 
-        self.conv1 = nn.Sequential(*discriminator_block(opt.channels, self.channels[0], bn=False),)
-        self.conv2 = nn.Sequential(*discriminator_block(self.channels[0], self.channels[1]),)
-        self.conv3 = nn.Sequential(*discriminator_block(self.channels[1], self.channels[2]),)
-        self.conv4 = nn.Sequential(*discriminator_block(self.channels[2], self.channels[3]),)
+        self.conv1 = nn.Sequential(*discriminator_block(opt.channels, self.channels[0], bn=False, bias=False),)
+        self.conv2 = nn.Sequential(*discriminator_block(self.channels[0], self.channels[1], bias=opt.do_bias),)
+        self.conv3 = nn.Sequential(*discriminator_block(self.channels[1], self.channels[2], bias=opt.do_bias),)
+        self.conv4 = nn.Sequential(*discriminator_block(self.channels[2], self.channels[3], bias=opt.do_bias),)
 
         # The height and width of downsampled image
         self.init_size = opt.img_size // opt.stride**4
@@ -191,8 +183,6 @@ class Discriminator(nn.Module):
             if cuda:
                 n = n.to('cuda')
             out += n
-        # if self.opt.do_whitening:
-        #     out = conv2d(out, KW, padding=1)
 
         out = self.conv1(out)
         if self.opt.verbose:
