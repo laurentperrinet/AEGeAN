@@ -14,20 +14,20 @@ class Encoder(nn.Module):
 
         NL = nn.LeakyReLU(opt.lrelu, inplace=True)
         opts_conv = dict(kernel_size=opt.kernel_size, stride=opt.stride,
-                         padding=opt.padding, padding_mode='zeros', bias=opt.do_bias)
+                         padding=opt.padding, padding_mode='zeros')
         self.channels = [opt.channel0, opt.channel1, opt.channel2, opt.channel3]
 
-        def encoder_block(in_filters, out_filters, bn=True):
-            block = [nn.Conv2d(in_filters, out_filters, **opts_conv), ]
+        def encoder_block(in_filters, out_filters, bias, bn=True):
+            block = [nn.Conv2d(in_filters, out_filters, bias=bias, **opts_conv), ]
             if bn and (not opt.bn_eps == np.inf):
                 block.append(nn.BatchNorm2d(out_filters, eps=opt.bn_eps, momentum=opt.bn_momentum))
             block.append(NL)
             return block
 
-        self.conv1 = nn.Sequential(*encoder_block(opt.channels, self.channels[0], bn=False),)
-        self.conv2 = nn.Sequential(*encoder_block(self.channels[0], self.channels[1]),)
-        self.conv3 = nn.Sequential(*encoder_block(self.channels[1], self.channels[2]),)
-        self.conv4 = nn.Sequential(*encoder_block(self.channels[2], self.channels[3]),)
+        self.conv1 = nn.Sequential(*encoder_block(opt.channels, self.channels[0], bn=False, bias=False),)
+        self.conv2 = nn.Sequential(*encoder_block(self.channels[0], self.channels[1], bias=opt.do_bias),)
+        self.conv3 = nn.Sequential(*encoder_block(self.channels[1], self.channels[2], bias=opt.do_bias),)
+        self.conv4 = nn.Sequential(*encoder_block(self.channels[2], self.channels[3], bias=opt.do_bias),)
 
         self.init_size = opt.img_size // opt.stride**4
         # self.vector = nn.Linear(self.channels[3] * self.init_size ** 2, opt.latent_dim)
@@ -43,12 +43,9 @@ class Encoder(nn.Module):
             print("Encoder")
         if self.opt.verbose:
             print("Image shape : ", img.shape)
-        out = img
-        # if self.opt.do_whitening:
-        #     out = conv2d(out, KW, padding=1)
         if self.opt.verbose:
             print("WImage shape : ", out.shape)
-        out = self.conv1(out)
+        out = self.conv1(img)
         if self.opt.verbose:
             print("Conv1 out : ", out.shape)
         out = self.conv2(out)
@@ -108,7 +105,8 @@ class Generator(nn.Module):
 
         self.conv_blocks = nn.Sequential(
             nn.Conv2d(self.channels[0], opt.channels, kernel_size=3, stride=1, padding=1, bias=True),
-            nn.Tanh(),
+            # nn.Tanh(),
+            nn.Sigmoid(),
         )
 
         self.opt = opt
@@ -139,18 +137,14 @@ class Generator(nn.Module):
         if self.opt.verbose:
             print("Conv3 out : ", out.shape)
 
-        # out = self.out_NL(out)
         out = self.conv_blocks(out)
-        # out = self.out_NL(out)
         # Dim : (opt.chanels, opt.img_size, opt.img_size)
         if self.opt.verbose:
             print("img out : ", out.shape)
 
         # if self.opt.do_whitening:
         #     out = conv2d(out, Kinv, padding=1)
-        # return F.tanh(out)
         return out
-
 
     def _name(self):
         return "Generator"

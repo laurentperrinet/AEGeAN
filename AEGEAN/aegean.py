@@ -7,6 +7,7 @@ from .init import init
 from .utils import *
 from .plot import *
 from .models import *
+from .ms_ssim import *
 
 import torchvision.transforms as transforms
 from torchvision.utils import save_image
@@ -24,24 +25,27 @@ import sys
 import time
 import datetime
 
-# see research/UniStellar/AlignAndStack/2019-06-27-B1c_linear_inverter-decorrelation.ipynb
-KW = torch.zeros(size=(1, 1, 3, 3))
-KW[0, 0, :, 0] = torch.Tensor([0, -1, 0])
-KW[0, 0, :, 1] = torch.Tensor([-1, 4, -1])
-KW[0, 0, :, 2] = torch.Tensor([0, -1, 0])
-# KW = KW * torch.ones(1, 3, 1, 1)
-KW = KW * torch.eye(3).view(3, 3, 1, 1)
-KW /= np.sqrt(4. * 3)
-Kinv = torch.zeros((1, 1, 3, 3))
-Kinv[0, 0, :, 0] = torch.Tensor([.75, 1.5, .75])
-Kinv[0, 0, :, 1] = torch.Tensor([1.5, 4.5, 1.5])
-Kinv[0, 0, :, 2] = torch.Tensor([.75, 1.5, .75])
-# Kinv = Kinv * torch.ones(1, 3, 1, 1)
-Kinv = Kinv * torch.eye(3).view(3, 3, 1, 1)
-Kinv /= np.sqrt(4. * 3)
-# print(conv2d(KW, Kinv, padding=1))
-# print(conv2d(Kinv, KW, padding=1))
-# print(KW, Kinv, conv2d(KW, Kinv, padding=1), conv2d(Kinv, KW, padding=1))
+# from .pytorch_msssim import ssim, ms_ssim, SSIM, MS_SSIM
+#
+#
+# # see research/UniStellar/AlignAndStack/2019-06-27-B1c_linear_inverter-decorrelation.ipynb
+# KW = torch.zeros(size=(1, 1, 3, 3))
+# KW[0, 0, :, 0] = torch.Tensor([0, -1, 0])
+# KW[0, 0, :, 1] = torch.Tensor([-1, 4, -1])
+# KW[0, 0, :, 2] = torch.Tensor([0, -1, 0])
+# # KW = KW * torch.ones(1, 3, 1, 1)
+# KW = KW * torch.eye(3).view(3, 3, 1, 1)
+# KW /= np.sqrt(4. * 3)
+# Kinv = torch.zeros((1, 1, 3, 3))
+# Kinv[0, 0, :, 0] = torch.Tensor([.75, 1.5, .75])
+# Kinv[0, 0, :, 1] = torch.Tensor([1.5, 4.5, 1.5])
+# Kinv[0, 0, :, 2] = torch.Tensor([.75, 1.5, .75])
+# # Kinv = Kinv * torch.ones(1, 3, 1, 1)
+# Kinv = Kinv * torch.eye(3).view(3, 3, 1, 1)
+# Kinv /= np.sqrt(4. * 3)
+# # print(conv2d(KW, Kinv, padding=1))
+# # print(conv2d(Kinv, KW, padding=1))
+# # print(KW, Kinv, conv2d(KW, Kinv, padding=1), conv2d(Kinv, KW, padding=1))
 
 cuda = True if torch.cuda.is_available() else False
 if cuda:
@@ -87,7 +91,11 @@ def do_learn(opt):
 
     # Loss functions
     adversarial_loss = torch.nn.BCEWithLogitsLoss()  # eq. 8 in https://arxiv.org/pdf/1701.00160.pdf
-    MSE_loss = torch.nn.MSELoss(reduction='sum')
+    if opt.do_whitening:
+        E_loss = NMSSSIM(window_size=7, val_range=1., size_average=True, channel=3, normalize=True)
+    else:
+        E_loss = torch.nn.MSELoss(reduction='sum')
+    MSE_loss = torch.nn.MSELoss(reduction='mean')
     sigmoid = nn.Sigmoid()
 
     # Initialize generator and discriminator
@@ -100,6 +108,8 @@ def do_learn(opt):
         print_network(discriminator)
         print_network(encoder)
 
+
+
     cuda = True if torch.cuda.is_available() else False
     if cuda:
         #print("Nombre de GPU : ",torch.cuda.device_count())
@@ -110,6 +120,8 @@ def do_learn(opt):
         adversarial_loss.cuda()
         encoder.cuda()
         MSE_loss.cuda()
+        E_loss.cuda()
+
     Tensor = torch.cuda.FloatTensor if cuda else torch.FloatTensor
 
     # Initialize weights
@@ -117,7 +129,6 @@ def do_learn(opt):
         generator.apply(weights_init_normal)
         discriminator.apply(weights_init_normal)
         encoder.apply(weights_init_normal)
-
 
     # Optimizers
     optimizer_G = torch.optim.Adam(generator.parameters(), lr=opt.lrG, betas=(opt.beta1, opt.beta2))
@@ -185,23 +196,26 @@ def do_learn(opt):
             # ---------------------
             optimizer_E.zero_grad()
 
+            # if opt.do_whitening:
+            #
+            #     real_imgs = conv2d(real_imgs, KW, padding=1)
+            #     decoded_imgs = conv2d(decoded_imgs, KW, padding=1)
+            #
+            #     # Loss measures Encoder's ability to generate vectors suitable with the generator
+            #     if opt.do_joint:
+            #         ms_ssim_loss = ms_ssim_module(real_imgs, decoded_imgs)
+            #
+            #         e_loss = ms_ssim_module(real_imgs, decoded_imgs) / energy
+            #     else:
+            #         e_loss = ms_ssim_module(real_imgs, decoded_imgs.detach()) / energy
+            #
+            # else:
             # Loss measures Encoder's ability to generate vectors suitable with the generator
-            energy = MSE_loss(real_imgs, zero_target)  # normalize on the energy of imgs
+            energy = 1. # E_loss(real_imgs, zero_target)  # normalize on the energy of imgs
             if opt.do_joint:
-                e_loss = MSE_loss(real_imgs, decoded_imgs) / energy
+                e_loss = E_loss(real_imgs, decoded_imgs) / energy
             else:
-                e_loss = MSE_loss(real_imgs, decoded_imgs.detach()) / energy
-
-            if opt.do_whitening:
-                real_imgs = conv2d(real_imgs, KW, padding=1)
-                decoded_imgs = conv2d(decoded_imgs, KW, padding=1)
-
-                # Loss measures Encoder's ability to generate vectors suitable with the generator
-                energy = MSE_loss(real_imgs, zero_target)  # normalize on the energy of imgs
-                if opt.do_joint:
-                    e_loss += MSE_loss(real_imgs, decoded_imgs) / energy
-                else:
-                    e_loss += MSE_loss(real_imgs, decoded_imgs.detach()) / energy
+                e_loss = E_loss(real_imgs, decoded_imgs.detach()) / energy
 
             if opt.lambdaE > 0:
                 # add a loss for the distance between of z values
