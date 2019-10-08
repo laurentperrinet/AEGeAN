@@ -142,15 +142,16 @@ class Normalize(object):
         """
         tmp_img = np.array(img).astype(np.float)
         # print(tmp_img.min(), tmp_img.max())
-        if self.do_median:
-            tmp_img -= np.median(tmp_img)
-        else:
-            tmp_img -= np.mean(tmp_img)
-        tmp_img = tmp_img / np.abs(tmp_img).max()
+        # if self.do_median:
+        #     tmp_img -= np.median(tmp_img)
+        # else:
+        #     tmp_img -= np.mean(tmp_img)
+        tmp_img -= np.min(tmp_img)
+        tmp_img = tmp_img / tmp_img.max()
         # tmp_img = tmp_img.astype(tmp_img.dtype)
         # print(tmp_img.min(), tmp_img.max())
         # return Image.fromarray(tmp_img)
-        return 2*tmp_img - 1
+        return self.max*tmp_img
 
     def __repr__(self):
         return self.__class__.__name__ + "(mean: {}, max: {})".format(self.mean, self.max)
@@ -199,9 +200,9 @@ def load_data(path, img_size, batch_size, Fast=True, FDD=False, rand_hflip=False
         # transform_tmp.append(transforms.RandomAffine(degrees=rand_affine, fillcolor=1))
         transform_tmp.append(RotoTransform(theta=rand_affine))
     # transform_tmp.append(transforms.ColorJitter(brightness=0, contrast=(0.9, 1.0), saturation=0, hue=0))
-    # transform_tmp.append(Normalize(mean, max))
+    transform_tmp.append(Normalize(mean, max))
     transform_tmp.append(transforms.ToTensor())
-    transform_tmp.append(transforms.Normalize([mean]*3, [std]*3))
+    # transform_tmp.append(transforms.Normalize([mean]*3, [std]*3))
 
     transform = transforms.Compose(transform_tmp)
     dataset = FolderDataset(path, img_size, img_size, transform)
