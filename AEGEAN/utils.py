@@ -125,12 +125,12 @@ class RotoTransform(object):
 
 
 class Normalize(object):
-    def __init__(self, mean, max, do_median=True):
+    def __init__(self, min, max, do_median=True):
         """
         :param max(float): max value
         """
         super(Normalize, self).__init__()
-        self.mean, self.max = mean, mean
+        self.min, self.max = min, max
         self.do_median = do_median
 
     def __call__(self, img):
@@ -151,7 +151,7 @@ class Normalize(object):
         # tmp_img = tmp_img.astype(tmp_img.dtype)
         # print(tmp_img.min(), tmp_img.max())
         # return Image.fromarray(tmp_img)
-        return self.max*tmp_img
+        return (self.max-self.min)*tmp_img - self.min
 
     def __repr__(self):
         return self.__class__.__name__ + "(mean: {}, max: {})".format(self.mean, self.max)
@@ -186,7 +186,9 @@ def weights_init_normal(m, factor=1.0):
         # m.bias.data.zero_()
 
 
-def load_data(path, img_size, batch_size, Fast=True, FDD=False, rand_hflip=False, rand_affine=None, mean=0., max=1., std=.7):
+def load_data(path, img_size, batch_size, 
+              rand_hflip=False, rand_affine=None,
+              min=0., max=1., mean=0.5, std=1.):
     print("Loading data...")
     t_total = time.time()
 
@@ -200,7 +202,7 @@ def load_data(path, img_size, batch_size, Fast=True, FDD=False, rand_hflip=False
         # transform_tmp.append(transforms.RandomAffine(degrees=rand_affine, fillcolor=1))
         transform_tmp.append(RotoTransform(theta=rand_affine))
     # transform_tmp.append(transforms.ColorJitter(brightness=0, contrast=(0.9, 1.0), saturation=0, hue=0))
-    transform_tmp.append(Normalize(mean, max))
+    transform_tmp.append(Normalize(min, max))
     transform_tmp.append(transforms.ToTensor())
     # transform_tmp.append(transforms.Normalize([mean]*3, [std]*3))
 
