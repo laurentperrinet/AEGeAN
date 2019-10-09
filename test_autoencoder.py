@@ -100,59 +100,69 @@ opt.runs_path = tag + 'high_D_noise'
 opt.D_noise *= base
 AG.learn(opt)
 
-opt = AG.init()
-opt.lrG, opt.lrD = 0., 0.
-# print('DEBUG opt.D_noise = ', opt.D_noise)
-if opt.do_whitening:
-    opt.runs_path = tag + 'no_whitening'
-else:
-    opt.runs_path = tag + 'do_whitening'
-opt.do_whitening = not opt.do_whitening
-AG.learn(opt)
+# opt = AG.init()
+# opt.lrG, opt.lrD = 0., 0.
+# # print('DEBUG opt.D_noise = ', opt.D_noise)
+# if opt.do_whitening:
+#     opt.runs_path = tag + 'no_whitening'
+# else:
+#     opt.runs_path = tag + 'do_whitening'
+# opt.do_whitening = not opt.do_whitening
+# AG.learn(opt)
 
 opt = AG.init()
 opt.lrG, opt.lrD = 0., 0.
-if opt.init_weight:
-    opt.runs_path = tag + 'no_init_weight'
-else:
-    opt.runs_path = tag + 'do_init_weight'
 opt.init_weight = not opt.init_weight
+if opt.init_weight:
+    opt.runs_path = tag + 'do_init_weight'
+else:
+    opt.runs_path = tag + 'no_init_weight'
 AG.learn(opt)
 
 opt = AG.init()
 opt.lrG, opt.lrD = 0., 0.
-opt.runs_path = tag + 'low_batch_size'
-opt.batch_size //= base
+opt.do_bias = not opt.do_bias
+if opt.do_bias:
+    opt.runs_path = tag + 'do_bias'
+else:
+    opt.runs_path = tag + 'no_bias'
 AG.learn(opt)
 
-opt = AG.init()
-opt.lrG, opt.lrD = 0., 0.
-opt.runs_path = tag + 'high_batch_size'
-opt.batch_size *= base
-AG.learn(opt)
+# opt = AG.init()
+# opt.lrG, opt.lrD = 0., 0.
+# opt.runs_path = tag + 'low_batch_size'
+# opt.batch_size //= base
+# AG.learn(opt)
+#
+# opt = AG.init()
+# opt.lrG, opt.lrD = 0., 0.
+# opt.runs_path = tag + 'high_batch_size'
+# opt.batch_size *= base
+# AG.learn(opt)
+
 
 opt = AG.init()
 opt.lrG, opt.lrD = 0., 0.
 opt.runs_path = tag + 'low_adam_beta1'
-opt.beta1 = 0.3
-AG.learn(opt)
-
-opt = AG.init()
-opt.lrG, opt.lrD = 0., 0.
-opt.runs_path = tag + 'low_adam_beta2'
-opt.beta2 = 0.99
+opt.beta1 = 0.2
 AG.learn(opt)
 
 opt = AG.init()
 opt.lrG, opt.lrD = 0., 0.
 opt.runs_path = tag + 'high_adam_beta1'
-opt.beta1 = 0.99
+opt.beta1 = 0.9
+AG.learn(opt)
+
+opt = AG.init()
+opt.lrG, opt.lrD = 0., 0.
+opt.runs_path = tag + 'low_adam_beta2'
+opt.beta2 = 0.9
 AG.learn(opt)
 
 opt = AG.init()
 opt.lrG, opt.lrD = 0., 0.
 opt.runs_path = tag + 'high_adam_beta2'
-opt.beta2 = 0.9999
+opt.beta2 = 0.99
 AG.learn(opt)
 
 opt = AG.init()
@@ -177,7 +187,7 @@ opt = AG.init()
 opt.lrG, opt.lrD = 0., 0.
 if opt.bn_eps == np.inf:
     opt.runs_path = tag + 'do_bn'
-    opt.bn_eps = .1
+    opt.bn_eps = .3
 else:
     opt.runs_path = tag + 'no_bn'
     opt.bn_eps = np.inf
@@ -198,7 +208,7 @@ AG.learn(opt)
 opt = AG.init()
 opt.lrG, opt.lrD = 0., 0.
 opt.runs_path = tag + 'small_momentum'
-opt.bn_momentum = .1
+opt.bn_momentum = .3
 AG.learn(opt)
 
 opt = AG.init()

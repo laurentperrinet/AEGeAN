@@ -12,7 +12,8 @@ class Encoder(nn.Module):
     def __init__(self, opt):
         super(Encoder, self).__init__()
 
-        NL = nn.LeakyReLU(opt.lrelu, inplace=True)
+        # NL = nn.LeakyReLU(opt.lrelu, inplace=True)
+        NL = nn.ReLU(inplace=True)
         opts_conv = dict(kernel_size=opt.kernel_size, stride=opt.stride,
                          padding=opt.padding, padding_mode='zeros')
         self.channels = [opt.channel0, opt.channel1, opt.channel2, opt.channel3]
@@ -74,7 +75,8 @@ class Encoder(nn.Module):
 class Generator(nn.Module):
     def __init__(self, opt):
         super(Generator, self).__init__()
-        NL = nn.LeakyReLU(opt.lrelu, inplace=True)
+        # NL = nn.LeakyReLU(opt.lrelu, inplace=True)
+        NL = nn.ReLU(inplace=True)
         opts_conv = dict(kernel_size=opt.kernel_size, bias=opt.do_bias,
                          padding=opt.padding, padding_mode='zeros')
         self.channels = [opt.channel0, opt.channel1, opt.channel2, opt.channel3]
@@ -146,6 +148,7 @@ class Generator(nn.Module):
 class Discriminator(nn.Module):
     def __init__(self, opt):
         super(Discriminator, self).__init__()
+        # “Use LeakyReLU in the discriminator.” — Jonathan Hui https://link.medium.com/IYyQV6sMD0
         NL = nn.LeakyReLU(opt.lrelu, inplace=True)
         opts_conv = dict(kernel_size=opt.kernel_size, stride=opt.stride,
                          padding=opt.padding, padding_mode='zeros')#,bias=opt.do_bias)
