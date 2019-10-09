@@ -25,8 +25,6 @@ import sys
 import time
 import datetime
 
-# from .pytorch_msssim import ssim, ms_ssim, SSIM, MS_SSIM
-#
 #
 # # see research/UniStellar/AlignAndStack/2019-06-27-B1c_linear_inverter-decorrelation.ipynb
 # KW = torch.zeros(size=(1, 1, 3, 3))

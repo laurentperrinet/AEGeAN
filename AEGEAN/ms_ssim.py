@@ -1,5 +1,7 @@
 # copied from https://github.com/jorge-pessoa/pytorch-msssim/blob/master/pytorch_msssim/__init__.py
-
+# An alternative measure to the MSE, based on
+# Z. Wang, A. C. Bovik, H. R. Sheikh and E. P. Simoncelli, "Image quality assessment: From error visibility to structural similarity," IEEE Transactions on Image Processing, vol. 13, no. 4, pp. 600-612, Apr. 2004.
+# https://ece.uwaterloo.ca/~z70wang/publications/ssim.html
 import torch
 import torch.nn.functional as F
 from math import exp
