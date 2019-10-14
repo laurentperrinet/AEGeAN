@@ -39,7 +39,7 @@ def init_hist(nb_epochs, nb_batch):
     hist["D_x_mean"] = np.zeros(nb_epochs)
     hist["D_G_z_mean"] = np.zeros(nb_epochs)
     hist["d_x_mean"] = np.zeros(nb_batch)
-    hist["d_fake_mean"] = np.zeros(nb_batch)
+    # hist["d_fake_mean"] = np.zeros(nb_batch)
     hist["d_g_z_mean"] = np.zeros(nb_batch)
 
     # # Écart type des réponse D(x) et D(G(z)) moyenner par epochs
@@ -63,13 +63,13 @@ def init_hist(nb_epochs, nb_batch):
     return hist
 
 
-def save_hist_batch(hist, idx_batch, idx_epoch, g_loss, d_loss, e_loss, d_x, d_fake, d_g_z):
+def save_hist_batch(hist, idx_batch, idx_epoch, g_loss, d_loss, e_loss, d_x, d_g_z): #, d_fake
     """
     Sauvegarde les données du batch dans l'historique après traitement
     """
 
     d_x = d_x.detach().cpu().numpy()
-    d_fake = d_fake.detach().cpu().numpy()
+    # d_fake = d_fake.detach().cpu().numpy()
     d_g_z = d_g_z.detach().cpu().numpy()
     g_loss = g_loss.item()
     d_loss = d_loss.item()
@@ -81,7 +81,7 @@ def save_hist_batch(hist, idx_batch, idx_epoch, g_loss, d_loss, e_loss, d_x, d_f
 
 
     hist["d_x_mean"][idx_batch] = d_x.mean()
-    hist["d_fake_mean"][idx_batch] = d_fake.mean()
+    # hist["d_fake_mean"][idx_batch] = d_fake.mean()
     hist["d_g_z_mean"][idx_batch] = d_g_z.mean()
 
     # hist["d_x_std"][idx_batch] = d_x.std()

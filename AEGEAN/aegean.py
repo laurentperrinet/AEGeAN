@@ -304,15 +304,15 @@ def do_learn(opt):
             # -----------------
             if opt.lrD > 0:
                 # Compensation pour le BCElogits
-                d_fake = sigmoid(d_fake)
+                # d_fake = sigmoid(d_fake)
                 d_x = sigmoid(d_x)
                 d_g_z = sigmoid(d_g_z)
                 print(
-                    "[Epoch %d/%d] [Batch %d/%d] [E loss: %f] [D loss: %f] [G loss: %f] [D real score %f] [D fake score %f] [G score %f] [Time: %fs]"
-                    % (epoch, opt.n_epochs, i+1, len(dataloader), e_loss.item(), d_loss.item(), g_loss.item(), torch.mean(d_x), torch.mean(d_fake), torch.mean(d_g_z), time.time()-t_batch)
+                    "[Epoch %d/%d] [Batch %d/%d] [E loss: %f] [D loss: %f] [G loss: %f] [D real score %f] [G score %f] [Time: %fs]"
+                    % (epoch, opt.n_epochs, i+1, len(dataloader), e_loss.item(), d_loss.item(), g_loss.item(), torch.mean(d_x), torch.mean(d_g_z), time.time()-t_batch)
                 )
                 # Save Losses and scores for Tensorboard
-                save_hist_batch(hist, i, j, g_loss, d_loss, e_loss, d_x, d_fake, d_g_z)
+                save_hist_batch(hist, i, j, g_loss, d_loss, e_loss, d_x, d_g_z)
             else:
                 print(
                     "[Epoch %d/%d] [Batch %d/%d] [E loss: %f] [Time: %fs]"
@@ -332,7 +332,7 @@ def do_learn(opt):
                     writer.add_scalar('loss/D', d_loss.item(), global_step=iteration)
 
                     writer.add_scalar('score/D_x', hist["d_x_mean"][i], global_step=iteration)
-                    writer.add_scalar('score/D_fake', hist["d_fake_mean"][i], global_step=iteration)
+                    # writer.add_scalar('score/D_fake', hist["d_fake_mean"][i], global_step=iteration)
                     writer.add_scalar('score/D_g_z', hist["d_g_z_mean"][i], global_step=iteration)
 
                     # writer.add_scalar('d_x_cv', hist["d_x_cv"][i], global_step=iteration)
