@@ -12,11 +12,11 @@ pep8:
 maria_rsync:
 	rsync --progress -avhuz --exclude-from=.ExclusionRSync  laurent@10.164.6.243:research/GAN-SDPC/GAN-SDPC/ .
 
-URL = lperrinet@login.mesocentre.univ-amu.fr:/scratch/lperrinet/SDPC/2019_AEGeAN/
-meso_rsync:
-	rsync --progress -avhuz --exclude-from=.ExclusionRSync $(URL) .
-
-meso_sync:
-	rsync --progress -avhuz runs $(URL)
+URL = lperrinet@login.mesocentre.univ-amu.fr:/scratch/lperrinet/SDPC/2019_AEGeAN
+meso_pull:
+	# rsync --progress -avhuz --exclude-from=.ExclusionRSync $(URL)/ .
 	rsync --progress -avhuz $(URL)/runs .
+
+meso_push:
+	rsync --progress -avhuz runs $(URL)
 	# rsync --progress -avhuz --exclude-from=.ExclusionRSync ../database $(URL)/..

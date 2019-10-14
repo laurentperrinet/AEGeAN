@@ -128,18 +128,17 @@ else:
     opt.runs_path = tag + 'no_bias'
 AG.learn(opt)
 
-# opt = AG.init()
-# opt.lrG, opt.lrD = 0., 0.
-# opt.runs_path = tag + 'low_batch_size'
-# opt.batch_size //= base
-# AG.learn(opt)
-#
-# opt = AG.init()
-# opt.lrG, opt.lrD = 0., 0.
-# opt.runs_path = tag + 'high_batch_size'
-# opt.batch_size *= base
-# AG.learn(opt)
+opt = AG.init()
+opt.lrG, opt.lrD = 0., 0.
+opt.runs_path = tag + 'low_batch_size'
+opt.batch_size //= base
+AG.learn(opt)
 
+opt = AG.init()
+opt.lrG, opt.lrD = 0., 0.
+opt.runs_path = tag + 'high_batch_size'
+opt.batch_size *= base
+AG.learn(opt)
 
 opt = AG.init()
 opt.lrG, opt.lrD = 0., 0.
@@ -185,6 +184,15 @@ AG.learn(opt)
 
 opt = AG.init()
 opt.lrG, opt.lrD = 0., 0.
+opt.do_joint = not opt.do_joint
+if opt.do_joint:
+    opt.runs_path = tag + 'do_joint'
+else:
+    opt.runs_path = tag + 'no_joint'
+AG.learn(opt)
+
+opt = AG.init()
+opt.lrG, opt.lrD = 0., 0.
 if opt.bn_eps == np.inf:
     opt.runs_path = tag + 'do_bn'
     opt.bn_eps = .3
@@ -195,24 +203,24 @@ AG.learn(opt)
 
 opt = AG.init()
 opt.lrG, opt.lrD = 0., 0.
-opt.runs_path = tag + 'small_eps'
+opt.runs_path = tag + 'small_bn_eps'
 opt.bn_eps /= base
 AG.learn(opt)
 
 opt = AG.init()
 opt.lrG, opt.lrD = 0., 0.
-opt.runs_path = tag + 'big_eps'
+opt.runs_path = tag + 'big_bn_eps'
 opt.bn_eps *= base
 AG.learn(opt)
 
 opt = AG.init()
 opt.lrG, opt.lrD = 0., 0.
-opt.runs_path = tag + 'small_momentum'
+opt.runs_path = tag + 'small_bn_momentum'
 opt.bn_momentum = .3
 AG.learn(opt)
 
 opt = AG.init()
 opt.lrG, opt.lrD = 0., 0.
-opt.runs_path = tag + 'big_momentum'
+opt.runs_path = tag + 'big_bn_momentum'
 opt.bn_momentum = .9
 AG.learn(opt)
