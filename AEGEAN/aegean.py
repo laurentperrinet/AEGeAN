@@ -7,7 +7,7 @@ from .init import init
 from .utils import *
 from .plot import *
 from .models import *
-from .ms_ssim import *
+from pytorch_msssim import NMSSSIM
 
 import torchvision.transforms as transforms
 from torchvision.utils import save_image
