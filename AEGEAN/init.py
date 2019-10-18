@@ -58,10 +58,8 @@ def init():
     parser.add_argument("--window_size", type=int, default=8, help="size of window_size for SSIM")
     parser.add_argument("--lrelu", type=float, default=0., help="LeakyReLU : alpha - zero for a standard ReLU")
     parser.add_argument("--channels", type=int, default=3, help="number of input image channels")
-    parser.add_argument("--sample_interval", type=int, default=1,
-                        help="interval in epochs between image sampling")
-    parser.add_argument("--N_samples", type=int, default=48,
-                        help="number of samples to generate each time")
+    parser.add_argument("--sample_interval", type=int, default=1, help="interval in epochs between image sampling")
+    parser.add_argument("--N_samples", type=int, default=48, help="number of images each sampling")
     # parser.add_argument("--model_save_interval", type=int, default=5000,
     #                     help="interval between image sampling. If model_save_interval > n_epochs : no save")
     # parser.add_argument('--model_save_path', type=str, default='models')
