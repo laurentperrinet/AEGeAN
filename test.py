@@ -2,7 +2,6 @@ import AEGEAN as AG
 import numpy as np
 # import os
 # PID, HOST = os.getpid(), os.uname()[1]
-base = 2
 
 experiments = {}
 experiments['AEGEAN'] = []
@@ -24,6 +23,10 @@ for expname in experiments.keys():
     opt.runs_path = tag + 'vanilla'
     print(opt)
     AG.learn(opt)
+
+
+    base = 2
+
     GAN_losses = ['original', 'wasserstein', 'ian', 'alternative'] #, 'alternativ2'
 
     for GAN_loss in GAN_losses:
@@ -87,15 +90,6 @@ for expname in experiments.keys():
         opt.lrG *= base
         AG.learn(opt)
 
-    tag, opt = init()
-    opt.runs_path = tag + 'small_lambdaE'
-    opt.lambdaE /= base
-    AG.learn(opt)
-
-    tag, opt = init()
-    opt.runs_path = tag + 'big_lambdaE'
-    opt.lambdaE *= base
-    AG.learn(opt)
 
     tag, opt = init()
     opt.runs_path = tag + 'small_window_size'
@@ -256,16 +250,27 @@ for expname in experiments.keys():
         opt.runs_path = tag + 'no_joint'
     AG.learn(opt)
 
+    #
+    # tag, opt = init()
+    # if opt.bn_eps == np.inf:
+    #     opt.runs_path = tag + 'do_bn'
+    #     opt.bn_eps = .3
+    # else:
+    #     opt.runs_path = tag + 'no_bn'
+    #     opt.bn_eps = np.inf
+    # AG.learn(opt)
+    base = 8
 
     tag, opt = init()
-    if opt.bn_eps == np.inf:
-        opt.runs_path = tag + 'do_bn'
-        opt.bn_eps = .3
-    else:
-        opt.runs_path = tag + 'no_bn'
-        opt.bn_eps = np.inf
+    opt.runs_path = tag + 'small_lambdaE'
+    opt.lambdaE /= base
     AG.learn(opt)
 
+    tag, opt = init()
+    opt.runs_path = tag + 'big_lambdaE'
+    opt.lambdaE *= base
+    AG.learn(opt)
+    
     tag, opt = init()
     opt.runs_path = tag + 'small_bn_eps'
     opt.bn_eps /= base

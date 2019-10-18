@@ -36,8 +36,7 @@ def init():
     parser.add_argument("--GAN_loss", type=str, default='alternative', help="Use different losses for G.")
     parser.add_argument("--do_SSIM", type=bool, default=True, help="Use contrasted images for the cost of E.")
     parser.add_argument("--do_bias", type=bool, default=False, help="Should we use biases in convolutions?")
-    parser.add_argument("--do_joint", type=bool, default=True,
-                        help="Do a joint learning of E and G, dude.")
+    parser.add_argument("--do_joint", type=bool, default=True, help="Do a joint learning of E and G, dude.")
     parser.add_argument("--bn_eps", type=float, default=0.001,
                         help="batchnorm: espilon for numerical stability")
     parser.add_argument("--bn_momentum", type=float, default=.5,
