@@ -162,7 +162,7 @@ import torch.nn as nn
 def weights_init_normal(m, weight_0=0.01, factor=1.0):
     # see https://pytorch.org/tutorials/beginner/dcgan_faces_tutorial.html#weight-initialization
     classname = m.__class__.__name__
-    #print('classname', classname)
+    # print('classname', classname)
     if classname.find("Conv") != -1:
         # n = float(m.in_channels * m.kernel_size[0] * m.kernel_size[1])
         # n += float(m.kernel_size[0] * m.kernel_size[1] * m.out_channels)

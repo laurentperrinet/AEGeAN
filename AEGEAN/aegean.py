@@ -339,17 +339,19 @@ def do_learn(opt):
                 # Backward
                 g_loss.backward()
                 optimizer_G.step()
+            else:
+                d_g_z = 0.
 
             # -----------------
             #  Recording stats
             # -----------------
-            if opt.lrD > 0:
+            if opt.lrG > 0:
                 # Compensation pour le BCElogits
                 # d_fake = sigmoid(d_fake)
                 d_x = sigmoid(d_x)
                 d_g_z = sigmoid(d_g_z)
                 print(
-                    "[Epoch %d/%d] [Batch %d/%d] [E loss: %f] [D loss: %f] [G loss: %f] [D real score %f] [G score %f] [Time: %fs]"
+                    "[Epoch %d/%d] [Batch %d/%d] [E loss: %f] [D loss: %f] [G loss: %f] [D score %f] [G score %f] [Time: %fs]"
                     % (epoch, opt.n_epochs, i+1, len(dataloader), e_loss.item(), d_loss.item(), g_loss.item(), torch.mean(d_x), torch.mean(d_g_z), time.time()-t_batch)
                 )
                 # Save Losses and scores for Tensorboard
