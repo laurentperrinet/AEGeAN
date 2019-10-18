@@ -188,7 +188,7 @@ def weights_init_normal(m, weight_0=0.01, factor=1.0):
 
 
 def load_data(path, img_size, batch_size,
-              rand_hflip=False, rand_affine=None,
+              rand_hflip=False, rand_affine=0.,
               min=0., max=1., mean=0.5, std=1.):
     print("Loading data...")
     t_total = time.time()
@@ -198,7 +198,7 @@ def load_data(path, img_size, batch_size,
     if rand_hflip:
         transform_tmp.append(transforms.RandomHorizontalFlip(p=0.5))
         # transform_tmp.append(ShiftTransform(x=0.05, y=0.05))
-    if rand_affine != None:
+    if rand_affine > 0.:
         # https://pytorch.org/docs/stable/torchvision/transforms.html#torchvision.transforms.RandomAffine
         # transform_tmp.append(transforms.RandomAffine(degrees=rand_affine, fillcolor=1))
         transform_tmp.append(RotoTransform(theta=rand_affine))

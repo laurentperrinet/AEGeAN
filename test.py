@@ -203,8 +203,12 @@ for expname in experiments.keys():
     AG.learn(opt)
 
     tag, opt = init()
-    opt.runs_path = tag + 'no_affine'
-    opt.rand_affine = 0.
+    if opt.rand_affine == 0.:
+        opt.runs_path = tag + 'do_affine'
+        opt.rand_affine = 2.
+    else:
+        opt.runs_path = tag + 'no_affine'
+        opt.rand_affine = 0.
     AG.learn(opt)
 
     tag, opt = init()
