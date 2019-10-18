@@ -231,10 +231,11 @@ def do_learn(opt):
             e_loss.backward()
             optimizer_E.step()
 
+            # Generate a batch of fake images
+            z = Variable(Tensor(np.random.normal(0, 1, (opt.batch_size, opt.latent_dim))), requires_grad=False)
+            gen_imgs = generator(z)
+
             if opt.lrD > 0:
-                z = Variable(Tensor(np.random.normal(0, 1, (opt.batch_size, opt.latent_dim))), requires_grad=False)
-                # Generate a batch of fake images
-                gen_imgs = generator(z)
 
                 # ---------------------
                 #  Train Discriminator
@@ -279,6 +280,8 @@ def do_learn(opt):
                 # -----------------
                 #  Train Generator
                 # -----------------
+                # TODO : optimiser la distance z - E(G(z))
+                
                 optimizer_G.zero_grad()
                 # if opt.lrG > 0:
 
@@ -330,9 +333,18 @@ def do_learn(opt):
                 # Tensorboard save
                 iteration = i + nb_batch * j
                 writer.add_scalar('loss/E', e_loss.item(), global_step=iteration)
+                writer.add_histogram('coeffs/z', z, global_step=iteration)
                 try:
-                    writer.add_histogram('x', real_imgs, global_step=iteration)
-                    writer.add_histogram('E_x', z_imgs, global_step=iteration)
+                    writer.add_histogram('coeffs/E_x', z_imgs, global_step=iteration)
+                except:
+                    pass
+                writer.add_histogram('image/x', real_imgs, global_step=iteration)
+                try:
+                    writer.add_histogram('image/E_G_x', decoded_imgs, global_step=iteration)
+                except:
+                    pass
+                try:
+                    writer.add_histogram('image/G_z', gen_imgs, global_step=iteration)
                 except:
                     pass
                 if opt.lrD > 0:
