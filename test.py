@@ -226,8 +226,8 @@ for expname in experiments.keys():
     AG.learn(opt)
 
     tag, opt = init()
+    opt.lrelu = 0.1 if opt.lrelu==0. else 0.
     opt.runs_path = tag + 'relu' if opt.lrelu==0. else tag + 'lrelu'
-    opt.lrelu = 0.02 if opt.lrelu==0. else 0.
     AG.learn(opt)
 
 
