@@ -159,7 +159,7 @@ class Normalize(object):
 
 import torch.nn as nn
 
-def weights_init_normal(m, factor=1.0):
+def weights_init_normal(m, weight_0=0.01, factor=1.0):
     # see https://pytorch.org/tutorials/beginner/dcgan_faces_tutorial.html#weight-initialization
     classname = m.__class__.__name__
     #print('classname', classname)
@@ -169,7 +169,8 @@ def weights_init_normal(m, factor=1.0):
         # n = n / 2.0
         # m.weight.data.normal_(0, np.sqrt(factor / n))
         # m.bias.data.zero_()
-        nn.init.normal_(m.weight.data, 0.0, 0.02)
+        nn.init.normal_(m.weight.data, 0.0, weight_0*factor)
+        nn.init.constant_(m.bias.data, 0)
     #
     # elif classname.find('Conv2d') != -1:
     #     print('classname', classname)
@@ -180,7 +181,7 @@ def weights_init_normal(m, factor=1.0):
         m.weight.data.normal_(0, np.sqrt(factor / n))
         m.bias.data.zero_()
     elif classname.find("BatchNorm2d") != -1:
-        nn.init.normal_(m.weight.data, 1.0, 0.02)
+        nn.init.normal_(m.weight.data, 1.0, weight_0*factor)
         nn.init.constant_(m.bias.data, 0)
         # m.weight.data.fill_(1.0)
         # m.bias.data.zero_()

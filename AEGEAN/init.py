@@ -23,7 +23,7 @@ def init():
                         help="data augmentation: horizontal flip")
     parser.add_argument("--rand_affine", type=float, default=2.,
                         help="data augmentation: angle in degrees")
-    parser.add_argument("--init_weight", type=bool, default=False,
+    parser.add_argument("--init_weight", type=bool, default=True,
                         help="initialize weights to normal")
     parser.add_argument("--lambdaE", type=float, default=0.1, help="regularization parameter for E")
     parser.add_argument("--lrE", type=float, default=0.0005, help="learning rate for E")
