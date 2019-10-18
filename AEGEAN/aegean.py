@@ -89,8 +89,8 @@ def do_learn(opt):
 
     # Loss functions
     adversarial_loss = torch.nn.BCEWithLogitsLoss()  # eq. 8 in https://arxiv.org/pdf/1701.00160.pdf
-    if opt.do_whitening:
-        E_loss = NMSSSIM(window_size=7, val_range=1., size_average=True, channel=3, normalize=True)
+    if opt.do_SSIM:
+        E_loss = NMSSSIM(window_size=opt.window_size, val_range=1., size_average=True, channel=3, normalize=True)
     else:
         E_loss = torch.nn.MSELoss(reduction='sum')
     MSE_loss = torch.nn.MSELoss(reduction='mean')
@@ -192,7 +192,7 @@ def do_learn(opt):
             # ---------------------
             optimizer_E.zero_grad()
 
-            # if opt.do_whitening:
+            # if opt.do_SSIM:
             #
             #     real_imgs = conv2d(real_imgs, KW, padding=1)
             #     decoded_imgs = conv2d(decoded_imgs, KW, padding=1)

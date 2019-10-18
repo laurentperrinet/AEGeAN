@@ -34,7 +34,7 @@ def init():
     parser.add_argument("--D_noise", type=float, default=0.15,
                         help="Add noise to the input images of D")
     parser.add_argument("--GAN_loss", type=str, default='original', help="Use different losses for G.")
-    parser.add_argument("--do_whitening", type=bool, default=True, help="Use contrasted images for the cost of E.")
+    parser.add_argument("--do_SSIM", type=bool, default=True, help="Use contrasted images for the cost of E.")
     parser.add_argument("--do_bias", type=bool, default=False, help="Should we use biases in convolutions?")
     parser.add_argument("--do_joint", type=bool, default=True,
                         help="Do a joint learning of E and G, dude.")
@@ -55,8 +55,8 @@ def init():
     parser.add_argument("--channel3", type=int, default=128//DEBUG, help="size of the channel 3")
     parser.add_argument("--latent_dim", type=int, default=42,
                         help="dimensionality of the latent space")
-    parser.add_argument("--img_size", type=int, default=128//DEBUG,
-                        help="size of each image dimension")
+    parser.add_argument("--img_size", type=int, default=128//DEBUG, help="size of each image dimension")
+    parser.add_argument("--window_size", type=int, default=8, help="size of window_size for SSIM")
     parser.add_argument("--lrelu", type=float, default=0., help="LeakyReLU : alpha - zero for a standard ReLU")
     parser.add_argument("--channels", type=int, default=3, help="number of input image channels")
     parser.add_argument("--sample_interval", type=int, default=1,

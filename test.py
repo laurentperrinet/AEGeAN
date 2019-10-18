@@ -98,6 +98,16 @@ for expname in experiments.keys():
     AG.learn(opt)
 
     tag, opt = init()
+    opt.runs_path = tag + 'small_window_size'
+    opt.window_size //= base
+    AG.learn(opt)
+
+    tag, opt = init()
+    opt.runs_path = tag + 'big_window_size'
+    opt.window_size *= base
+    AG.learn(opt)
+
+    tag, opt = init()
     opt.runs_path = tag + 'small_channel0'
     opt.channel0 //= base
     AG.learn(opt)
@@ -138,11 +148,11 @@ for expname in experiments.keys():
     AG.learn(opt)
 
     # tag, opt = init()
-    # if opt.do_whitening:
-    #     opt.runs_path = tag + 'no_whitening'
+    # if opt.do_SSIM:
+    #     opt.runs_path = tag + 'no_SSIM'
     # else:
-    #     opt.runs_path = tag + 'do_whitening'
-    # opt.do_whitening = not opt.do_whitening
+    #     opt.runs_path = tag + 'do_SSIM'
+    # opt.do_SSIM = not opt.do_SSIM
     # AG.learn(opt)
 
     tag, opt = init()
