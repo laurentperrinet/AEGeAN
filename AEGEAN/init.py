@@ -25,7 +25,7 @@ def init():
                         help="data augmentation: angle in degrees")
     parser.add_argument("--init_weight", type=bool, default=True,
                         help="initialize weights to normal")
-    parser.add_argument("--lambdaE", type=float, default=0.1, help="regularization parameter for E")
+    parser.add_argument("--lambdaE", type=float, default=.2, help="regularization parameter for E")
     parser.add_argument("--lrE", type=float, default=0.0005, help="learning rate for E")
     parser.add_argument("--lrD", type=float, default=0.0001, help="learning rate for D")
     parser.add_argument("--lrG", type=float, default=0.0001, help="learning rate for G supervised by D")

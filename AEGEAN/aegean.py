@@ -93,7 +93,7 @@ def do_learn(opt):
         E_loss = NMSSSIM(window_size=opt.window_size, val_range=1., size_average=True, channel=3, normalize=True)
     else:
         E_loss = torch.nn.MSELoss(reduction='sum')
-    MSE_loss = torch.nn.MSELoss(reduction='mean')
+    MSE_loss = torch.nn.MSELoss(reduction='sum')
     sigmoid = nn.Sigmoid()
 
     # Initialize generator and discriminator
@@ -281,7 +281,7 @@ def do_learn(opt):
                 #  Train Generator
                 # -----------------
                 # TODO : optimiser la distance z - E(G(z))
-                
+
                 optimizer_G.zero_grad()
                 # if opt.lrG > 0:
 
