@@ -15,7 +15,7 @@ else:
 def init():
     parser = argparse.ArgumentParser()
     parser.add_argument("--runs_path", type=str, default='vanilla',
-                        help="folder to save samples data and statistics")
+                        help="TensorBoard folder to save samples data and statistics")
     parser.add_argument("--n_epochs", type=int, default=64,
                         help="number of epochs of training")
     parser.add_argument("--batch_size", type=int, default=32, help="size of the batches")
@@ -63,20 +63,20 @@ def init():
                         help="interval in epochs between image sampling")
     parser.add_argument("--N_samples", type=int, default=48,
                         help="number of samples to generate each time")
-    parser.add_argument("--model_save_interval", type=int, default=5000,
-                        help="interval between image sampling. If model_save_interval > n_epochs : no save")
-    parser.add_argument('--model_save_path', type=str, default='models')
+    # parser.add_argument("--model_save_interval", type=int, default=5000,
+    #                     help="interval between image sampling. If model_save_interval > n_epochs : no save")
+    # parser.add_argument('--model_save_path', type=str, default='models')
     # parser.add_argument('--datapath', type=str, default='../database/Simpsons-Face_clear/cp/')
     parser.add_argument('--datapath', type=str, default='../database/CFD Version 2.0.3/CFD 2.0.3 Images')
-    parser.add_argument('--load_model', action="store_true",
-                        help="Load model present in model_save_path/Last_*.pt, if present.")
+    # parser.add_argument('--load_model', action="store_true",
+    #                     help="Load model present in model_save_path/Last_*.pt, if present.")
     parser.add_argument("--verbose", type=bool, default=False if DEBUG <
                         4 else True, help="Displays more verbose output.")
     parser.add_argument("--GPU", type=int, default=0, help="Identifiant du GPU à utiliser.")
     opt = parser.parse_args()
 
     # Dossier de sauvegarde
-    os.makedirs(opt.model_save_path, exist_ok=True)
+    # os.makedirs(opt.model_save_path, exist_ok=True)
 
     if opt.verbose:
         print(opt)

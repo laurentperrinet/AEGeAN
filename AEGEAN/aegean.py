@@ -141,10 +141,10 @@ def do_learn(opt):
     # ----------
     #  Load models
     # ----------
-    start_epoch = 1
-    if opt.load_model == True:
-        start_epoch = load_models(discriminator, optimizer_D, generator,
-                                  optimizer_G, opt.n_epochs, opt.model_save_path, encoder, optimizer_E)
+    # start_epoch = 1
+    # if opt.load_model == True:
+    #     start_epoch = load_models(discriminator, optimizer_D, generator,
+    #                               optimizer_G, opt.n_epochs, opt.model_save_path, encoder, optimizer_E)
 
 
     # ----------
@@ -152,9 +152,9 @@ def do_learn(opt):
     # ----------
 
     nb_batch = len(dataloader)
-    nb_epochs = 1 + opt.n_epochs - start_epoch
+    # nb_epochs = 1 + opt.n_epochs - start_epoch
 
-    hist = init_hist(nb_epochs, nb_batch)
+    hist = init_hist(opt.n_epochs, nb_batch)
 
     # save_dot = 1 # Nombre d'epochs avant de sauvegarder un point des courbes
     # batch_on_save_dot = save_dot*len(dataloader)
@@ -172,7 +172,7 @@ def do_learn(opt):
     fake = Variable(Tensor(opt.batch_size, 1).fill_(0), requires_grad=False)
 
     t_total = time.time()
-    for j, epoch in enumerate(range(start_epoch, opt.n_epochs + 1)):
+    for j, epoch in enumerate(range(1, opt.n_epochs + 1)):
         t_epoch = time.time()
         for i, (imgs, _) in enumerate(dataloader):
             t_batch = time.time()
@@ -360,12 +360,12 @@ def do_learn(opt):
             sampling(fixed_noise, generator, path_data, epoch, tag)
             # do_plot(hist, start_epoch, epoch)
 
-        # Save models
-        if epoch % opt.model_save_interval == 0 :
-            num = str(int(epoch / opt.model_save_interval))
-            save_model(discriminator, optimizer_D, epoch, opt.model_save_path + "/" + num + "_D.pt")
-            save_model(generator, optimizer_G, epoch, opt.model_save_path + "/" + num + "_G.pt")
-            save_model(encoder, optimizer_E, epoch, opt.model_save_path + "/" + num + "_E.pt")
+        # # Save models
+        # if epoch % opt.model_save_interval == 0 :
+        #     num = str(int(epoch / opt.model_save_interval))
+        #     save_model(discriminator, optimizer_D, epoch, opt.model_save_path + "/" + num + "_D.pt")
+        #     save_model(generator, optimizer_G, epoch, opt.model_save_path + "/" + num + "_G.pt")
+        #     save_model(encoder, optimizer_E, epoch, opt.model_save_path + "/" + num + "_E.pt")
 
         print("[Epoch Time: ", time.time() - t_epoch, "s]")
 
@@ -374,10 +374,10 @@ def do_learn(opt):
           time.strftime("%Hh:%Mm:%Ss", t_final), "]", sep='')
 
     # Save model for futur training
-    if opt.model_save_interval < opt.n_epochs + 1:
-        save_model(discriminator, optimizer_D, epoch, opt.model_save_path + "/last_D.pt")
-        save_model(generator, optimizer_G, epoch, opt.model_save_path + "/last_G.pt")
-        save_model(encoder, optimizer_E, epoch, opt.model_save_path + "/last_E.pt")
+    # if opt.model_save_interval < opt.n_epochs + 1:
+    #     save_model(discriminator, optimizer_D, epoch, opt.model_save_path + "/last_D.pt")
+    #     save_model(generator, optimizer_G, epoch, opt.model_save_path + "/last_G.pt")
+    #     save_model(encoder, optimizer_E, epoch, opt.model_save_path + "/last_E.pt")
 
     if do_tensorboard:
         writer.close()
