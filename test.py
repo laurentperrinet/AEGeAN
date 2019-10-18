@@ -138,6 +138,11 @@ for expname in experiments.keys():
     AG.learn(opt)
 
     tag, opt = init()
+    opt.runs_path = tag + 'no_D_noise'
+    opt.D_noise = 0.
+    AG.learn(opt)
+
+    tag, opt = init()
     opt.runs_path = tag + 'low_D_noise'
     opt.D_noise /= base
     AG.learn(opt)
@@ -145,6 +150,21 @@ for expname in experiments.keys():
     tag, opt = init()
     opt.runs_path = tag + 'high_D_noise'
     opt.D_noise *= base
+    AG.learn(opt)
+
+    tag, opt = init()
+    opt.runs_path = tag + 'no_G_noise'
+    opt.G_noise = 0.
+    AG.learn(opt)
+
+    tag, opt = init()
+    opt.runs_path = tag + 'low_G_noise'
+    opt.G_noise /= base
+    AG.learn(opt)
+
+    tag, opt = init()
+    opt.runs_path = tag + 'high_G_noise'
+    opt.G_noise *= base
     AG.learn(opt)
 
     # tag, opt = init()

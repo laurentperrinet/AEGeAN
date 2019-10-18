@@ -180,14 +180,7 @@ class Discriminator(nn.Module):
             print("Image shape : ", img.shape)
             # Dim : (opt.chanels, opt.img_size, opt.img_size)
 
-        out = img*1.
-        if self.opt.D_noise > 0:
-            n = self.opt.D_noise * torch.randn(img.shape)
-            if cuda:
-                n = n.to('cuda')
-            out += n
-
-        out = self.conv1(out)
+        out = self.conv1(img)
         if self.opt.verbose:
             print("Conv1 out : ", out.shape)
 

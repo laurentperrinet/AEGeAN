@@ -263,6 +263,10 @@ def do_learn(opt):
                 # z = Variable(Tensor(np.random.normal(0, 1, (opt.batch_size, opt.latent_dim))))
 
                 # Discriminator decision for fake data
+                gen_imgs_ = gen_imgs * 1.
+                if opt.D_noise > 0:
+                    gen_imgs_ += opt.D_noise * Variable(torch.randn(img.shape))
+
                 d_fake = discriminator(gen_imgs.detach())
                 # Measure discriminator's ability to classify real from generated samples
                 if opt.GAN_loss == 'wasserstein':
@@ -283,10 +287,11 @@ def do_learn(opt):
                 # TODO : optimiser la distance z - E(G(z))
 
                 optimizer_G.zero_grad()
-                # if opt.lrG > 0:
 
-                # New discriminator decision, Since we just updated D
-                # gen_imgs = generator(z)
+                # New discriminator decision (since we just updated D)
+                gen_imgs_ = gen_imgs * 1.
+                if opt.G_noise > 0:
+                    gen_imgs_ += opt.G_noise * Variable(torch.randn(img.shape))
                 d_g_z = discriminator(gen_imgs)
 
                 # Loss measures generator's ability to fool the discriminator
