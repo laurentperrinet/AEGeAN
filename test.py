@@ -6,7 +6,8 @@ base = 2
 
 experiments = {}
 experiments['AEGEAN'] = []
-experiments['AE'] = [('lrG', 0.), ('lrD', 0.)]
+# experiments['AE'] = [('lrG', 0.), ('lrD', 0.)]
+experiments['AE'] = [('lrG', 0.)] # still training the discriminator but G is not supervised by D
 experiments['Simpsons'] = [('datapath', '../database/Simpsons-Face_clear/cp/')]
 
 for expname in experiments.keys():
@@ -75,13 +76,13 @@ for expname in experiments.keys():
         AG.learn(opt)
 
     tag, opt = init()
-    if opt.lrD > 0:
+    if opt.lrG > 0:
         opt.runs_path = tag + 'small_lrG'
         opt.lrG /= base
         AG.learn(opt)
 
     tag, opt = init()
-    if opt.lrD > 0:
+    if opt.lrG > 0:
         opt.runs_path = tag + 'big_lrG'
         opt.lrG *= base
         AG.learn(opt)

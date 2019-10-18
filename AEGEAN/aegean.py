@@ -269,6 +269,7 @@ def do_learn(opt):
 
                 optimizer_D.step()
 
+            if opt.lrG > 0:
                 # -----------------
                 #  Train Generator
                 # -----------------

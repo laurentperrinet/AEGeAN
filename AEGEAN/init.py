@@ -28,7 +28,7 @@ def init():
     parser.add_argument("--lambdaE", type=float, default=0.1, help="regularization parameter for E")
     parser.add_argument("--lrE", type=float, default=0.0005, help="learning rate for E")
     parser.add_argument("--lrD", type=float, default=0.0001, help="learning rate for D")
-    parser.add_argument("--lrG", type=float, default=0.0001, help="learning rate for G")
+    parser.add_argument("--lrG", type=float, default=0.0001, help="learning rate for G supervised by D")
     parser.add_argument("--valid_smooth", type=float, default=0.99,
                         help="Smoothing the results of D on real images")
     parser.add_argument("--D_noise", type=float, default=0.15,
