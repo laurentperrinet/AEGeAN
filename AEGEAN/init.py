@@ -31,8 +31,8 @@ def init():
     parser.add_argument("--lrG", type=float, default=0.0001, help="learning rate for G supervised by D")
     parser.add_argument("--valid_smooth", type=float, default=0.99,
                         help="Smoothing the results of D on real images")
-    parser.add_argument("--D_noise", type=float, default=0.15,
-                        help="Add noise to the input images of D")
+    parser.add_argument("--D_noise", type=float, default=0.15, help="Add noise to the input images D_x")
+    parser.add_argument("--G_noise", type=float, default=0.15, help="Add noise to the input images D_G_z")
     parser.add_argument("--GAN_loss", type=str, default='alternative', help="Use different losses for G.")
     parser.add_argument("--do_SSIM", type=bool, default=True, help="Use contrasted images for the cost of E.")
     parser.add_argument("--do_bias", type=bool, default=False, help="Should we use biases in convolutions?")

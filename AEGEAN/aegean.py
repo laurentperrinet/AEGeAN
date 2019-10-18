@@ -277,7 +277,7 @@ def do_learn(opt):
                 # Discriminator decision for fake data
                 gen_imgs_ = gen_imgs * 1.
                 if opt.D_noise > 0:
-                    gen_imgs_ += opt.D_noise * Variable(torch.randn(img.shape))
+                    gen_imgs_ += opt.D_noise * Variable(torch.randn(gen_imgs.shape))
 
                 d_fake = discriminator(gen_imgs.detach())
                 # Measure discriminator's ability to classify real from generated samples
@@ -315,7 +315,7 @@ def do_learn(opt):
                 # New discriminator decision (since we just updated D)
                 gen_imgs_ = gen_imgs * 1.
                 if opt.G_noise > 0:
-                    gen_imgs_ += opt.G_noise * Variable(torch.randn(img.shape))
+                    gen_imgs_ += opt.G_noise * Variable(torch.randn(gen_imgs.shape))
                 d_g_z = discriminator(gen_imgs)
 
                 # Loss measures generator's ability to fool the discriminator
