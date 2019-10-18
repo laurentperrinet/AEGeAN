@@ -184,7 +184,7 @@ for expname in experiments.keys():
 
     tag, opt = init()
     opt.runs_path = tag + 'low_adam_beta1'
-    opt.beta1 = 0.2
+    opt.beta1 = 0.5
     AG.learn(opt)
 
     tag, opt = init()

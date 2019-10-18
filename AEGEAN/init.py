@@ -42,9 +42,9 @@ def init():
                         help="batchnorm: espilon for numerical stability")
     parser.add_argument("--bn_momentum", type=float, default=.5,
                         help="batchnorm: momentum for numerical stability")
-    parser.add_argument("--beta1", type=float, default=0.5,
+    parser.add_argument("--beta1", type=float, default=0.7,
                         help="adam: decay of first order momentum of gradient")
-    parser.add_argument("--beta2", type=float, default=0.95,
+    parser.add_argument("--beta2", type=float, default=0.975,
                         help="adam: decay of first order momentum of gradient")
     parser.add_argument("--kernel_size", type=int, default=9, help="size of the kernels")
     parser.add_argument("--stride", type=int, default=2, help="stride")
