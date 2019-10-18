@@ -106,8 +106,6 @@ def do_learn(opt):
         print_network(discriminator)
         print_network(encoder)
 
-
-
     cuda = True if torch.cuda.is_available() else False
     if cuda:
         #print("Nombre de GPU : ",torch.cuda.device_count())
@@ -216,6 +214,14 @@ def do_learn(opt):
                 e_loss = E_loss(real_imgs, decoded_imgs.detach()) / energy
 
             if opt.lambdaE > 0:
+                # We do not do a VAE, still we wish to make sure the z_imgs get closer to a gaussian
+                # https://github.com/pytorch/examples/blob/master/vae/main.py#L72
+                # # see Appendix B from VAE paper:
+                # # Kingma and Welling. Auto-Encoding Variational Bayes. ICLR, 2014
+                # # https://arxiv.org/abs/1312.6114
+                # # 0.5 * sum(1 + log(sigma^2) - mu^2 - sigma^2)
+                # KLD = -0.5 * torch.sum(1 + logvar - mu.pow(2) - logvar.exp())
+
                 # add a loss for the distance between of z values
                 e_loss += opt.lambdaE * MSE_loss(z_imgs, z_zeros)/opt.batch_size/opt.latent_dim
                 e_loss += opt.lambdaE * \
@@ -325,7 +331,8 @@ def do_learn(opt):
                 iteration = i + nb_batch * j
                 writer.add_scalar('loss/E', e_loss.item(), global_step=iteration)
                 try:
-                    writer.add_histogram('E(x)', z_imgs, global_step=iteration)
+                    writer.add_histogram('x', real_imgs, global_step=iteration)
+                    writer.add_histogram('E_x', z_imgs, global_step=iteration)
                 except:
                     pass
                 if opt.lrD > 0:
@@ -339,9 +346,9 @@ def do_learn(opt):
                     # writer.add_scalar('d_x_cv', hist["d_x_cv"][i], global_step=iteration)
                     # writer.add_scalar('d_g_z_cv', hist["d_g_z_cv"][i], global_step=iteration)
 
-                    writer.add_histogram('D(x)', d_x, global_step=iteration,
+                    writer.add_histogram('D_x', d_x, global_step=iteration,
                                          bins=np.linspace(0, 1, 20))
-                    writer.add_histogram('D(G(z))', d_g_z, global_step=iteration,
+                    writer.add_histogram('D_G_z', d_g_z, global_step=iteration,
                                          bins=np.linspace(0, 1, 20))
 
 
