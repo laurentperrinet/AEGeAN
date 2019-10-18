@@ -170,7 +170,7 @@ def weights_init_normal(m, weight_0=0.01, factor=1.0):
         # m.weight.data.normal_(0, np.sqrt(factor / n))
         # m.bias.data.zero_()
         nn.init.normal_(m.weight.data, 0.0, weight_0*factor)
-        nn.init.constant_(m.bias.data, 0)
+        if m.bias is not None: nn.init.constant_(m.bias.data, 0.)
     #
     # elif classname.find('Conv2d') != -1:
     #     print('classname', classname)
