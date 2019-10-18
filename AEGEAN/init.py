@@ -52,7 +52,7 @@ def init():
     parser.add_argument("--channel1", type=int, default=32//DEBUG, help="size of the channel 1")
     parser.add_argument("--channel2", type=int, default=64//DEBUG, help="size of the channel 2")
     parser.add_argument("--channel3", type=int, default=128//DEBUG, help="size of the channel 3")
-    parser.add_argument("--latent_dim", type=int, default=42,
+    parser.add_argument("--latent_dim", type=int, default=69,
                         help="dimensionality of the latent space")
     parser.add_argument("--img_size", type=int, default=128//DEBUG, help="size of each image dimension")
     parser.add_argument("--window_size", type=int, default=8, help="size of window_size for SSIM")
