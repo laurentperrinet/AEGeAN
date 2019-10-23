@@ -27,7 +27,8 @@ for expname in experiments.keys():
 
     base = 2
 
-    GAN_losses = ['original', 'wasserstein', 'ian', 'alternative'] #, 'alternativ2'
+    GAN_losses = ['original', 'wasserstein', 'ian', 'alternative']
+    GAN_losses.remove(opt.GAN_loss)
 
     for GAN_loss in GAN_losses:
         tag, opt = init()
