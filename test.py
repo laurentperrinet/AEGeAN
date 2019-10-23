@@ -161,13 +161,13 @@ for expname in experiments.keys():
     opt.G_noise *= base
     AG.learn(opt)
 
-    # tag, opt = init()
-    # if opt.do_SSIM:
-    #     opt.runs_path = tag + 'no_SSIM'
-    # else:
-    #     opt.runs_path = tag + 'do_SSIM'
-    # opt.do_SSIM = not opt.do_SSIM
-    # AG.learn(opt)
+    tag, opt = init()
+    opt.do_SSIM = not opt.do_SSIM
+    if opt.do_SSIM:
+        opt.runs_path = tag + 'do_SSIM'
+    else:
+        opt.runs_path = tag + 'no_SSIM'
+    AG.learn(opt)
 
     tag, opt = init()
     opt.init_weight = not opt.init_weight
@@ -197,22 +197,22 @@ for expname in experiments.keys():
         AG.learn(opt)
 
     tag, opt = init()
-    opt.runs_path = tag + 'low_adam_beta1'
+    opt.runs_path = tag + 'low_beta1'
     opt.beta1 = 0.5
     AG.learn(opt)
 
     tag, opt = init()
-    opt.runs_path = tag + 'high_adam_beta1'
+    opt.runs_path = tag + 'high_beta1'
     opt.beta1 = 0.9
     AG.learn(opt)
 
     tag, opt = init()
-    opt.runs_path = tag + 'low_adam_beta2'
+    opt.runs_path = tag + 'low_beta2'
     opt.beta2 = 0.9
     AG.learn(opt)
 
     tag, opt = init()
-    opt.runs_path = tag + 'high_adam_beta2'
+    opt.runs_path = tag + 'high_beta2'
     opt.beta2 = 0.99
     AG.learn(opt)
 

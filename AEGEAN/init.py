@@ -16,24 +16,24 @@ def init():
     parser = argparse.ArgumentParser()
     parser.add_argument("--runs_path", type=str, default='vanilla',
                         help="TensorBoard folder to save samples data and statistics")
-    parser.add_argument("--n_epochs", type=int, default=64,
+    parser.add_argument("--n_epochs", type=int, default=128,
                         help="number of epochs of training")
     parser.add_argument("--batch_size", type=int, default=64, help="size of the batches")
     parser.add_argument("--rand_hflip", type=bool, default=True,
                         help="data augmentation: horizontal flip")
-    parser.add_argument("--rand_affine", type=float, default=0.,
+    parser.add_argument("--rand_affine", type=float, default=3.,
                         help="data augmentation: angle in degrees")
     parser.add_argument("--init_weight", type=bool, default=True,
                         help="initialize weights to normal")
-    parser.add_argument("--lambdaE", type=float, default=.2, help="regularization parameter for E")
-    parser.add_argument("--lrE", type=float, default=0.00025, help="learning rate for E")
+    parser.add_argument("--lambdaE", type=float, default=.1, help="regularization parameter for E")
+    parser.add_argument("--lrE", type=float, default=0.00005, help="learning rate for E")
     parser.add_argument("--lrD", type=float, default=0.0001, help="learning rate for D")
-    parser.add_argument("--lrG", type=float, default=0.0001, help="learning rate for G supervised by D")
-    parser.add_argument("--valid_smooth", type=float, default=0.99,
+    parser.add_argument("--lrG", type=float, default=0.0005, help="learning rate for G supervised by D")
+    parser.add_argument("--valid_smooth", type=float, default=1.,
                         help="Smoothing the results of D on real images")
     parser.add_argument("--D_noise", type=float, default=0.15, help="Add noise to the input images D_x")
     parser.add_argument("--G_noise", type=float, default=0.15, help="Add noise to the input images D_G_z")
-    parser.add_argument("--GAN_loss", type=str, default='alternative', help="Use different losses for G.")
+    parser.add_argument("--GAN_loss", type=str, default='wasserstein', help="Use different losses for G.")
     parser.add_argument("--do_SSIM", type=bool, default=True, help="Use contrasted images for the cost of E.")
     parser.add_argument("--do_bias", type=bool, default=False, help="Should we use biases in convolutions?")
     parser.add_argument("--do_joint", type=bool, default=True, help="Do a joint learning of E and G, dude.")
@@ -48,15 +48,15 @@ def init():
     parser.add_argument("--kernel_size", type=int, default=9, help="size of the kernels")
     parser.add_argument("--stride", type=int, default=2, help="stride")
     parser.add_argument("--padding", type=int, default=4, help="padding")
-    parser.add_argument("--channel0", type=int, default=16//DEBUG, help="size of the channel 0")
-    parser.add_argument("--channel1", type=int, default=32//DEBUG, help="size of the channel 1")
-    parser.add_argument("--channel2", type=int, default=64//DEBUG, help="size of the channel 2")
-    parser.add_argument("--channel3", type=int, default=128//DEBUG, help="size of the channel 3")
+    parser.add_argument("--channel0", type=int, default=32, help="size of the channel 0")
+    parser.add_argument("--channel1", type=int, default=64, help="size of the channel 1")
+    parser.add_argument("--channel2", type=int, default=128, help="size of the channel 2")
+    parser.add_argument("--channel3", type=int, default=256, help="size of the channel 3")
     parser.add_argument("--latent_dim", type=int, default=69,
                         help="dimensionality of the latent space")
     parser.add_argument("--img_size", type=int, default=128//DEBUG, help="size of each image dimension")
     parser.add_argument("--window_size", type=int, default=8, help="size of window_size for SSIM")
-    parser.add_argument("--lrelu", type=float, default=0., help="LeakyReLU : alpha - zero for a standard ReLU")
+    parser.add_argument("--lrelu", type=float, default=0.02, help="LeakyReLU : alpha - zero for a standard ReLU")
     parser.add_argument("--channels", type=int, default=3, help="number of input image channels")
     parser.add_argument("--sample_interval", type=int, default=1, help="interval in epochs between image sampling")
     parser.add_argument("--N_samples", type=int, default=48, help="number of images each sampling")

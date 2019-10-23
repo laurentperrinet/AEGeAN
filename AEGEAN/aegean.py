@@ -127,14 +127,15 @@ def do_learn(opt):
         encoder.apply(weights_init_normal)
 
     # Optimizers
-    optimizer_G = torch.optim.Adam(generator.parameters(), lr=opt.lrG, betas=(opt.beta1, opt.beta2))
-    optimizer_D = torch.optim.Adam(discriminator.parameters(), lr=opt.lrD, betas=(opt.beta1, opt.beta2))
+    # https://pytorch.org/docs/stable/optim.html#torch.optim.RMSprop
+    optimizer_G = torch.optim.RMSprop(generator.parameters(), lr=opt.lrG, momentum=1-opt.beta1, alpha=opt.beta2)
+    optimizer_D = torch.optim.RMSprop(discriminator.parameters(), lr=opt.lrD, momentum=1-opt.beta1, alpha=opt.beta2)
     if opt.do_joint:
         import itertools
-        optimizer_E = torch.optim.Adam(itertools.chain(
-            encoder.parameters(), generator.parameters()), lr=opt.lrE, betas=(opt.beta1, opt.beta2))
+        optimizer_E = torch.optim.RMSprop(itertools.chain(
+            encoder.parameters(), generator.parameters()), lr=opt.lrE, momentum=1-opt.beta1, alpha=opt.beta2)
     else:
-        optimizer_E = torch.optim.Adam(encoder.parameters(), lr=opt.lrE, betas=(opt.beta1, opt.beta2))
+        optimizer_E = torch.optim.RMSprop(encoder.parameters(), lr=opt.lrE, momentum=1-opt.beta1, alpha=opt.beta2)
 
     # ----------
     #  Load models
@@ -231,9 +232,12 @@ def do_learn(opt):
             e_loss.backward()
             optimizer_E.step()
 
-            # Generate a batch of fake images
-            z = Variable(Tensor(np.random.normal(0, 1, (opt.batch_size, opt.latent_dim))), requires_grad=False)
-            gen_imgs = generator(z)
+
+            # Configure input
+            real_imgs = Variable(imgs.type(Tensor))
+            # Real batch
+            # Discriminator decision (in logit units)
+            d_x = discriminator(real_imgs)
 
             if opt.lrD > 0:
 
@@ -246,11 +250,6 @@ def do_learn(opt):
                 valid_smooth = Variable(Tensor(imgs.shape[0], 1).fill_(
                     float(np.random.uniform(opt.valid_smooth, 1.0, 1))), requires_grad=False)
 
-                # Configure input
-                real_imgs = Variable(imgs.type(Tensor))
-                # Real batch
-                # Discriminator decision (in logit units)
-                d_x = discriminator(real_imgs)
                 # Measure discriminator's ability to classify real from generated samples
                 if opt.GAN_loss == 'ian':
                     # eq. 14 in https://arxiv.org/pdf/1701.00160.pdf
@@ -271,15 +270,18 @@ def do_learn(opt):
                 # Backward
                 real_loss.backward()
 
-                # Fake batch
-                # z = Variable(Tensor(np.random.normal(0, 1, (opt.batch_size, opt.latent_dim))))
+            # Generate a batch of fake images
+            z = Variable(Tensor(np.random.normal(0, 1, (opt.batch_size, opt.latent_dim))), requires_grad=False)
+            gen_imgs = generator(z)
+            # Discriminator decision for fake data
+            gen_imgs_ = gen_imgs * 1.
+            if opt.D_noise > 0:
+                gen_imgs_ += opt.D_noise * Variable(torch.randn(gen_imgs.shape))
 
-                # Discriminator decision for fake data
-                gen_imgs_ = gen_imgs * 1.
-                if opt.D_noise > 0:
-                    gen_imgs_ += opt.D_noise * Variable(torch.randn(gen_imgs.shape))
+            d_fake = discriminator(gen_imgs.detach())
 
-                d_fake = discriminator(gen_imgs.detach())
+            if opt.lrD > 0:
+
                 # Measure discriminator's ability to classify real from generated samples
                 if opt.GAN_loss == 'ian':
                     # eq. 14 in https://arxiv.org/pdf/1701.00160.pdf
@@ -339,8 +341,7 @@ def do_learn(opt):
                 # Backward
                 g_loss.backward()
                 optimizer_G.step()
-            else:
-                d_g_z = 0.
+
 
             # -----------------
             #  Recording stats
@@ -380,21 +381,27 @@ def do_learn(opt):
                     writer.add_histogram('image/G_z', gen_imgs, global_step=iteration)
                 except:
                     pass
-                if opt.lrD > 0:
+                if opt.lrG > 0:
                     writer.add_scalar('loss/G', g_loss.item(), global_step=iteration)
+                    # writer.add_scalar('score/D_fake', hist["d_fake_mean"][i], global_step=iteration)
+                    writer.add_scalar('score/D_g_z', hist["d_g_z_mean"][i], global_step=iteration)
+                    try:
+                        writer.add_histogram('D_G_z', d_g_z, global_step=iteration,
+                                             bins=np.linspace(0, 1, 20))
+                    except:
+                        pass
+                if opt.lrD > 0:
                     writer.add_scalar('loss/D', d_loss.item(), global_step=iteration)
 
                     writer.add_scalar('score/D_x', hist["d_x_mean"][i], global_step=iteration)
-                    # writer.add_scalar('score/D_fake', hist["d_fake_mean"][i], global_step=iteration)
-                    writer.add_scalar('score/D_g_z', hist["d_g_z_mean"][i], global_step=iteration)
 
                     # writer.add_scalar('d_x_cv', hist["d_x_cv"][i], global_step=iteration)
                     # writer.add_scalar('d_g_z_cv', hist["d_g_z_cv"][i], global_step=iteration)
-
-                    writer.add_histogram('D_x', d_x, global_step=iteration,
+                    try:
+                        writer.add_histogram('D_x', d_x, global_step=iteration,
                                          bins=np.linspace(0, 1, 20))
-                    writer.add_histogram('D_G_z', d_g_z, global_step=iteration,
-                                         bins=np.linspace(0, 1, 20))
+                    except:
+                        pass
 
 
         if do_tensorboard:
