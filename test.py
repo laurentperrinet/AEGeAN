@@ -17,7 +17,6 @@ for expname in experiments.keys():
         tag = f'{expname}_{opt.img_size}_'
         return tag, opt
 
-
     # VANILLA
     tag, opt = init()
     opt.runs_path = tag + 'vanilla'
@@ -28,15 +27,6 @@ for expname in experiments.keys():
     base = 2
 
     GAN_losses = ['original', 'wasserstein', 'ian', 'alternative']
-    GAN_losses.remove(opt.GAN_loss)
-
-    for GAN_loss in GAN_losses:
-        tag, opt = init()
-        if opt.lrD > 0:
-            opt.runs_path = tag + 'GAN_loss_' + GAN_loss
-            opt.GAN_loss = GAN_loss
-            AG.learn(opt)
-
     for GAN_loss in GAN_losses:
         tag, opt = init()
         if opt.lrD > 0:
@@ -44,6 +34,15 @@ for expname in experiments.keys():
             opt.GAN_loss = GAN_loss
             opt.runs_path += '_no_bn'
             opt.bn_eps = np.inf
+            AG.learn(opt)
+
+    GAN_losses.remove(opt.GAN_loss)
+
+    for GAN_loss in GAN_losses:
+        tag, opt = init()
+        if opt.lrD > 0:
+            opt.runs_path = tag + 'GAN_loss_' + GAN_loss
+            opt.GAN_loss = GAN_loss
             AG.learn(opt)
 
 

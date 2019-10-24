@@ -18,10 +18,10 @@ class Encoder(nn.Module):
                          padding=opt.padding, padding_mode='zeros')
         self.channels = [opt.channel0, opt.channel1, opt.channel2, opt.channel3]
 
-        def encoder_block(in_filters, out_filters, bias, bn=True):
-            block = [nn.Conv2d(in_filters, out_filters, bias=bias, **opts_conv), ]
+        def encoder_block(in_channels, out_channels, bias, bn=True):
+            block = [nn.Conv2d(in_channels, out_channels, bias=bias, **opts_conv), ]
             if bn and (not opt.bn_eps == np.inf):
-                block.append(nn.BatchNorm2d(out_filters, eps=opt.bn_eps, momentum=opt.bn_momentum))
+                block.append(nn.BatchNorm2d(num_features=out_channels, eps=opt.bn_eps, momentum=opt.bn_momentum))
             block.append(NL)
             return block
 
@@ -81,13 +81,13 @@ class Generator(nn.Module):
                          padding=opt.padding, padding_mode='zeros')
         self.channels = [opt.channel0, opt.channel1, opt.channel2, opt.channel3]
 
-        def generator_block(in_filters, out_filters, bn=True):
+        def generator_block(in_channels, out_channels, bn=True):
             block = [nn.UpsamplingNearest2d(scale_factor=opt.stride),
-                     nn.Conv2d(in_filters, out_filters, **opts_conv),
-                     #nn.ConvTranspose2d(in_filters, out_filters, stride=opt.stride, **opts_conv),
+                     nn.Conv2d(in_channels, out_channels, **opts_conv),
+                     #nn.ConvTranspose2d(in_channels, out_channels, stride=opt.stride, **opts_conv),
                      ]
             if bn and (not opt.bn_eps == np.inf):
-                block.append(nn.BatchNorm2d(out_filters, eps=opt.bn_eps, momentum=opt.bn_momentum))
+                block.append(nn.BatchNorm2d(num_features=out_channels, eps=opt.bn_eps, momentum=opt.bn_momentum))
             block.append(NL)
             return block
 
@@ -154,11 +154,11 @@ class Discriminator(nn.Module):
                          padding=opt.padding, padding_mode='zeros')#,bias=opt.do_bias)
         self.channels = [opt.channel0, opt.channel1, opt.channel2, opt.channel3]
 
-        def discriminator_block(in_filters, out_filters, bn=True, bias=False):
-            block = [nn.Conv2d(in_filters, out_filters, bias=bias, **opts_conv), ]  # , nn.Dropout2d(0.25)
+        def discriminator_block(in_channels, out_channels, bn=True, bias=False):
+            block = [nn.Conv2d(in_channels, out_channels, bias=bias, **opts_conv), ]  # , nn.Dropout2d(0.25)
             if bn and (not opt.bn_eps == np.inf):
                 # https://pytorch.org/docs/stable/nn.html#torch.nn.BatchNorm2d
-                block.append(nn.BatchNorm2d(out_filters, eps=opt.bn_eps, momentum=opt.bn_momentum))
+                block.append(nn.BatchNorm2d(num_features=out_channels, eps=opt.bn_eps, momentum=opt.bn_momentum))
             block.append(NL)
             return block
 

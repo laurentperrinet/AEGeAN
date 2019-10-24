@@ -176,6 +176,16 @@ def do_learn(opt):
         for i, (imgs, _) in enumerate(dataloader):
             t_batch = time.time()
 
+            # ---------------------
+            #  Train Encoder
+            # ---------------------
+            for p in generator.parameters():
+                p.requires_grad = opt.do_joint
+            for p in encoder.parameters():
+                p.requires_grad = True
+            for p in discriminator.parameters():
+                p.requires_grad = False  # to avoid computation
+
             real_imgs = Variable(imgs.type(Tensor), requires_grad=False)
 
             # init samples used in the AE
@@ -188,9 +198,7 @@ def do_learn(opt):
             decoded_imgs_samples = decoded_imgs[:opt.N_samples]
 
 
-            # ---------------------
-            #  Train Encoder
-            # ---------------------
+
             optimizer_E.zero_grad()
 
             # if opt.do_SSIM:
@@ -244,6 +252,19 @@ def do_learn(opt):
                 # ---------------------
                 #  Train Discriminator
                 # ---------------------
+                if opt.GAN_loss == 'wasserstein':
+                    # weight clipping
+                    for p in discriminator.parameters():
+                        p.data.clamp_(-0.01, 0.01)
+
+                # Discriminator Requires grad, Generator requires_grad = False
+                for p in discriminator.parameters():
+                    p.requires_grad = True
+                for p in generator.parameters():
+                    p.requires_grad = False  # to avoid computation
+                for p in encoder.parameters():
+                    p.requires_grad = False  # to avoid computation
+
                 optimizer_D.zero_grad()
 
                 # Adversarial ground truths
@@ -306,12 +327,20 @@ def do_learn(opt):
 
                 optimizer_D.step()
 
+
+
+
             if opt.lrG > 0:
                 # -----------------
                 #  Train Generator
                 # -----------------
                 # TODO : optimiser la distance z - E(G(z))
-
+                for p in generator.parameters():
+                    p.requires_grad = True
+                for p in discriminator.parameters():
+                    p.requires_grad = False  # to avoid computation
+                for p in encoder.parameters():
+                    p.requires_grad = False  # to avoid computation
                 optimizer_G.zero_grad()
 
                 # New discriminator decision (since we just updated D)

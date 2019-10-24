@@ -1,5 +1,8 @@
 default: meso_rsync
 
+run:
+	python3 -c'import AEGEAN as AG; opt = AG.init(); opt.runs_path = "AEGEAN_long"; opt.n_epochs=1000; AG.learn(opt)' 
+
 load_modules:
 	module purge; module load userspace/all; module load python3/3.6.3
 
