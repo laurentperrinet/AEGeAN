@@ -253,9 +253,14 @@ def do_learn(opt):
 
             # Configure input
             real_imgs = Variable(imgs.type(Tensor), requires_grad=False)
+
+            real_imgs_ = real_imgs * 1.
+            if opt.D_noise > 0:
+                real_imgs_ += opt.D_noise * Variable(torch.randn(real_imgs.shape))
+
             # Real batch
             # Discriminator decision (in logit units)
-            d_x = discriminator(real_imgs)
+            d_x = discriminator(real_imgs_)
 
             # Adversarial ground truths
             valid_smooth = Variable(Tensor(imgs.shape[0], 1).fill_(
@@ -391,8 +396,8 @@ def do_learn(opt):
                 save_hist_batch(hist, i, j, g_loss, d_loss, e_loss, d_x, d_g_z)
             else:
                 print(
-                    "[Epoch %d/%d] [Batch %d/%d] [E loss: %f] [Time: %fs]"
-                    % (epoch, opt.n_epochs, i+1, len(dataloader), e_loss.item(), time.time()-t_batch)
+                    "%s [Epoch %d/%d] [Batch %d/%d] [E loss: %f] [Time: %fs]"
+                    % (opt.runs_path, epoch, opt.n_epochs, i+1, len(dataloader), e_loss.item(), time.time()-t_batch)
                 )
 
             if do_tensorboard:
