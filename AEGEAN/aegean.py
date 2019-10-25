@@ -197,8 +197,6 @@ def do_learn(opt):
             decoded_imgs = generator(z_imgs)
             decoded_imgs_samples = decoded_imgs[:opt.N_samples]
 
-
-
             optimizer_E.zero_grad()
 
             # if opt.do_SSIM:
@@ -240,12 +238,28 @@ def do_learn(opt):
             e_loss.backward()
             optimizer_E.step()
 
+            if opt.lrD > 0:
+
+                # ---------------------
+                #  Train Discriminator
+                # ---------------------
+                # Discriminator Requires grad, Generator requires_grad = False
+                for p in discriminator.parameters():
+                    p.requires_grad = True
+                for p in generator.parameters():
+                    p.requires_grad = False  # to avoid computation
+                for p in encoder.parameters():
+                    p.requires_grad = False  # to avoid computation
 
             # Configure input
-            real_imgs = Variable(imgs.type(Tensor))
+            real_imgs = Variable(imgs.type(Tensor), requires_grad=False)
             # Real batch
             # Discriminator decision (in logit units)
             d_x = discriminator(real_imgs)
+
+            # Adversarial ground truths
+            valid_smooth = Variable(Tensor(imgs.shape[0], 1).fill_(
+                float(np.random.uniform(opt.valid_smooth, 1.0, 1))), requires_grad=False)
 
             if opt.lrD > 0:
 
@@ -257,19 +271,9 @@ def do_learn(opt):
                     for p in discriminator.parameters():
                         p.data.clamp_(-0.01, 0.01)
 
-                # Discriminator Requires grad, Generator requires_grad = False
-                for p in discriminator.parameters():
-                    p.requires_grad = True
-                for p in generator.parameters():
-                    p.requires_grad = False  # to avoid computation
-                for p in encoder.parameters():
-                    p.requires_grad = False  # to avoid computation
 
                 optimizer_D.zero_grad()
 
-                # Adversarial ground truths
-                valid_smooth = Variable(Tensor(imgs.shape[0], 1).fill_(
-                    float(np.random.uniform(opt.valid_smooth, 1.0, 1))), requires_grad=False)
 
                 # Measure discriminator's ability to classify real from generated samples
                 if opt.GAN_loss == 'ian':
@@ -299,7 +303,7 @@ def do_learn(opt):
             if opt.D_noise > 0:
                 gen_imgs_ += opt.D_noise * Variable(torch.randn(gen_imgs.shape))
 
-            d_fake = discriminator(gen_imgs.detach())
+            d_fake = discriminator(gen_imgs_.detach())
 
             if opt.lrD > 0:
 
@@ -327,9 +331,6 @@ def do_learn(opt):
 
                 optimizer_D.step()
 
-
-
-
             if opt.lrG > 0:
                 # -----------------
                 #  Train Generator
@@ -341,13 +342,15 @@ def do_learn(opt):
                     p.requires_grad = False  # to avoid computation
                 for p in encoder.parameters():
                     p.requires_grad = False  # to avoid computation
-                optimizer_G.zero_grad()
 
-                # New discriminator decision (since we just updated D)
-                gen_imgs_ = gen_imgs * 1.
-                if opt.G_noise > 0:
-                    gen_imgs_ += opt.G_noise * Variable(torch.randn(gen_imgs.shape))
-                d_g_z = discriminator(gen_imgs)
+            # New discriminator decision (since we just updated D)
+            gen_imgs_ = gen_imgs * 1.
+            if opt.G_noise > 0:
+                gen_imgs_ += opt.G_noise * Variable(torch.randn(gen_imgs.shape))
+            d_g_z = discriminator(gen_imgs_)
+
+            if opt.lrG > 0:
+                optimizer_G.zero_grad()
 
                 # Loss measures generator's ability to fool the discriminator
                 if opt.GAN_loss == 'ian':

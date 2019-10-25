@@ -84,7 +84,7 @@ class Generator(nn.Module):
         def generator_block(in_channels, out_channels, bn=True):
             block = [nn.UpsamplingNearest2d(scale_factor=opt.stride),
                      nn.Conv2d(in_channels, out_channels, **opts_conv),
-                     #nn.ConvTranspose2d(in_channels, out_channels, stride=opt.stride, **opts_conv),
+                     # TODO use nn.ConvTranspose2d(in_channels, out_channels, stride=opt.stride, **opts_conv),
                      ]
             if bn and (not opt.bn_eps == np.inf):
                 block.append(nn.BatchNorm2d(num_features=out_channels, eps=opt.bn_eps, momentum=opt.bn_momentum))
