@@ -6,8 +6,9 @@ import numpy as np
 experiments = {}
 experiments['AEGEAN'] = []
 # experiments['AE'] = [('lrG', 0.), ('lrD', 0.)]
-experiments['AE'] = [('lrG', 0.)] # still training the discriminator but G is not supervised by D
 experiments['Simpsons'] = [('datapath', '../database/Simpsons-Face_clear/cp/')]
+experiments['AE'] = [('lrG', 0.)] # still training the discriminator but G is not supervised by D
+experiments['Holidays'] = [('datapath', '/Users/laurentperrinet/nextcloud/Photos/2019/08')]
 
 for expname in experiments.keys():
     def init():

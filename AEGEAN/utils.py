@@ -95,8 +95,10 @@ class FolderDataset(Dataset):
                 width (int): image width
                 transform: pytorch transforms for transforms and tensor conversion during training
         """
-        files = glob(os.path.join(dir_path, '*'))
-        files.extend(glob(os.path.join(dir_path, '**/*')))
+        files = []
+        for ext in ['png', 'PNG', 'jpg', 'JPG']:
+            files.extend(glob(os.path.join(dir_path, f'*.{ext}')))
+            files.extend(glob(os.path.join(dir_path, f'**/*.{ext}')))
         #self.files = list(pathlib.Path(dir_path).rglob("*.png"))#".[png|jpg]")
         # print(self.files, os.path.join(dir_path, '**/*'))
         # self.labels = np.zeros(len(self.files))

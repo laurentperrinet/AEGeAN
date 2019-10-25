@@ -348,6 +348,9 @@ def do_learn(opt):
                 for p in encoder.parameters():
                     p.requires_grad = False  # to avoid computation
 
+            # Generate a batch of fake images
+            z = Variable(Tensor(np.random.normal(0, 1, (opt.batch_size, opt.latent_dim))), requires_grad=False)
+            gen_imgs = generator(z)
             # New discriminator decision (since we just updated D)
             gen_imgs_ = gen_imgs * 1.
             if opt.G_noise > 0:
