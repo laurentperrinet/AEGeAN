@@ -188,14 +188,14 @@ def do_learn(opt):
 
             real_imgs = Variable(imgs.type(Tensor), requires_grad=False)
 
-            # init samples used in the AE
+            # init samples used to visualize performance of the AE
             if real_imgs_samples is None:
                 real_imgs_samples = real_imgs[:opt.N_samples]
 
             # TODO add noise here to real_imgs
             z_imgs = encoder(real_imgs)
             decoded_imgs = generator(z_imgs)
-            decoded_imgs_samples = decoded_imgs[:opt.N_samples]
+            # decoded_imgs_samples = decoded_imgs[:opt.N_samples]
 
             optimizer_E.zero_grad()
 
