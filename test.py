@@ -23,6 +23,14 @@ for expname in experiments.keys():
     print(opt)
     AG.learn(opt)
 
+    # Does it help a GAN to be coupled with an AE ?
+    tag, opt = init()
+    opt.do_joint = not opt.do_joint
+    if opt.do_joint:
+        opt.runs_path = tag + 'do_joint'
+    else:
+        opt.runs_path = tag + 'no_joint'
+    AG.learn(opt)
 
     base = 2
 
@@ -241,14 +249,6 @@ for expname in experiments.keys():
         opt.runs_path = tag + 'no_valid_smooth'
         opt.valid_smooth = 1.
         AG.learn(opt)
-
-    tag, opt = init()
-    opt.do_joint = not opt.do_joint
-    if opt.do_joint:
-        opt.runs_path = tag + 'do_joint'
-    else:
-        opt.runs_path = tag + 'no_joint'
-    AG.learn(opt)
 
     #
     # tag, opt = init()
