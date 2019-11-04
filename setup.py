@@ -3,11 +3,15 @@
 
 from setuptools import setup, find_packages
 
-import AEGEAN
+try:
+    import AEGEAN
+    version = AEGEAN.__version__
+except:
+    version = '20191014'
 
 setup(
     name='AEGEAN',
-    version=AEGEAN.__version__,
+    version=version,
     packages=find_packages(),
     author="",
     author_email="",
