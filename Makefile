@@ -39,3 +39,8 @@ load_modules:
 
 clean_models:
 	rm */models/*.pt; rm */*/models/*.pt
+
+## INSTALL
+install:
+	python3 -m pip install --user -r requirements.txt
+	python3 -m pip install -e .

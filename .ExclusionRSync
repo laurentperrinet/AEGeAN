@@ -6,7 +6,6 @@ __pycache__
 *.py
 *.egg-info
 *$py.class
-test.py
 
 #Directory
 save
