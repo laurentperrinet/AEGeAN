@@ -8,3 +8,4 @@ tensorboard==1.14.0
 tensorflow-estimator==1.14.0
 torch
 torchvision
+-e git+https://github.com/SpikeAI/pytorch-msssim#egg=pytorch-msssim
