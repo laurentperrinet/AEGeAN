@@ -18,7 +18,7 @@ def init():
                         help="TensorBoard folder to save samples data and statistics")
     parser.add_argument("--n_epochs", type=int, default=128,
                         help="number of epochs of training")
-    parser.add_argument("--batch_size", type=int, default=64, help="size of the batches")
+    parser.add_argument("--batch_size", type=int, default=128, help="size of the batches")
     parser.add_argument("--rand_hflip", type=bool, default=True,
                         help="data augmentation: horizontal flip")
     parser.add_argument("--rand_affine", type=float, default=5.,
@@ -69,7 +69,7 @@ def init():
     #                     help="Load model present in model_save_path/Last_*.pt, if present.")
     parser.add_argument("--verbose", type=bool, default=False if DEBUG <
                         4 else True, help="Displays more verbose output.")
-    parser.add_argument("--GPU", type=int, default=0, help="Identifiant du GPU à utiliser.")
+    # parser.add_argument("--GPU", type=int, default=0, help="Identifiant du GPU à utiliser.")
     opt = parser.parse_args()
 
     # Dossier de sauvegarde

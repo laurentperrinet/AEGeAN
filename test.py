@@ -194,7 +194,7 @@ for expname in experiments.keys():
         opt.runs_path = tag + 'no_bias'
     AG.learn(opt)
 
-    if False:
+    if True:
         tag, opt = init()
         opt.runs_path = tag + 'low_batch_size'
         opt.batch_size //= base
