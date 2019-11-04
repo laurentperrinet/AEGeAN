@@ -12,7 +12,7 @@ from pytorch_msssim import NMSSSIM
 import torchvision.transforms as transforms
 from torchvision.utils import save_image
 
-from torch.utils.data import DataLoader
+# from torch.utils.data import DataLoader
 from torchvision import datasets
 
 import torch
@@ -106,8 +106,8 @@ def do_learn(opt):
         print_network(discriminator)
         print_network(encoder)
 
-    cuda = True if torch.cuda.is_available() else False
-    if cuda:
+    use_cuda = True if torch.cuda.is_available() else False
+    if use_cuda:
         #print("Nombre de GPU : ",torch.cuda.device_count())
         # if torch.cuda.device_count() > opt.GPU:
         #     torch.cuda.set_device(opt.GPU)
@@ -118,7 +118,7 @@ def do_learn(opt):
         MSE_loss.cuda(non_blocking=True)
         E_loss.cuda(non_blocking=True)
 
-    Tensor = torch.cuda.FloatTensor if cuda else torch.FloatTensor
+    Tensor = torch.cuda.FloatTensor if use_cuda else torch.FloatTensor
 
     # Initialize weights
     if opt.init_weight:
