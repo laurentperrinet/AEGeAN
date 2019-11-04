@@ -57,12 +57,12 @@ for expname in experiments.keys():
 
     # what's the effect of a smaller latent_dim ?
     tag, opt = init()
-    opt.latent_dim, opt.runs_path = opt.latent_dim//base, tag + 'small_latent'
+    opt.latent_dim, opt.runs_path = opt.latent_dim//base, tag + 'small_latent_dim'
     AG.learn(opt)
 
     # what's the effect of a smaller latent_dim ?
     tag, opt = init()
-    opt.latent_dim, opt.runs_path = opt.latent_dim*base, tag + 'large_latent'
+    opt.latent_dim, opt.runs_path = opt.latent_dim*base, tag + 'large_latent_dim'
     AG.learn(opt)
 
     tag, opt = init()

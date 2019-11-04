@@ -43,4 +43,4 @@ clean_models:
 ## INSTALL
 install:
 	python3.7 -m pip install --user -r requirements.txt
-	python3.7 -m pip install -e .
+	python3.7 -m pip install --user -e .
