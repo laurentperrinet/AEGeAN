@@ -45,10 +45,10 @@ import datetime
 # # print(conv2d(Kinv, KW, padding=1))
 # # print(KW, Kinv, conv2d(KW, Kinv, padding=1), conv2d(Kinv, KW, padding=1))
 
-cuda = True if torch.cuda.is_available() else False
-if cuda:
-    KW = KW.to('cuda')
-    Kinv = Kinv.to('cuda')
+# cuda = True if torch.cuda.is_available() else False
+# if cuda:
+#     KW = KW.to('cuda')
+#     Kinv = Kinv.to('cuda')
 
 try:
     from torch.utils.tensorboard import SummaryWriter
@@ -109,14 +109,14 @@ def do_learn(opt):
     cuda = True if torch.cuda.is_available() else False
     if cuda:
         #print("Nombre de GPU : ",torch.cuda.device_count())
-        if torch.cuda.device_count() > opt.GPU:
-            torch.cuda.set_device(opt.GPU)
-        generator.cuda()
-        discriminator.cuda()
-        adversarial_loss.cuda()
-        encoder.cuda()
-        MSE_loss.cuda()
-        E_loss.cuda()
+        # if torch.cuda.device_count() > opt.GPU:
+        #     torch.cuda.set_device(opt.GPU)
+        generator.cuda(non_blocking=True)
+        discriminator.cuda(non_blocking=True)
+        adversarial_loss.cuda(non_blocking=True)
+        encoder.cuda(non_blocking=True)
+        MSE_loss.cuda(non_blocking=True)
+        E_loss.cuda(non_blocking=True)
 
     Tensor = torch.cuda.FloatTensor if cuda else torch.FloatTensor
 
