@@ -111,12 +111,12 @@ def do_learn(opt):
         #print("Nombre de GPU : ",torch.cuda.device_count())
         # if torch.cuda.device_count() > opt.GPU:
         #     torch.cuda.set_device(opt.GPU)
-        generator.cuda(non_blocking=True)
-        discriminator.cuda(non_blocking=True)
-        adversarial_loss.cuda(non_blocking=True)
-        encoder.cuda(non_blocking=True)
-        MSE_loss.cuda(non_blocking=True)
-        E_loss.cuda(non_blocking=True)
+        generator.cuda()
+        discriminator.cuda()
+        adversarial_loss.cuda()
+        encoder.cuda()
+        MSE_loss.cuda()
+        E_loss.cuda()
 
     Tensor = torch.cuda.FloatTensor if use_cuda else torch.FloatTensor
 
