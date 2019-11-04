@@ -4,6 +4,7 @@
 __pycache__
 *.py[cod]
 *.py
+*.egg-info
 *$py.class
 test.py
 
@@ -12,13 +13,9 @@ save
 data
 
 #File
-launch.sh
 */models/[0-9]_*.pt
 */*/models/[0-9]_*.pt
-*.md
-AEGEAN*
-.ExclusionRSync
-Makefile
 *.pkl
-.git*
+#.git*
+runs
 *ubyte
