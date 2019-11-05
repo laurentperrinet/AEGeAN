@@ -109,6 +109,7 @@ def do_learn(opt):
     use_cuda = True if torch.cuda.is_available() else False
     if use_cuda:
         #print("Nombre de GPU : ",torch.cuda.device_count())
+        print("Running on GPU : ", torch.cuda.get_device_name())
         # if torch.cuda.device_count() > opt.GPU:
         #     torch.cuda.set_device(opt.GPU)
         generator.cuda()

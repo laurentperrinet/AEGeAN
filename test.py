@@ -1,3 +1,6 @@
+import sys
+sys.settrace
+
 import AEGEAN as AG
 import numpy as np
 # import os
