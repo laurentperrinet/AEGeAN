@@ -257,7 +257,9 @@ def do_learn(opt):
 
             real_imgs_ = real_imgs * 1.
             if opt.D_noise > 0:
-                real_imgs_ += opt.D_noise * Variable(torch.randn(real_imgs.shape))
+                # real_imgs_ += opt.D_noise * Variable(torch.randn(real_imgs.shape))
+                noise = Variable(Tensor(np.random.normal(0, opt.D_noise, real_imgs.shape)), requires_grad=False)
+                real_imgs_ = real_imgs_ + noise
 
             # Real batch
             # Discriminator decision (in logit units)
@@ -306,8 +308,12 @@ def do_learn(opt):
             gen_imgs = generator(z)
             # Discriminator decision for fake data
             gen_imgs_ = gen_imgs * 1.
+            # if opt.D_noise > 0:
+            #     gen_imgs_ += opt.D_noise * Variable(torch.randn(gen_imgs.shape))
             if opt.D_noise > 0:
-                gen_imgs_ += opt.D_noise * Variable(torch.randn(gen_imgs.shape))
+                # real_imgs_ += opt.D_noise * Variable(torch.randn(real_imgs.shape))
+                noise = Variable(Tensor(np.random.normal(0, opt.D_noise, gen_imgs.shape)), requires_grad=False)
+                gen_imgs_ = gen_imgs_ + noise
 
             d_fake = discriminator(gen_imgs_.detach())
 
@@ -355,7 +361,9 @@ def do_learn(opt):
             # New discriminator decision (since we just updated D)
             gen_imgs_ = gen_imgs * 1.
             if opt.G_noise > 0:
-                gen_imgs_ += opt.G_noise * Variable(torch.randn(gen_imgs.shape))
+                # gen_imgs_ += opt.G_noise * Variable(torch.randn(gen_imgs.shape))
+                noise = Variable(Tensor(np.random.normal(0, opt.G_noise, gen_imgs.shape)), requires_grad=False)
+                gen_imgs_ = gen_imgs_ + noise
             d_g_z = discriminator(gen_imgs_)
 
             if opt.lrG > 0:
