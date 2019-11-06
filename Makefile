@@ -25,7 +25,7 @@ maria_push:
 	rsync --progress -avhuz --delete --exclude-from=.ExclusionRSync ../database $(MARIA_URL)/..
 
 
-MESO_URL = lperrinet@login.mesocentre.univ-amu.fr:/scratch/lperrinet/SDPC/2019_AEGeAN
+MESO_URL = lperrinet@login.mesocentre.univ-amu.fr:/scratch/lperrinet/SDPC/AEGeAN
 meso_pull:
 	# rsync --progress -avhuz --exclude-from=.ExclusionRSync $(URL)/ .
 	rsync --progress -avhuz $(MESO_URL)/runs .
