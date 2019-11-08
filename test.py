@@ -8,10 +8,11 @@ import numpy as np
 
 experiments = {}
 experiments['AEGEAN'] = []
+experiments['AEGEAN'] = [('img_size', 64)]
 # experiments['AE'] = [('lrG', 0.), ('lrD', 0.)]
-experiments['Simpsons'] = [('datapath', '../database/Simpsons-Face_clear/cp/')]
-experiments['AE'] = [('lrG', 0.)] # still training the discriminator but G is not supervised by D
-experiments['Holidays'] = [('datapath', '/Users/laurentperrinet/nextcloud/Photos/2019/08')]
+experiments['Simpsons'] = [('datapath', '../database/Simpsons-Face_clear/cp/'), ('img_size', 64)]
+experiments['AE'] = [('lrG', 0.), ('img_size', 64)] # still training the discriminator but G is not supervised by D
+experiments['Holidays'] = [('datapath', '/Users/laurentperrinet/nextcloud/Photos/2019/08'), ('img_size', 64)]
 
 for expname in experiments.keys():
     def init():
@@ -144,6 +145,21 @@ for expname in experiments.keys():
     AG.learn(opt)
 
     tag, opt = init()
+    opt.runs_path = tag + 'no_E_noise'
+    opt.E_noise = 0.
+    AG.learn(opt)
+
+    tag, opt = init()
+    opt.runs_path = tag + 'low_E_noise'
+    opt.E_noise /= base
+    AG.learn(opt)
+
+    tag, opt = init()
+    opt.runs_path = tag + 'high_E_noise'
+    opt.E_noise *= base
+    AG.learn(opt)
+
+    tag, opt = init()
     opt.runs_path = tag + 'no_D_noise'
     opt.D_noise = 0.
     AG.learn(opt)
@@ -157,7 +173,6 @@ for expname in experiments.keys():
     opt.runs_path = tag + 'high_D_noise'
     opt.D_noise *= base
     AG.learn(opt)
-
     tag, opt = init()
     opt.runs_path = tag + 'no_G_noise'
     opt.G_noise = 0.

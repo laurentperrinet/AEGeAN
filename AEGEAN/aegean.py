@@ -193,27 +193,18 @@ def do_learn(opt):
             if real_imgs_samples is None:
                 real_imgs_samples = real_imgs[:opt.N_samples]
 
-            # TODO add noise here to real_imgs
-            z_imgs = encoder(real_imgs)
+            # add noise here to real_imgs
+            real_imgs_ = real_imgs * 1.
+            if opt.E_noise > 0:
+                noise = Variable(Tensor(np.random.normal(0, opt.E_noise, real_imgs.shape)), requires_grad=False)
+                real_imgs_ = real_imgs_ + noise
+
+            z_imgs = encoder(real_imgs_)
             decoded_imgs = generator(z_imgs)
             # decoded_imgs_samples = decoded_imgs[:opt.N_samples]
 
             optimizer_E.zero_grad()
 
-            # if opt.do_SSIM:
-            #
-            #     real_imgs = conv2d(real_imgs, KW, padding=1)
-            #     decoded_imgs = conv2d(decoded_imgs, KW, padding=1)
-            #
-            #     # Loss measures Encoder's ability to generate vectors suitable with the generator
-            #     if opt.do_joint:
-            #         ms_ssim_loss = ms_ssim_module(real_imgs, decoded_imgs)
-            #
-            #         e_loss = ms_ssim_module(real_imgs, decoded_imgs) / energy
-            #     else:
-            #         e_loss = ms_ssim_module(real_imgs, decoded_imgs.detach()) / energy
-            #
-            # else:
             # Loss measures Encoder's ability to generate vectors suitable with the generator
             energy = 1. # E_loss(real_imgs, zero_target)  # normalize on the energy of imgs
             if opt.do_joint:
