@@ -6,6 +6,9 @@ scikit-image
 scipy
 tensorboard==1.14.0
 tensorflow-estimator==1.14.0
+# PyTorch
 torch
 torchvision
 -e git+https://github.com/SpikeAI/pytorch-msssim#egg=pytorch-msssim
+# progress bars in model download and training scripts
+tqdm
