@@ -7,11 +7,11 @@ import numpy as np
 # PID, HOST = os.getpid(), os.uname()[1]
 
 experiments = {}
-experiments['AEGEAN'] = []
-experiments['AEGEAN'] = [('img_size', 64)]
+experiments['AEGEAN_64'] = [('img_size', 64)]
 # experiments['AE'] = [('lrG', 0.), ('lrD', 0.)]
-experiments['Simpsons'] = [('datapath', '../database/Simpsons-Face_clear/cp/'), ('img_size', 64)]
-experiments['AE'] = [('lrG', 0.), ('img_size', 64)] # still training the discriminator but G is not supervised by D
+experiments['Simpsons'] = [('datapath', '../database/Simpsons-Face_clear/cp/'), ('img_size', 64), ('n_epochs', 64)]
+experiments['AE'] = [('lrG', 0.), ('img_size', 64), ('n_epochs', 64)] # still training the discriminator but G is not supervised by D
+experiments['AEGEAN'] = []
 experiments['Holidays'] = [('datapath', '/Users/laurentperrinet/nextcloud/Photos/2019/08'), ('img_size', 64)]
 
 for expname in experiments.keys():
@@ -19,7 +19,7 @@ for expname in experiments.keys():
         opt = AG.init()
         for variable, value in experiments[expname]:
             vars(opt)[variable] = value
-        tag = f'{expname}_{opt.img_size}_'
+        tag = f'{expname}' #_{opt.img_size}_'
         return tag, opt
 
     # VANILLA
@@ -37,28 +37,27 @@ for expname in experiments.keys():
         opt.runs_path = tag + 'no_joint'
     AG.learn(opt)
 
-    base = 2
-
     GAN_losses = ['original', 'wasserstein', 'ian', 'alternative']
+    # for GAN_loss in GAN_losses:
+    #     tag, opt = init()
+    #     if opt.lrD > 0:
+    #         opt.runs_path = tag + 'GAN_loss_' + GAN_loss
+    #         opt.GAN_loss = GAN_loss
+    #         opt.runs_path += '_no_bn'
+    #         opt.bn_eps = np.inf
+    #         AG.learn(opt)
+    #
+    # GAN_losses.remove(opt.GAN_loss)
+
     for GAN_loss in GAN_losses:
         tag, opt = init()
         if opt.lrD > 0:
             opt.runs_path = tag + 'GAN_loss_' + GAN_loss
             opt.GAN_loss = GAN_loss
-            opt.runs_path += '_no_bn'
-            opt.bn_eps = np.inf
             AG.learn(opt)
 
-    GAN_losses.remove(opt.GAN_loss)
-
-    for GAN_loss in GAN_losses:
-        tag, opt = init()
-        if opt.lrD > 0:
-            opt.runs_path = tag + 'GAN_loss_' + GAN_loss
-            opt.GAN_loss = GAN_loss
-            AG.learn(opt)
-
-
+    base = 2
+    
     # what's the effect of a smaller latent_dim ?
     tag, opt = init()
     opt.latent_dim, opt.runs_path = opt.latent_dim//base, tag + 'small_latent_dim'
@@ -145,6 +144,16 @@ for expname in experiments.keys():
     AG.learn(opt)
 
     tag, opt = init()
+    opt.runs_path = tag + 'small_channel3'
+    opt.channel3 //= base
+    AG.learn(opt)
+
+    tag, opt = init()
+    opt.runs_path = tag + 'big_channel3'
+    opt.channel3 *= base
+    AG.learn(opt)
+
+    tag, opt = init()
     opt.runs_path = tag + 'no_E_noise'
     opt.E_noise = 0.
     AG.learn(opt)
@@ -225,12 +234,12 @@ for expname in experiments.keys():
 
     tag, opt = init()
     opt.runs_path = tag + 'low_beta1'
-    opt.beta1 = 0.5
+    opt.beta1 = 0.7
     AG.learn(opt)
 
     tag, opt = init()
     opt.runs_path = tag + 'high_beta1'
-    opt.beta1 = 0.9
+    opt.beta1 = 0.91
     AG.learn(opt)
 
     tag, opt = init()
