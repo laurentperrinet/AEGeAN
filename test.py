@@ -19,7 +19,7 @@ for expname in experiments.keys():
         opt = AG.init()
         for variable, value in experiments[expname]:
             vars(opt)[variable] = value
-        tag = f'{expname}' #_{opt.img_size}_'
+        tag = f'{expname}_' #{opt.img_size}_'
         return tag, opt
 
     # VANILLA
@@ -57,7 +57,7 @@ for expname in experiments.keys():
             AG.learn(opt)
 
     base = 2
-    
+
     # what's the effect of a smaller latent_dim ?
     tag, opt = init()
     opt.latent_dim, opt.runs_path = opt.latent_dim//base, tag + 'small_latent_dim'
