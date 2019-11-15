@@ -8,9 +8,9 @@ import numpy as np
 
 experiments = {}
 experiments['AEGEAN_64'] = [('img_size', 64)]
+experiments['AE'] = [('lrG', 0.), ('img_size', 64), ('n_epochs', 64)] # still training the discriminator but G is not supervised by D
 # experiments['AE'] = [('lrG', 0.), ('lrD', 0.)]
 experiments['Simpsons'] = [('datapath', '../database/Simpsons-Face_clear/cp/'), ('img_size', 64), ('n_epochs', 64)]
-experiments['AE'] = [('lrG', 0.), ('img_size', 64), ('n_epochs', 64)] # still training the discriminator but G is not supervised by D
 experiments['AEGEAN'] = []
 experiments['Holidays'] = [('datapath', '/Users/laurentperrinet/nextcloud/Photos/2019/08'), ('img_size', 64)]
 
@@ -66,6 +66,11 @@ for expname in experiments.keys():
     # what's the effect of a smaller latent_dim ?
     tag, opt = init()
     opt.latent_dim, opt.runs_path = opt.latent_dim*base, tag + 'large_latent_dim'
+    AG.learn(opt)
+
+    tag, opt = init()
+    opt.latent_threshold = 0.3 if opt.lrelu==0. else 0.
+    opt.runs_path = tag + 'no_latent_threshold' if opt.lrelu==0. else tag + f'latent_threshold_{str(opt.latent_threshold)}'
     AG.learn(opt)
 
     tag, opt = init()

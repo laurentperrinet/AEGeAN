@@ -100,6 +100,8 @@ def do_learn(opt):
     generator = Generator(opt)
     discriminator = Discriminator(opt)
     encoder = Encoder(opt)
+    if opt.latent_threshold>0.:
+        hs = torch.nn.Hardshrink(lambd=opt.latent_threshold)
 
     if opt.verbose:
         print_network(generator)
@@ -164,6 +166,14 @@ def do_learn(opt):
         0, 1, (opt.N_samples, opt.latent_dim))), requires_grad=False)
     real_imgs_samples = None
 
+    def gen_z(threshold=opt.latent_threshold):
+        z = np.random.normal(0, 1, (opt.batch_size, opt.latent_dim))
+        if threshold > 0:
+            z[np.abs(z)<threshold] = 0.
+        z = Variable(Tensor(z), requires_grad=False)
+        return z
+
+
     zero_target = Variable(Tensor(torch.zeros(opt.batch_size, opt.channels,
                                               opt.img_size, opt.img_size)), requires_grad=False)
     z_zeros = Variable(Tensor(opt.batch_size, opt.latent_dim).fill_(0), requires_grad=False)
@@ -200,6 +210,9 @@ def do_learn(opt):
                 real_imgs_ = real_imgs_ + noise
 
             z_imgs = encoder(real_imgs_)
+            if opt.latent_threshold>0:
+                z_imgs = hs(z_imgs)
+
             decoded_imgs = generator(z_imgs)
             # decoded_imgs_samples = decoded_imgs[:opt.N_samples]
 
@@ -235,7 +248,7 @@ def do_learn(opt):
                 # ---------------------
                 #  Train Discriminator
                 # ---------------------
-                # Discriminator Requires grad, Generator requires_grad = False
+                # Discriminator Requires grad, Encoder + Generator requires_grad = False
                 for p in discriminator.parameters():
                     p.requires_grad = True
                 for p in generator.parameters():
@@ -295,7 +308,9 @@ def do_learn(opt):
                 real_loss.backward()
 
             # Generate a batch of fake images
-            z = Variable(Tensor(np.random.normal(0, 1, (opt.batch_size, opt.latent_dim))), requires_grad=False)
+            z = gen_z()
+            if opt.latent_threshold>0:
+                z_imgs = hs(z_imgs)
             gen_imgs = generator(z)
             # Discriminator decision for fake data
             gen_imgs_ = gen_imgs * 1.
@@ -347,7 +362,7 @@ def do_learn(opt):
                     p.requires_grad = False  # to avoid computation
 
             # Generate a batch of fake images
-            z = Variable(Tensor(np.random.normal(0, 1, (opt.batch_size, opt.latent_dim))), requires_grad=False)
+            z = gen_z()
             gen_imgs = generator(z)
             # New discriminator decision (since we just updated D)
             gen_imgs_ = gen_imgs * 1.
@@ -392,8 +407,8 @@ def do_learn(opt):
                 d_x = sigmoid(d_x)
                 d_g_z = sigmoid(d_g_z)
                 print(
-                    "[Epoch %d/%d] [Batch %d/%d] [E loss: %f] [D loss: %f] [G loss: %f] [D score %f] [G score %f] [Time: %fs]"
-                    % (epoch, opt.n_epochs, i+1, len(dataloader), e_loss.item(), d_loss.item(), g_loss.item(), torch.mean(d_x), torch.mean(d_g_z), time.time()-t_batch)
+                    "%s [Epoch %d/%d] [Batch %d/%d] [E loss: %f] [D loss: %f] [G loss: %f] [D score %f] [G score %f] [Time: %fs]"
+                    % (opt.runs_path, epoch, opt.n_epochs, i+1, len(dataloader), e_loss.item(), d_loss.item(), g_loss.item(), torch.mean(d_x), torch.mean(d_g_z), time.time()-t_batch)
                 )
                 # Save Losses and scores for Tensorboard
                 save_hist_batch(hist, i, j, g_loss, d_loss, e_loss, d_x, d_g_z)

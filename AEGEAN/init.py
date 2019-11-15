@@ -18,10 +18,10 @@ def init():
                         help="TensorBoard folder to save samples data and statistics")
     parser.add_argument("--n_epochs", type=int, default=128,
                         help="number of epochs of training")
-    parser.add_argument("--batch_size", type=int, default=16, help="size of the batches")
+    parser.add_argument("--batch_size", type=int, default=32, help="size of the batches")
     parser.add_argument("--rand_hflip", type=bool, default=True,
                         help="data augmentation: horizontal flip")
-    parser.add_argument("--rand_affine", type=float, default=1.,
+    parser.add_argument("--rand_affine", type=float, default=2.,
                         help="data augmentation: angle in degrees")
     parser.add_argument("--init_weight", type=bool, default=False,
                         help="initialize weights to normal")
@@ -31,9 +31,9 @@ def init():
     parser.add_argument("--lrG", type=float, default=0.0005, help="learning rate for G supervised by D")
     parser.add_argument("--valid_smooth", type=float, default=1.,
                         help="Smoothing the results of D on real images")
-    parser.add_argument("--E_noise", type=float, default=0.015, help="Add noise to the input images to G_E_x")
-    parser.add_argument("--D_noise", type=float, default=0.015, help="Add noise to the input images to D_x")
-    parser.add_argument("--G_noise", type=float, default=0.005, help="Add noise to the input images to D_G_z")
+    parser.add_argument("--E_noise", type=float, default=0.005, help="Add noise to the input images to G_E_x")
+    parser.add_argument("--D_noise", type=float, default=0.025, help="Add noise to the input images to D_x")
+    parser.add_argument("--G_noise", type=float, default=0.002, help="Add noise to the input images to D_G_z")
     parser.add_argument("--GAN_loss", type=str, default='original', help="Use different losses for G.")
     parser.add_argument("--do_SSIM", type=bool, default=True, help="Use contrasted images for the cost of E.")
     parser.add_argument("--do_bias", type=bool, default=True, help="Should we use biases in convolutions?")
@@ -47,12 +47,13 @@ def init():
                         help="adam: decay of first order momentum of gradient")
     parser.add_argument("--beta2", type=float, default=0.975,
                         help="adam: decay of first order momentum of gradient")
-    parser.add_argument("--channel0", type=int, default=16, help="size of the channel 0")
-    parser.add_argument("--channel1", type=int, default=64, help="size of the channel 1")
-    parser.add_argument("--channel2", type=int, default=128, help="size of the channel 2")
-    parser.add_argument("--channel3", type=int, default=256, help="size of the channel 3")
-    parser.add_argument("--latent_dim", type=int, default=100,
+    parser.add_argument("--channel0", type=int, default=16, help="size of channel 0")
+    parser.add_argument("--channel1", type=int, default=64, help="size of channel 1")
+    parser.add_argument("--channel2", type=int, default=64, help="size of channel 2")
+    parser.add_argument("--channel3", type=int, default=256, help="size of channel 3")
+    parser.add_argument("--latent_dim", type=int, default=200,
                         help="dimensionality of the latent space")
+    parser.add_argument("--latent_threshold", type=float, default=0.2, help="threshold for decimating the latent vector")
     parser.add_argument("--kernel_size", type=int, default=9, help="size of the kernels")
     parser.add_argument("--stride", type=int, default=2, help="stride")
     parser.add_argument("--padding", type=int, default=4, help="padding")
