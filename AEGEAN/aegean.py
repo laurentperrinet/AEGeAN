@@ -51,6 +51,7 @@ import datetime
 #     Kinv = Kinv.to('cuda')
 
 try:
+    # to use with `$ tensorboard --logdir=runs`
     from torch.utils.tensorboard import SummaryWriter
     do_tensorboard = True
 except:  # ImportError:
@@ -238,6 +239,9 @@ def do_learn(opt):
                 e_loss += opt.lambdaE * MSE_loss(z_imgs, z_zeros)/opt.batch_size/opt.latent_dim
                 e_loss += opt.lambdaE * \
                     MSE_loss(z_imgs.pow(2), z_ones).pow(.5)/opt.batch_size/opt.latent_dim
+
+                # TODO check that E_x and z have similar stats
+                # TODO use wasserstein for this cost?
 
             # Backward
             e_loss.backward()

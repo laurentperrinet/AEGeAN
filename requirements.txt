@@ -4,8 +4,8 @@ numpy
 pillow>=6.2.0
 scikit-image
 scipy
-tensorboard==1.14.0
-tensorflow-estimator==1.14.0
+tensorboard
+tensorflow-estimator
 # PyTorch
 torch
 torchvision
