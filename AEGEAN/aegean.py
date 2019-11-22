@@ -51,7 +51,7 @@ import datetime
 #     Kinv = Kinv.to('cuda')
 
 try:
-    # to use with `$ tensorboard --logdir=runs`
+    # to use with `$ tensorboard --logdir runs`
     from torch.utils.tensorboard import SummaryWriter
     do_tensorboard = True
 except:  # ImportError:
@@ -232,13 +232,15 @@ def do_learn(opt):
                 # # see Appendix B from VAE paper:
                 # # Kingma and Welling. Auto-Encoding Variational Bayes. ICLR, 2014
                 # # https://arxiv.org/abs/1312.6114
-                # # 0.5 * sum(1 + log(sigma^2) - mu^2 - sigma^2)
+                # KLD =  0.5 * sum(1 + log(sigma^2) - mu^2 - sigma^2)
                 # KLD = -0.5 * torch.sum(1 + logvar - mu.pow(2) - logvar.exp())
 
                 # add a loss for the distance between of z values
-                e_loss += opt.lambdaE * MSE_loss(z_imgs, z_zeros)/opt.batch_size/opt.latent_dim
-                e_loss += opt.lambdaE * \
-                    MSE_loss(z_imgs.pow(2), z_ones).pow(.5)/opt.batch_size/opt.latent_dim
+                # e_loss += opt.lambdaE * MSE_loss(z_imgs, z_zeros)/opt.batch_size/opt.latent_dim
+                # e_loss += opt.lambdaE * \
+                #     MSE_loss(z_imgs.pow(2), z_ones).pow(.5)/opt.batch_size/opt.latent_dim
+                e_loss += opt.lambdaE * (torch.sum(z_imgs)/opt.batch_size/opt.latent_dim).pow(2)
+                e_loss += opt.lambdaE * (torch.sum(z_imgs.pow(2))/opt.batch_size/opt.latent_dim-1).pow(2).pow(.5)
 
                 # TODO check that E_x and z have similar stats
                 # TODO use wasserstein for this cost?

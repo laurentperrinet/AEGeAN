@@ -53,7 +53,7 @@ def init():
     parser.add_argument("--channel3", type=int, default=256, help="size of channel 3")
     parser.add_argument("--latent_dim", type=int, default=200,
                         help="dimensionality of the latent space")
-    parser.add_argument("--latent_threshold", type=float, default=0.2, help="threshold for decimating the latent vector")
+    parser.add_argument("--latent_threshold", type=float, default=0., help="threshold for decimating the latent vector")
     parser.add_argument("--kernel_size", type=int, default=9, help="size of the kernels")
     parser.add_argument("--stride", type=int, default=2, help="stride")
     parser.add_argument("--padding", type=int, default=4, help="padding")

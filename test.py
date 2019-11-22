@@ -8,10 +8,10 @@ import numpy as np
 
 experiments = {}
 experiments['AEGEAN_64'] = [('img_size', 64)]
+experiments['AEGEAN'] = []
 experiments['AE'] = [('lrG', 0.), ('img_size', 64), ('n_epochs', 64)] # still training the discriminator but G is not supervised by D
 # experiments['AE'] = [('lrG', 0.), ('lrD', 0.)]
 experiments['Simpsons'] = [('datapath', '../database/Simpsons-Face_clear/cp/'), ('img_size', 64), ('n_epochs', 64)]
-experiments['AEGEAN'] = []
 experiments['Holidays'] = [('datapath', '/Users/laurentperrinet/nextcloud/Photos/2019/08'), ('img_size', 64)]
 
 for expname in experiments.keys():
@@ -107,56 +107,56 @@ for expname in experiments.keys():
         opt.lrG *= base
         AG.learn(opt)
 
+    if False:
+        tag, opt = init()
+        opt.runs_path = tag + 'small_window_size'
+        opt.window_size //= base
+        AG.learn(opt)
 
-    tag, opt = init()
-    opt.runs_path = tag + 'small_window_size'
-    opt.window_size //= base
-    AG.learn(opt)
+        tag, opt = init()
+        opt.runs_path = tag + 'big_window_size'
+        opt.window_size *= base
+        AG.learn(opt)
 
-    tag, opt = init()
-    opt.runs_path = tag + 'big_window_size'
-    opt.window_size *= base
-    AG.learn(opt)
+        tag, opt = init()
+        opt.runs_path = tag + 'small_channel0'
+        opt.channel0 //= base
+        AG.learn(opt)
 
-    tag, opt = init()
-    opt.runs_path = tag + 'small_channel0'
-    opt.channel0 //= base
-    AG.learn(opt)
+        tag, opt = init()
+        opt.runs_path = tag + 'big_channel0'
+        opt.channel0 *= base
+        AG.learn(opt)
 
-    tag, opt = init()
-    opt.runs_path = tag + 'big_channel0'
-    opt.channel0 *= base
-    AG.learn(opt)
+        tag, opt = init()
+        opt.runs_path = tag + 'small_channel1'
+        opt.channel1 //= base
+        AG.learn(opt)
 
-    tag, opt = init()
-    opt.runs_path = tag + 'small_channel1'
-    opt.channel1 //= base
-    AG.learn(opt)
+        tag, opt = init()
+        opt.runs_path = tag + 'big_channel1'
+        opt.channel1 *= base
+        AG.learn(opt)
 
-    tag, opt = init()
-    opt.runs_path = tag + 'big_channel1'
-    opt.channel1 *= base
-    AG.learn(opt)
+        tag, opt = init()
+        opt.runs_path = tag + 'small_channel2'
+        opt.channel2 //= base
+        AG.learn(opt)
 
-    tag, opt = init()
-    opt.runs_path = tag + 'small_channel2'
-    opt.channel2 //= base
-    AG.learn(opt)
+        tag, opt = init()
+        opt.runs_path = tag + 'big_channel2'
+        opt.channel2 *= base
+        AG.learn(opt)
 
-    tag, opt = init()
-    opt.runs_path = tag + 'big_channel2'
-    opt.channel2 *= base
-    AG.learn(opt)
+        tag, opt = init()
+        opt.runs_path = tag + 'small_channel3'
+        opt.channel3 //= base
+        AG.learn(opt)
 
-    tag, opt = init()
-    opt.runs_path = tag + 'small_channel3'
-    opt.channel3 //= base
-    AG.learn(opt)
-
-    tag, opt = init()
-    opt.runs_path = tag + 'big_channel3'
-    opt.channel3 *= base
-    AG.learn(opt)
+        tag, opt = init()
+        opt.runs_path = tag + 'big_channel3'
+        opt.channel3 *= base
+        AG.learn(opt)
 
     tag, opt = init()
     opt.runs_path = tag + 'no_E_noise'
@@ -210,78 +210,80 @@ for expname in experiments.keys():
         opt.runs_path = tag + 'no_SSIM'
     AG.learn(opt)
 
-    tag, opt = init()
-    opt.init_weight = not opt.init_weight
-    if opt.init_weight:
-        opt.runs_path = tag + 'do_init_weight'
-    else:
-        opt.runs_path = tag + 'no_init_weight'
-    AG.learn(opt)
+    if False:
 
-    tag, opt = init()
-    opt.do_bias = not opt.do_bias
-    if opt.do_bias:
-        opt.runs_path = tag + 'do_bias'
-    else:
-        opt.runs_path = tag + 'no_bias'
-    AG.learn(opt)
-
-    if True:
         tag, opt = init()
-        opt.runs_path = tag + 'low_batch_size'
-        opt.batch_size //= base
+        opt.init_weight = not opt.init_weight
+        if opt.init_weight:
+            opt.runs_path = tag + 'do_init_weight'
+        else:
+            opt.runs_path = tag + 'no_init_weight'
         AG.learn(opt)
 
         tag, opt = init()
-        opt.runs_path = tag + 'high_batch_size'
-        opt.batch_size *= base
+        opt.do_bias = not opt.do_bias
+        if opt.do_bias:
+            opt.runs_path = tag + 'do_bias'
+        else:
+            opt.runs_path = tag + 'no_bias'
         AG.learn(opt)
 
-    tag, opt = init()
-    opt.runs_path = tag + 'low_beta1'
-    opt.beta1 = 0.7
-    AG.learn(opt)
+        if True:
+            tag, opt = init()
+            opt.runs_path = tag + 'low_batch_size'
+            opt.batch_size //= base
+            AG.learn(opt)
 
-    tag, opt = init()
-    opt.runs_path = tag + 'high_beta1'
-    opt.beta1 = 0.91
-    AG.learn(opt)
+            tag, opt = init()
+            opt.runs_path = tag + 'high_batch_size'
+            opt.batch_size *= base
+            AG.learn(opt)
 
-    tag, opt = init()
-    opt.runs_path = tag + 'low_beta2'
-    opt.beta2 = 0.9
-    AG.learn(opt)
-
-    tag, opt = init()
-    opt.runs_path = tag + 'high_beta2'
-    opt.beta2 = 0.99
-    AG.learn(opt)
-
-    tag, opt = init()
-    if opt.rand_affine == 0.:
-        opt.runs_path = tag + 'do_affine'
-        opt.rand_affine = 2.
-    else:
-        opt.runs_path = tag + 'no_affine'
-        opt.rand_affine = 0.
-    AG.learn(opt)
-
-    tag, opt = init()
-    opt.lrelu = 0.1 if opt.lrelu==0. else 0.
-    opt.runs_path = tag + 'relu' if opt.lrelu==0. else tag + 'lrelu'
-    AG.learn(opt)
-
-
-    tag, opt = init()
-    if opt.lrD > 0:
-        opt.runs_path = tag + 'low_valid_smooth'
-        opt.valid_smooth = 0.9
+        tag, opt = init()
+        opt.runs_path = tag + 'low_beta1'
+        opt.beta1 = 0.7
         AG.learn(opt)
-    tag, opt = init()
-    if opt.lrD > 0:
-        opt.runs_path = tag + 'no_valid_smooth'
-        opt.valid_smooth = 1.
+
+        tag, opt = init()
+        opt.runs_path = tag + 'high_beta1'
+        opt.beta1 = 0.91
         AG.learn(opt)
+
+        tag, opt = init()
+        opt.runs_path = tag + 'low_beta2'
+        opt.beta2 = 0.9
+        AG.learn(opt)
+
+        tag, opt = init()
+        opt.runs_path = tag + 'high_beta2'
+        opt.beta2 = 0.99
+        AG.learn(opt)
+
+        tag, opt = init()
+        if opt.rand_affine == 0.:
+            opt.runs_path = tag + 'do_affine'
+            opt.rand_affine = 2.
+        else:
+            opt.runs_path = tag + 'no_affine'
+            opt.rand_affine = 0.
+        AG.learn(opt)
+
+        tag, opt = init()
+        opt.lrelu = 0.1 if opt.lrelu==0. else 0.
+        opt.runs_path = tag + 'relu' if opt.lrelu==0. else tag + 'lrelu'
+        AG.learn(opt)
+
+
+        tag, opt = init()
+        if opt.lrD > 0:
+            opt.runs_path = tag + 'low_valid_smooth'
+            opt.valid_smooth = 0.9
+            AG.learn(opt)
+        tag, opt = init()
+        if opt.lrD > 0:
+            opt.runs_path = tag + 'no_valid_smooth'
+            opt.valid_smooth = 1.
+            AG.learn(opt)
 
     #
     # tag, opt = init()
@@ -304,22 +306,24 @@ for expname in experiments.keys():
     opt.lambdaE *= base
     AG.learn(opt)
 
-    tag, opt = init()
-    opt.runs_path = tag + 'small_bn_eps'
-    opt.bn_eps /= base
-    AG.learn(opt)
+    if False:
 
-    tag, opt = init()
-    opt.runs_path = tag + 'big_bn_eps'
-    opt.bn_eps *= base
-    AG.learn(opt)
+        tag, opt = init()
+        opt.runs_path = tag + 'small_bn_eps'
+        opt.bn_eps /= base
+        AG.learn(opt)
 
-    tag, opt = init()
-    opt.runs_path = tag + 'small_bn_momentum'
-    opt.bn_momentum = .3
-    AG.learn(opt)
+        tag, opt = init()
+        opt.runs_path = tag + 'big_bn_eps'
+        opt.bn_eps *= base
+        AG.learn(opt)
 
-    tag, opt = init()
-    opt.runs_path = tag + 'big_bn_momentum'
-    opt.bn_momentum = .9
-    AG.learn(opt)
+        tag, opt = init()
+        opt.runs_path = tag + 'small_bn_momentum'
+        opt.bn_momentum = .3
+        AG.learn(opt)
+
+        tag, opt = init()
+        opt.runs_path = tag + 'big_bn_momentum'
+        opt.bn_momentum = .9
+        AG.learn(opt)
