@@ -7,12 +7,13 @@ import numpy as np
 # PID, HOST = os.getpid(), os.uname()[1]
 
 experiments = {}
-experiments['AEGEAN_64'] = [('img_size', 64)]
-experiments['AEGEAN'] = []
+experiments['AEGEAN_64'] = [('img_size', 64), ('n_epochs', 64)]
 experiments['AE'] = [('lrG', 0.), ('img_size', 64), ('n_epochs', 64)] # still training the discriminator but G is not supervised by D
 # experiments['AE'] = [('lrG', 0.), ('lrD', 0.)]
 experiments['Simpsons'] = [('datapath', '../database/Simpsons-Face_clear/cp/'), ('img_size', 64), ('n_epochs', 64)]
-experiments['Holidays'] = [('datapath', '/Users/laurentperrinet/nextcloud/Photos/2019/08'), ('img_size', 64)]
+experiments['Holidays'] = [('datapath', '/Users/laurentperrinet/quantic/Photos/2019/08'), ('img_size', 64)]
+experiments['AEGEAN_128'] = []
+experiments['AEGEAN_256'] = [('img_size', 256)]
 
 for expname in experiments.keys():
     def init():
@@ -69,8 +70,8 @@ for expname in experiments.keys():
     AG.learn(opt)
 
     tag, opt = init()
-    opt.latent_threshold = 0.3 if opt.lrelu==0. else 0.
-    opt.runs_path = tag + 'no_latent_threshold' if opt.lrelu==0. else tag + f'latent_threshold_{str(opt.latent_threshold)}'
+    opt.latent_threshold = 0.3 if opt.latent_threshold==0. else 0.
+    opt.runs_path = tag + 'no_latent_threshold' if opt.latent_threshold==0. else tag + f'latent_threshold_{str(opt.latent_threshold)}'
     AG.learn(opt)
 
     tag, opt = init()

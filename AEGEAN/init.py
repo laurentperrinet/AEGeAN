@@ -25,13 +25,13 @@ def init():
                         help="data augmentation: angle in degrees")
     parser.add_argument("--init_weight", type=bool, default=False,
                         help="initialize weights to normal")
-    parser.add_argument("--lambdaE", type=float, default=.2, help="regularization parameter for E")
+    parser.add_argument("--lambdaE", type=float, default=.04, help="regularization parameter for E")
     parser.add_argument("--lrE", type=float, default=0.0002, help="learning rate for E")
     parser.add_argument("--lrD", type=float, default=0.0015, help="learning rate for D")
     parser.add_argument("--lrG", type=float, default=0.0005, help="learning rate for G supervised by D")
     parser.add_argument("--valid_smooth", type=float, default=1.,
                         help="Smoothing the results of D on real images")
-    parser.add_argument("--E_noise", type=float, default=0.005, help="Add noise to the input images to G_E_x")
+    parser.add_argument("--E_noise", type=float, default=0.008, help="Add noise to the input images to G_E_x")
     parser.add_argument("--D_noise", type=float, default=0.025, help="Add noise to the input images to D_x")
     parser.add_argument("--G_noise", type=float, default=0.002, help="Add noise to the input images to D_G_z")
     parser.add_argument("--GAN_loss", type=str, default='original', help="Use different losses for G.")
