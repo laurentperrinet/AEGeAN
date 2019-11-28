@@ -47,9 +47,8 @@ for expname in experiments.keys():
     #         opt.runs_path += '_no_bn'
     #         opt.bn_eps = np.inf
     #         AG.learn(opt)
-    #
-    # GAN_losses.remove(opt.GAN_loss)
 
+    GAN_losses.remove(opt.GAN_loss)
     for GAN_loss in GAN_losses:
         tag, opt = init()
         if opt.lrD > 0:

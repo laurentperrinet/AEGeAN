@@ -332,10 +332,10 @@ def do_learn(opt):
             if opt.lrD > 0:
 
                 # Measure discriminator's ability to classify real from generated samples
-                if opt.GAN_loss == 'ian':
-                    # eq. 14 in https://arxiv.org/pdf/1701.00160.pdf
-                    fake_loss = - torch.sum(1 / (1. - 1/(1-sigmoid(d_fake))))
-                elif opt.GAN_loss == 'wasserstein':
+                # if opt.GAN_loss == 'ian':
+                #     # eq. 14 in https://arxiv.org/pdf/1701.00160.pdf
+                #     fake_loss = - torch.sum(1 / (1. - 1/(1-sigmoid(d_fake))))
+                if opt.GAN_loss == 'wasserstein':
                     fake_loss = torch.mean(sigmoid(d_fake))
                 elif opt.GAN_loss == 'alternative':
                     # https://www.inference.vc/an-alternative-update-rule-for-generative-adversarial-networks/
@@ -343,7 +343,7 @@ def do_learn(opt):
                 elif opt.GAN_loss == 'alternativ2':
                     # https://www.inference.vc/an-alternative-update-rule-for-generative-adversarial-networks/
                     fake_loss = torch.sum(torch.log(sigmoid(d_fake) / (1. - sigmoid(d_fake))))
-                elif opt.GAN_loss == 'original':
+                elif opt.GAN_loss in ['original', 'ian']:
                     fake_loss = adversarial_loss(d_fake, fake)
                 else:
                     print ('GAN_loss not defined', opt.GAN_loss)
@@ -384,7 +384,8 @@ def do_learn(opt):
                 # Loss measures generator's ability to fool the discriminator
                 if opt.GAN_loss == 'ian':
                     # eq. 14 in https://arxiv.org/pdf/1701.00160.pdf
-                    g_loss = - torch.sum(1 / (1. - 1/sigmoid(d_g_z)))
+                    # https://en.wikipedia.org/wiki/Logit
+                    g_loss = - torch.sum(sigmoid(d_g_z)/(1 - sigmoid(d_g_z)))
                 elif opt.GAN_loss == 'wasserstein':
                     g_loss = torch.mean(torch.abs(valid - sigmoid(d_g_z)))
                 elif opt.GAN_loss == 'alternative':
