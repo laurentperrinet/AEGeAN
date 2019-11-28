@@ -194,23 +194,22 @@ class RotoTransform(object):
 
 
 class Normalize(object):
-    def __init__(self, min, max, do_median=True):
+    def __init__(self, min, max):
         """
         :param max(float): max value
         """
         super(Normalize, self).__init__()
         self.min, self.max = min, max
-        self.do_median = do_median
+        # self.do_median = do_median
 
     def __call__(self, img):
         """
         :param img: PIL Image
         :return: PIL Image
 
-        TODO: determine a contrast
         """
         tmp_img = np.array(img).astype(np.float)
-        # print(tmp_img.min(), tmp_img.max())
+        # print('m-M', tmp_img.min(), tmp_img.max())
         # if self.do_median:
         #     tmp_img -= np.median(tmp_img)
         # else:
@@ -218,9 +217,11 @@ class Normalize(object):
         tmp_img -= np.min(tmp_img)
         tmp_img = tmp_img / tmp_img.max()
         # tmp_img = tmp_img.astype(tmp_img.dtype)
-        # print(tmp_img.min(), tmp_img.max())
+        # print('0-1', tmp_img.min(), tmp_img.max())
         # return Image.fromarray(tmp_img)
-        return (self.max-self.min)*tmp_img - self.min
+        tmp_img = (self.max-self.min)*tmp_img + self.min
+        # print('m-M', tmp_img.min(), tmp_img.max())
+        return tmp_img
 
     def __repr__(self):
         return self.__class__.__name__ + "(mean: {}, max: {})".format(self.mean, self.max)

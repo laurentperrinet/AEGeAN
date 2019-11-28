@@ -26,7 +26,7 @@ def init():
     parser.add_argument("--init_weight", type=bool, default=False,
                         help="initialize weights to normal")
     parser.add_argument("--gamma", type=float, default=1., help="gamma correction of images")
-    parser.add_argument("--lambdaE", type=float, default=.06, help="regularization parameter for E")
+    parser.add_argument("--lambdaE", type=float, default=.04, help="regularization parameter for E")
     parser.add_argument("--lrE", type=float, default=0.0002, help="learning rate for E")
     parser.add_argument("--lrD", type=float, default=0.0015, help="learning rate for D")
     parser.add_argument("--lrG", type=float, default=0.0005, help="learning rate for G supervised by D")
