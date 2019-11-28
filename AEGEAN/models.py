@@ -44,9 +44,11 @@ class Encoder(nn.Module):
             print("Encoder")
         if self.opt.verbose:
             print("Image shape : ", img.shape)
+        # https://en.wikipedia.org/wiki/Gamma_correction
+        out = torch.pow(img, 1/self.opt.gamma)
         if self.opt.verbose:
-            print("WImage shape : ", out.shape)
-        out = self.conv1(img)
+            print("Image shape : ", out.shape)
+        out = self.conv1(out)
         if self.opt.verbose:
             print("Conv1 out : ", out.shape)
         out = self.conv2(out)
@@ -139,6 +141,9 @@ class Generator(nn.Module):
         if self.opt.verbose:
             print("img out : ", out.shape)
 
+        # https://en.wikipedia.org/wiki/Gamma_correction
+        out = torch.pow(out, self.opt.gamma)
+
         return out
 
     def _name(self):
@@ -179,8 +184,11 @@ class Discriminator(nn.Module):
             print("D")
             print("Image shape : ", img.shape)
             # Dim : (opt.chanels, opt.img_size, opt.img_size)
+        # https://en.wikipedia.org/wiki/Gamma_correction
+        # TODO may not be necessary in the discriminator
+        out = torch.pow(img, 1/self.opt.gamma)
 
-        out = self.conv1(img)
+        out = self.conv1(out)
         if self.opt.verbose:
             print("Conv1 out : ", out.shape)
 
