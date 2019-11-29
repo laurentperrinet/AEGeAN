@@ -7,12 +7,13 @@ import numpy as np
 # PID, HOST = os.getpid(), os.uname()[1]
 
 experiments = {}
+experiments['AEGEAN_128'] = []
+experiments['Simpsons_128'] = [('datapath', '../database/Simpsons-Face_clear/cp/'), ('img_size', 128), ('n_epochs', 128)]
 experiments['AEGEAN_64'] = [('img_size', 64), ('n_epochs', 64)]
 experiments['AE'] = [('lrG', 0.), ('img_size', 64), ('n_epochs', 64)] # still training the discriminator but G is not supervised by D
 # experiments['AE'] = [('lrG', 0.), ('lrD', 0.)]
-experiments['Simpsons'] = [('datapath', '../database/Simpsons-Face_clear/cp/'), ('img_size', 64), ('n_epochs', 64)]
+experiments['Simpsons_64'] = [('datapath', '../database/Simpsons-Face_clear/cp/'), ('img_size', 64), ('n_epochs', 64)]
 experiments['Holidays'] = [('datapath', '/Users/laurentperrinet/quantic/Photos/2019/08'), ('img_size', 64)]
-experiments['AEGEAN_128'] = []
 experiments['AEGEAN_256'] = [('img_size', 256)]
 
 for expname in experiments.keys():
@@ -74,7 +75,7 @@ for expname in experiments.keys():
     AG.learn(opt)
 
     tag, opt = init()
-    opt.gamma = 1.5 if opt.gamma==1. else 1.
+    opt.gamma = 1.2 if opt.gamma==1. else 1.
     # opt.gamma = 1.
     opt.runs_path = tag + f'gamma_{str(opt.gamma)}'
     AG.learn(opt)

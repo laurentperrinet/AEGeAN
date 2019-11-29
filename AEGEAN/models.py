@@ -46,7 +46,7 @@ class Encoder(nn.Module):
             print("Image shape : ", img.shape)
             print("Image min-max : ", img.min(), img.max())
         # https://en.wikipedia.org/wiki/Gamma_correction
-        out = torch.pow(img, 1/self.opt.gamma)
+        out = torch.pow(img, self.opt.gamma)
         if self.opt.verbose:
             print("Image shape : ", out.shape)
         out = self.conv1(out)
@@ -145,7 +145,7 @@ class Generator(nn.Module):
         # https://en.wikipedia.org/wiki/Gamma_correction
         if self.opt.verbose:
             print("out Image min-max : ", out.min(), out.max())
-        out = torch.pow(out, self.opt.gamma)
+        out = torch.pow(out, 1/self.opt.gamma)
 
         return out
 
@@ -187,12 +187,9 @@ class Discriminator(nn.Module):
             print("D")
             print("Image shape : ", img.shape)
             # Dim : (opt.chanels, opt.img_size, opt.img_size)
-        # https://en.wikipedia.org/wiki/Gamma_correction
-        # TODO may not be necessary in the discriminator
-        # print("img Image min-max : ", img.min(), img.max())
-        out = torch.pow(img, 1/self.opt.gamma)
+            print("img Image min-max : ", img.min(), img.max())
 
-        out = self.conv1(out)
+        out = self.conv1(img)
         if self.opt.verbose:
             print("Conv1 out : ", out.shape)
 

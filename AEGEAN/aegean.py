@@ -316,7 +316,7 @@ def do_learn(opt):
             # Generate a batch of fake images
             z = gen_z()
             if opt.latent_threshold>0:
-                z_imgs = hs(z_imgs)
+                z = hs(z)
             gen_imgs = generator(z)
             # Discriminator decision for fake data
             gen_imgs_ = gen_imgs * 1.
@@ -447,11 +447,11 @@ def do_learn(opt):
                     writer.add_scalar('loss/G', g_loss.item(), global_step=iteration)
                     # writer.add_scalar('score/D_fake', hist["d_fake_mean"][i], global_step=iteration)
                     writer.add_scalar('score/D_g_z', hist["d_g_z_mean"][i], global_step=iteration)
-                    try:
-                        writer.add_histogram('D_G_z', d_g_z, global_step=iteration,
-                                             bins=np.linspace(0, 1, 20))
-                    except:
-                        pass
+                    # try:
+                    #     writer.add_histogram('D_G_z', d_g_z, global_step=iteration,
+                    #                          bins=np.linspace(0, 1, 20))
+                    # except:
+                    #     pass
                 if opt.lrD > 0:
                     writer.add_scalar('loss/D', d_loss.item(), global_step=iteration)
 
@@ -459,11 +459,11 @@ def do_learn(opt):
 
                     # writer.add_scalar('d_x_cv', hist["d_x_cv"][i], global_step=iteration)
                     # writer.add_scalar('d_g_z_cv', hist["d_g_z_cv"][i], global_step=iteration)
-                    try:
-                        writer.add_histogram('D_x', d_x, global_step=iteration,
-                                         bins=np.linspace(0, 1, 20))
-                    except:
-                        pass
+                    # try:
+                    #     writer.add_histogram('D_x', d_x, global_step=iteration,
+                    #                      bins=np.linspace(0, 1, 20))
+                    # except:
+                    #     pass
 
 
         if do_tensorboard:

@@ -194,12 +194,12 @@ class RotoTransform(object):
 
 
 class Normalize(object):
-    def __init__(self, min, max):
+    def __init__(self, min, mean, max):
         """
         :param max(float): max value
         """
         super(Normalize, self).__init__()
-        self.min, self.max = min, max
+        self.min, self.mean, self.max = min, mean, max
         # self.do_median = do_median
 
     def __call__(self, img):
@@ -209,18 +209,20 @@ class Normalize(object):
 
         """
         tmp_img = np.array(img).astype(np.float)
-        # print('m-M', tmp_img.min(), tmp_img.max())
-        # if self.do_median:
-        #     tmp_img -= np.median(tmp_img)
-        # else:
-        #     tmp_img -= np.mean(tmp_img)
-        tmp_img -= np.min(tmp_img)
-        tmp_img = tmp_img / tmp_img.max()
-        # tmp_img = tmp_img.astype(tmp_img.dtype)
-        # print('0-1', tmp_img.min(), tmp_img.max())
-        # return Image.fromarray(tmp_img)
-        tmp_img = (self.max-self.min)*tmp_img + self.min
-        # print('m-M', tmp_img.min(), tmp_img.max())
+        #print('min-mean-max', tmp_img.min(), tmp_img.mean(), tmp_img.max())
+        if False:
+            tmp_img -= np.mean(tmp_img)
+            tmp_img /= np.abs(tmp_img).max()
+            tmp_img *= self.max - self.mean
+            tmp_img += self.mean
+        else:
+            tmp_img -= np.min(tmp_img)
+            tmp_img = tmp_img / tmp_img.max()
+            # tmp_img = tmp_img.astype(tmp_img.dtype)
+            # print('0-1', tmp_img.min(), tmp_img.max())
+            # return Image.fromarray(tmp_img)
+            tmp_img = (self.max-self.min)*tmp_img + self.min
+        #print('min-mean-max', tmp_img.min(), tmp_img.mean(), tmp_img.max())
         return tmp_img
 
     def __repr__(self):
@@ -259,7 +261,7 @@ def weights_init_normal(m, weight_0=0.01, factor=1.0):
 
 def load_data(path, img_size, batch_size,
               rand_hflip=False, rand_affine=0.,
-              min=0., max=1., mean=0.5, std=1.):
+              min=0., max=1., mean=.5, std=1.):
     print("Loading data...")
     t_total = time.time()
 
@@ -273,7 +275,7 @@ def load_data(path, img_size, batch_size,
         # transform_tmp.append(transforms.RandomAffine(degrees=rand_affine, fillcolor=1))
         transform_tmp.append(RotoTransform(theta=rand_affine))
     # transform_tmp.append(transforms.ColorJitter(brightness=0, contrast=(0.9, 1.0), saturation=0, hue=0))
-    transform_tmp.append(Normalize(min, max))
+    transform_tmp.append(Normalize(min, mean, max))
     transform_tmp.append(transforms.ToTensor())
     # transform_tmp.append(transforms.Normalize([mean]*3, [std]*3))
 
