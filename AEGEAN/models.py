@@ -34,7 +34,7 @@ class Encoder(nn.Module):
         # self.vector = nn.Linear(self.channels[3] * self.init_size ** 2, opt.latent_dim)
         self.vector = nn.Sequential(
             nn.Linear(self.channels[3] * self.init_size ** 2, opt.latent_dim),
-            nn.Tanh(),
+            # nn.Tanh(),
         )
 
         self.opt = opt
