@@ -112,10 +112,12 @@ class FolderDataset(Dataset):
         for fname in files:
             if os.path.isfile(fname):
                 #img_as_np = np.asarray(Image.open(img).resize((self.height, self.width))).astype('uint8')
-                img_as_pil = Image.open(fname).resize((self.height, self.width), resample=Image.BILINEAR)
+                img_as_pil = Image.open(fname)
                 # HACK for CFD images
                 if list(img_as_pil.getdata())[0]  == (255, 255, 255): # rgb_im.getpixel((1, 1))
-                    ImageDraw.floodfill(img_as_pil, xy=(0, 0), value=(127, 127, 127), thresh=200)
+                    ImageDraw.floodfill(img_as_pil, xy=(0, 0), value=(127, 127, 127), thresh=10)
+                    ImageDraw.floodfill(img_as_pil, xy=(0, -1), value=(127, 127, 127), thresh=10)
+                img_as_pil = img_as_pil.resize((self.height, self.width), resample=Image.BILINEAR)
                 self.imgs.append(img_as_pil)
                 self.files.append(fname)
 
