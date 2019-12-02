@@ -12,7 +12,7 @@ from torch.utils.data.dataset import Dataset
 from torchvision import transforms
 import torchvision
 from torchvision.utils import save_image
-from PIL import Image
+from PIL import Image, ImageDraw
 import matplotlib
 matplotlib.use('Agg')
 
@@ -112,8 +112,10 @@ class FolderDataset(Dataset):
         for fname in files:
             if os.path.isfile(fname):
                 #img_as_np = np.asarray(Image.open(img).resize((self.height, self.width))).astype('uint8')
-                img_as_pil = Image.open(fname).resize((self.height, self.width))
-
+                img_as_pil = Image.open(fname).resize((self.height, self.width), resample=Image.BILINEAR)
+                # HACK for CFD images
+                if list(img_as_pil.getdata())[0]  == (255, 255, 255): # rgb_im.getpixel((1, 1))
+                    ImageDraw.floodfill(img_as_pil, xy=(0, 0), value=(127, 127, 127), thresh=200)
                 self.imgs.append(img_as_pil)
                 self.files.append(fname)
 
