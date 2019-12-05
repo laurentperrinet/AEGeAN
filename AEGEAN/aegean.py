@@ -122,7 +122,9 @@ def do_learn(opt):
         MSE_loss.cuda()
         E_loss.cuda()
 
-    Tensor = torch.cuda.FloatTensor if use_cuda else torch.FloatTensor
+        Tensor = torch.cuda.FloatTensor
+    else:
+        Tensor = torch.FloatTensor
 
     # Initialize weights
     if opt.init_weight:
