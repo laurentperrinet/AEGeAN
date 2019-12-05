@@ -182,8 +182,8 @@ def do_learn(opt):
     valid = Variable(Tensor(opt.batch_size, 1).fill_(1), requires_grad=False)
     fake = Variable(Tensor(opt.batch_size, 1).fill_(0), requires_grad=False)
 
-    zero_target = Variable(Tensor(torch.zeros(opt.batch_size, opt.channels,
-                                              opt.img_size, opt.img_size)), requires_grad=False)
+    # zero_target = Variable(Tensor(opt.batch_size, opt.channels,
+    #                           opt.img_size, opt.img_size).fill_(0), requires_grad=False)
 
     t_total = time.time()
     for j, epoch in enumerate(range(1, opt.n_epochs + 1)):
