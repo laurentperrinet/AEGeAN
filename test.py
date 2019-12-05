@@ -75,7 +75,7 @@ for expname in experiments.keys():
     AG.learn(opt)
 
     tag, opt = init()
-    opt.gamma = 1.2 if opt.gamma==1. else 1.
+    opt.gamma = .618 if opt.gamma==1. else 1.
     # opt.gamma = 1.
     opt.runs_path = tag + f'gamma_{str(opt.gamma)}'
     AG.learn(opt)

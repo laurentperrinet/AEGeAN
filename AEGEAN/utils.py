@@ -114,9 +114,9 @@ class FolderDataset(Dataset):
                 #img_as_np = np.asarray(Image.open(img).resize((self.height, self.width))).astype('uint8')
                 img_as_pil = Image.open(fname)
                 # HACK for CFD images
-                if list(img_as_pil.getdata())[0]  == (255, 255, 255): # rgb_im.getpixel((1, 1))
-                    ImageDraw.floodfill(img_as_pil, xy=(0, 0), value=(127, 127, 127), thresh=10)
-                    ImageDraw.floodfill(img_as_pil, xy=(0, -1), value=(127, 127, 127), thresh=10)
+                # if list(img_as_pil.getdata())[0]  == (255, 255, 255): # rgb_im.getpixel((1, 1))
+                #     ImageDraw.floodfill(img_as_pil, xy=(0, 0), value=(127, 127, 127), thresh=10)
+                #     ImageDraw.floodfill(img_as_pil, xy=(0, -1), value=(127, 127, 127), thresh=10)
                 img_as_pil = img_as_pil.resize((self.height, self.width), resample=Image.BILINEAR)
                 self.imgs.append(img_as_pil)
                 self.files.append(fname)
@@ -284,7 +284,16 @@ def load_data(path, img_size, batch_size,
     # transform_tmp.append(transforms.Normalize([mean]*3, [std]*3))
 
     transform = transforms.Compose(transform_tmp)
-    dataset = FolderDataset(path, img_size, img_size, transform)
+
+    file_path = f"/tmp/AEGEAN_dataset_{path.replace('/', '_')}_{img_size}.pt"
+    print(file_path)
+    try :
+        dataset = torch.load(file_path)
+        print("Loading dataset")
+    except :
+
+        dataset = FolderDataset(path, img_size, img_size, transform)
+        torch.save(dataset, file_path)
 
     use_cuda = True if torch.cuda.is_available() else False
     kwargs = {'num_workers': 1, 'pin_memory': True} if use_cuda else {}
