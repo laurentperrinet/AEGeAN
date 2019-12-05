@@ -124,6 +124,7 @@ def do_learn(opt):
 
         Tensor = torch.cuda.FloatTensor
     else:
+        print("Running on CPU ")
         Tensor = torch.FloatTensor
 
     # Initialize weights
@@ -176,13 +177,13 @@ def do_learn(opt):
         z = Variable(Tensor(z), requires_grad=False)
         return z
 
-
-    zero_target = Variable(Tensor(torch.zeros(opt.batch_size, opt.channels,
-                                              opt.img_size, opt.img_size)), requires_grad=False)
     z_zeros = Variable(Tensor(opt.batch_size, opt.latent_dim).fill_(0), requires_grad=False)
     z_ones = Variable(Tensor(opt.batch_size, opt.latent_dim).fill_(1), requires_grad=False)
     valid = Variable(Tensor(opt.batch_size, 1).fill_(1), requires_grad=False)
     fake = Variable(Tensor(opt.batch_size, 1).fill_(0), requires_grad=False)
+
+    zero_target = Variable(Tensor(torch.zeros(opt.batch_size, opt.channels,
+                                              opt.img_size, opt.img_size)), requires_grad=False)
 
     t_total = time.time()
     for j, epoch in enumerate(range(1, opt.n_epochs + 1)):
