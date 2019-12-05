@@ -25,7 +25,11 @@ maria_push:
 	rsync --progress -avhuz --delete --exclude-from=.ExclusionRSync ../database $(MARIA_URL)/..
 
 
-MESO_URL = lperrinet@login.mesocentre.univ-amu.fr:/scratch/lperrinet/SDPC/AEGeAN
+MESO_URL = lperrinet@login.mesocentre.univ-amu.fr:/home/lperrinet/science/AEGeAN
+meso_run:
+	# https://mesocentre.univ-amu.fr/slurm/
+	srun -p kepler -A h146 -t 4-2 --gres=gpu:1 --gres-flags=enforce-binding --pty bash -i
+
 meso_pull:
 	# rsync --progress -avhuz --exclude-from=.ExclusionRSync $(URL)/ .
 	rsync --progress -avhuz $(MESO_URL)/runs .
@@ -35,7 +39,7 @@ meso_push:
 	# rsync --progress -avhuz --delete --exclude-from=.ExclusionRSync ../database $(MESO_URL)/..
 
 load_modules:
-	module purge; module load userspace/all; module load python3/3.6.3
+	module purge; module load userspace/all; module load python3/3.6.3; module load cuda/10.1
 
 clean_models:
 	rm */models/*.pt; rm */*/models/*.pt
