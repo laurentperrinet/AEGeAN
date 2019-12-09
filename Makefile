@@ -35,7 +35,7 @@ meso_run:
 
 meso_pull:
 	# rsync --progress -avhuz --exclude-from=.ExclusionRSync $(URL)/ .
-	rsync --progress -avhuz --delete $(MESO_URL)/runs/* runs
+	rsync --progress -avh --delete $(MESO_URL)/runs/ runs
 
 meso_push:
 	rsync --progress -avhuz runs $(MESO_URL)
