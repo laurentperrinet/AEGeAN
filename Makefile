@@ -31,11 +31,11 @@ maria_push:
 MESO_URL = lperrinet@login.mesocentre.univ-amu.fr:/home/lperrinet/science/AEGeAN
 meso_run:
 	# https://mesocentre.univ-amu.fr/slurm/
-	srun -p kepler -A h146 -t 4-2 --gres=gpu:1 --gres-flags=enforce-binding --pty bash -i
+	srun -p gpu -A h146 -t 4-2 --gres=gpu:1 --gres-flags=enforce-binding --pty bash -i
 
 meso_pull:
 	# rsync --progress -avhuz --exclude-from=.ExclusionRSync $(URL)/ .
-	rsync --progress -avhuz $(MESO_URL)/runs .
+	rsync --progress -avhuz --delete $(MESO_URL)/runs/* runs
 
 meso_push:
 	rsync --progress -avhuz runs $(MESO_URL)
@@ -46,6 +46,9 @@ load_modules:
 
 clean_models:
 	rm */models/*.pt; rm */*/models/*.pt
+
+clean:
+	rm -fr runs
 
 ## INSTALL
 install:
