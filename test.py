@@ -7,9 +7,10 @@ import numpy as np
 # PID, HOST = os.getpid(), os.uname()[1]
 
 experiments = {}
-experiments['AEGEAN_128'] = []
+# experiments['AEGEAN_128'] = []
+experiments['AEGEAN_256'] = [('img_size', 256), ]
 experiments['Simpsons_128'] = [('datapath', '../database/Simpsons-Face_clear/cp/'), ('img_size', 128), ('n_epochs', 128)]
-experiments['AEGEAN_64'] = [('img_size', 64), ('n_epochs', 64)]
+# experiments['AEGEAN_64'] = [('img_size', 64), ('n_epochs', 64)]
 experiments['AE'] = [('lrG', 0.), ('img_size', 64), ('n_epochs', 64)] # still training the discriminator but G is not supervised by D
 # experiments['AE'] = [('lrG', 0.), ('lrD', 0.)]
 experiments['Simpsons_64'] = [('datapath', '../database/Simpsons-Face_clear/cp/'), ('img_size', 64), ('n_epochs', 64)]
@@ -39,23 +40,25 @@ for expname in experiments.keys():
         opt.runs_path = tag + 'no_joint'
     AG.learn(opt)
 
-    GAN_losses = ['original', 'wasserstein', 'ian', 'alternative']
-    # for GAN_loss in GAN_losses:
-    #     tag, opt = init()
-    #     if opt.lrD > 0:
-    #         opt.runs_path = tag + 'GAN_loss_' + GAN_loss
-    #         opt.GAN_loss = GAN_loss
-    #         opt.runs_path += '_no_bn'
-    #         opt.bn_eps = np.inf
-    #         AG.learn(opt)
+    if False:
 
-    GAN_losses.remove(opt.GAN_loss)
-    for GAN_loss in GAN_losses:
-        tag, opt = init()
-        if opt.lrD > 0:
-            opt.runs_path = tag + 'GAN_loss_' + GAN_loss
-            opt.GAN_loss = GAN_loss
-            AG.learn(opt)
+        GAN_losses = ['original', 'wasserstein', 'ian', 'alternative']
+        for GAN_loss in GAN_losses:
+            tag, opt = init()
+            if opt.lrD > 0:
+                opt.runs_path = tag + 'GAN_loss_' + GAN_loss
+                opt.GAN_loss = GAN_loss
+                opt.runs_path += '_no_bn'
+                opt.bn_eps = np.inf
+                AG.learn(opt)
+
+        GAN_losses.remove(opt.GAN_loss)
+        for GAN_loss in GAN_losses:
+            tag, opt = init()
+            if opt.lrD > 0:
+                opt.runs_path = tag + 'GAN_loss_' + GAN_loss
+                opt.GAN_loss = GAN_loss
+                AG.learn(opt)
 
     base = 2
 

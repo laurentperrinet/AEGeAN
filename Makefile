@@ -1,6 +1,9 @@
-default: run_CFD
+default: run
 
 # RUNNING
+run:
+	sbatch launch.sh
+
 run_CFD:
 	python3 -c'import AEGEAN as AG; opt = AG.init(); opt.runs_path = "AEGEAN_long"; opt.n_epochs=1000; AG.learn(opt)'
 
