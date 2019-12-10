@@ -274,9 +274,16 @@ def do_learn(opt):
                 noise = Variable(Tensor(np.random.normal(0, opt.D_noise, real_imgs.shape)), requires_grad=False)
                 real_imgs_ = real_imgs_ + noise
 
-            # Real batch
-            # Discriminator decision (in logit units)
-            d_x = discriminator(real_imgs_)
+            if opt.do_insight:
+                z_imgs = encoder(real_imgs_)
+                if opt.latent_threshold>0:
+                    z_imgs = hs(z_imgs)
+                decoded_imgs = generator(z_imgs)
+                d_x = discriminator(real_imgs_)
+            else:
+                # Real batch
+                # Discriminator decision (in logit units)
+                d_x = discriminator(real_imgs_)
 
             # Adversarial ground truths
             valid_smooth = Variable(Tensor(imgs.shape[0], 1).fill_(

@@ -40,6 +40,15 @@ for expname in experiments.keys():
         opt.runs_path = tag + 'no_joint'
     AG.learn(opt)
 
+    # What if the discriminator has only acces to the image reconstructed by the AE ?
+    tag, opt = init()
+    opt.do_insight = not opt.do_insight
+    if opt.do_insight:
+        opt.runs_path = tag + 'do_insight'
+    else:
+        opt.runs_path = tag + 'no_insight'
+    AG.learn(opt)
+
     if False:
 
         GAN_losses = ['original', 'wasserstein', 'ian', 'alternative']
@@ -61,6 +70,17 @@ for expname in experiments.keys():
                 AG.learn(opt)
 
     base = 2
+
+
+    tag, opt = init()
+    opt.runs_path = tag + 'low_batch_size'
+    opt.batch_size //= base
+    AG.learn(opt)
+
+    tag, opt = init()
+    opt.runs_path = tag + 'high_batch_size'
+    opt.batch_size *= base
+    AG.learn(opt)
 
     # what's the effect of a smaller latent_dim ?
     tag, opt = init()
@@ -220,6 +240,7 @@ for expname in experiments.keys():
         opt.runs_path = tag + 'no_SSIM'
     AG.learn(opt)
 
+
     if False:
 
         tag, opt = init()
@@ -238,16 +259,6 @@ for expname in experiments.keys():
             opt.runs_path = tag + 'no_bias'
         AG.learn(opt)
 
-        if True:
-            tag, opt = init()
-            opt.runs_path = tag + 'low_batch_size'
-            opt.batch_size //= base
-            AG.learn(opt)
-
-            tag, opt = init()
-            opt.runs_path = tag + 'high_batch_size'
-            opt.batch_size *= base
-            AG.learn(opt)
 
         tag, opt = init()
         opt.runs_path = tag + 'low_beta1'

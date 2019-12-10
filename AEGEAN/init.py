@@ -18,7 +18,7 @@ def init():
                         help="TensorBoard folder to save samples data and statistics")
     parser.add_argument("--n_epochs", type=int, default=256,
                         help="number of epochs of training")
-    parser.add_argument("--batch_size", type=int, default=32, help="size of the batches")
+    parser.add_argument("--batch_size", type=int, default=64, help="size of the batches")
     parser.add_argument("--rand_hflip", type=bool, default=True,
                         help="data augmentation: horizontal flip")
     parser.add_argument("--rand_affine", type=float, default=2.,
@@ -40,6 +40,7 @@ def init():
     parser.add_argument("--do_bias", type=bool, default=True, help="Should we use biases in convolutions?")
     parser.add_argument("--lrelu", type=float, default=0., help="LeakyReLU : alpha - zero for a standard ReLU")
     parser.add_argument("--do_joint", type=bool, default=True, help="Do a joint learning of E and G, dude.")
+    parser.add_argument("--do_insight", type=bool, default=False, help="D looks at G_E_x instead of x.")
     parser.add_argument("--bn_eps", type=float, default=0.0001,
                         help="batchnorm: espilon for numerical stability")
     parser.add_argument("--bn_momentum", type=float, default=.5,
