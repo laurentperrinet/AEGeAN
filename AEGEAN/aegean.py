@@ -475,6 +475,10 @@ def do_learn(opt):
                     # except:
                     #     pass
 
+                # inception score
+                IS, _ = get_inception_score(gen_imgs, cuda=use_cuda, batch_size=opt.batch_size//4, resize=True, splits=1)
+                writer.add_scalar('InceptionScore', IS, global_step=iteration)
+
 
         if do_tensorboard:
             # writer.add_scalar('D_x/max', hist["D_x_max"][j], global_step=epoch)
