@@ -26,21 +26,21 @@ def init():
     parser.add_argument("--init_weight", type=bool, default=False,
                         help="initialize weights to normal")
     parser.add_argument("--gamma", type=float, default=1., help="gamma correction of images")
-    parser.add_argument("--lambdaE", type=float, default=.001, help="regularization parameter for E")
+    parser.add_argument("--lambdaE", type=float, default=.0005, help="regularization parameter for E")
     parser.add_argument("--lrE", type=float, default=0.001, help="learning rate for E")
     parser.add_argument("--lrD", type=float, default=0.0025, help="learning rate for D")
     parser.add_argument("--lrG", type=float, default=0.00025, help="learning rate for G supervised by D")
     parser.add_argument("--valid_smooth", type=float, default=1.,
                         help="Smoothing the results of D on real images")
-    parser.add_argument("--E_noise", type=float, default=0.005, help="Add noise to the input images to G_E_x")
-    parser.add_argument("--D_noise", type=float, default=0.01, help="Add noise to the input images to D_x")
-    parser.add_argument("--G_noise", type=float, default=0.01, help="Add noise to the input images to D_G_z")
+    parser.add_argument("--E_noise", type=float, default=0.01, help="Add noise to the input images to G_E_x")
+    parser.add_argument("--D_noise", type=float, default=0.02, help="Add noise to the input images to D_x")
+    parser.add_argument("--G_noise", type=float, default=0.05, help="Add noise to the input images to D_G_z")
     parser.add_argument("--GAN_loss", type=str, default='original', help="Use different losses for G.")
     parser.add_argument("--do_SSIM", type=bool, default=True, help="Use contrasted images for the cost of E.")
     parser.add_argument("--do_bias", type=bool, default=True, help="Should we use biases in convolutions?")
     parser.add_argument("--lrelu", type=float, default=0., help="LeakyReLU : alpha - zero for a standard ReLU")
     parser.add_argument("--do_joint", type=bool, default=True, help="Do a joint learning of E and G, dude.")
-    parser.add_argument("--do_insight", type=bool, default=False, help="D looks at G_E_x instead of x.")
+    parser.add_argument("--do_insight", type=bool, default=True, help="D looks at G_E_x instead of x.")
     parser.add_argument("--bn_eps", type=float, default=0.0001,
                         help="batchnorm: espilon for numerical stability")
     parser.add_argument("--bn_momentum", type=float, default=.5,
@@ -53,7 +53,7 @@ def init():
     parser.add_argument("--channel1", type=int, default=64, help="size of channel 1")
     parser.add_argument("--channel2", type=int, default=64, help="size of channel 2")
     parser.add_argument("--channel3", type=int, default=256, help="size of channel 3")
-    parser.add_argument("--latent_dim", type=int, default=30,
+    parser.add_argument("--latent_dim", type=int, default=23,
                         help="dimensionality of the latent space")
     parser.add_argument("--latent_threshold", type=float, default=0., help="threshold for decimating the latent vector")
     parser.add_argument("--kernel_size", type=int, default=9, help="size of the kernels")
@@ -62,7 +62,7 @@ def init():
     parser.add_argument("--img_size", type=int, default=128//DEBUG, help="size of each image dimension")
     parser.add_argument("--window_size", type=int, default=8, help="size of window_size for SSIM")
     parser.add_argument("--channels", type=int, default=3, help="number of input image channels")
-    parser.add_argument("--sample_interval", type=int, default=10, help="interval in epochs between image sampling")
+    parser.add_argument("--sample_interval", type=int, default=8, help="interval in epochs between image sampling")
     parser.add_argument("--N_samples", type=int, default=48, help="number of images each sampling")
     # parser.add_argument("--model_save_interval", type=int, default=5000,
     #                     help="interval between image sampling. If model_save_interval > n_epochs : no save")

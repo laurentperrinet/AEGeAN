@@ -7,15 +7,19 @@ import numpy as np
 # PID, HOST = os.getpid(), os.uname()[1]
 
 experiments = {}
-# experiments['AEGEAN_128'] = []
 experiments['AEGEAN_256'] = [('img_size', 256), ]
-experiments['Simpsons_128'] = [('datapath', '../database/Simpsons-Face_clear/cp/'), ('img_size', 128), ('n_epochs', 128)]
+# experiments['AEGEAN_128'] = [('img_size', 128), ]
+# experiments['Holidays'] = [('datapath', '/Users/laurentperrinet/quantic/Photos/2019/08'), ('img_size', 128)]
+# experiments['clouds'] = [('datapath', '../database/downloads/cloud/'), ('img_size', 256)]
+experiments['Simpsons_256'] = [('datapath', '../database/Simpsons-Face_clear/cp/'), ('img_size', 256), ('do_SSIM', False)]
+# experiments['Simpsons_64'] = [('datapath', '../database/Simpsons-Face_clear/cp/'), ('img_size', 64), ('n_epochs', 64), ('do_SSIM', False)]
+# experiments['butterflies_256'] = [('datapath', '../database/swapnesh_butterflies/'), ('img_size', 256)]
+# experiments['butterflies_64'] = [('datapath', '../database/swapnesh_butterflies/'), ('img_size', 64)]
+# experiments['butterflies_256'] = [('datapath', '../database/swapnesh_butterflies/'), ('img_size', 256)]
+# experiments['Simpsons_128'] = [('datapath', '../database/Simpsons-Face_clear/cp/'), ('img_size', 128), ('n_epochs', 128), ('do_SSIM', False)]
 # experiments['AEGEAN_64'] = [('img_size', 64), ('n_epochs', 64)]
-experiments['AE'] = [('lrG', 0.), ('img_size', 64), ('n_epochs', 64)] # still training the discriminator but G is not supervised by D
+# experiments['AE'] = [('lrG', 0.), ('img_size', 64), ('n_epochs', 64)] # still training the discriminator but G is not supervised by D
 # experiments['AE'] = [('lrG', 0.), ('lrD', 0.)]
-experiments['Simpsons_64'] = [('datapath', '../database/Simpsons-Face_clear/cp/'), ('img_size', 64), ('n_epochs', 64)]
-experiments['Holidays'] = [('datapath', '/Users/laurentperrinet/quantic/Photos/2019/08'), ('img_size', 64)]
-experiments['AEGEAN_256'] = [('img_size', 256)]
 
 for expname in experiments.keys():
     def init():
@@ -37,6 +41,7 @@ for expname in experiments.keys():
     if opt.do_joint:
         opt.runs_path = tag + 'do_joint'
     else:
+        opt.do_insight = False
         opt.runs_path = tag + 'no_joint'
     AG.learn(opt)
 
@@ -49,9 +54,10 @@ for expname in experiments.keys():
         opt.runs_path = tag + 'no_insight'
     AG.learn(opt)
 
-    if False:
+    if True:
 
-        GAN_losses = ['original', 'wasserstein', 'ian', 'alternative']
+        # GAN_losses = ['original', 'wasserstein', 'ian', 'alternative']
+        GAN_losses = ['original', 'ian', ]
         for GAN_loss in GAN_losses:
             tag, opt = init()
             if opt.lrD > 0:
@@ -97,11 +103,6 @@ for expname in experiments.keys():
     opt.runs_path = tag + 'no_latent_threshold' if opt.latent_threshold==0. else tag + f'latent_threshold_{str(opt.latent_threshold)}'
     AG.learn(opt)
 
-    tag, opt = init()
-    opt.gamma = .618 if opt.gamma==1. else 1.
-    # opt.gamma = 1.
-    opt.runs_path = tag + f'gamma_{str(opt.gamma)}'
-    AG.learn(opt)
 
     tag, opt = init()
     opt.runs_path = tag + 'small_lrE'
@@ -138,6 +139,13 @@ for expname in experiments.keys():
         AG.learn(opt)
 
     if False:
+
+        tag, opt = init()
+        opt.gamma = .618 if opt.gamma==1. else 1.
+        # opt.gamma = 1.
+        opt.runs_path = tag + f'gamma_{str(opt.gamma)}'
+        AG.learn(opt)
+
         tag, opt = init()
         opt.runs_path = tag + 'small_window_size'
         opt.window_size //= base
