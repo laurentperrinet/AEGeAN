@@ -5,10 +5,13 @@ run:
 	sbatch launch.sh
 
 run_CFD:
-	python3 -c'import AEGEAN as AG; opt = AG.init(); opt.runs_path = "AEGEAN_long"; opt.n_epochs=1024; AG.learn(opt)'
+	python3 -c'import AEGEAN as AG; opt = AG.init(); opt.runs_path = "AEGEAN_long"; opt.n_epochs=16384; opt.sample_interval=128; AG.learn(opt)'
 
 run_simpsons:
-	python3 -c'import AEGEAN as AG; opt = AG.init(); opt.runs_path = "Simpsons_long"; opt.datapath="../database/Simpsons-Face_clear/cp/"; opt.n_epochs=1024; AG.learn(opt)'
+	python3 -c'import AEGEAN as AG; opt = AG.init(); opt.runs_path = "Simpsons_long"; opt.datapath="../database/Simpsons-Face_clear/cp/"; opt.n_epochs=16384; opt.sample_interval=128; AG.learn(opt)'
+
+run_butterflies:
+	python3 -c'import AEGEAN as AG; opt = AG.init(); opt.runs_path = "butterflies_long"; opt.n_epochs=16384; opt.sample_interval=128; AG.learn(opt)'
 
 # CODING
 pep8:
@@ -39,8 +42,8 @@ meso_pull:
 	# rsync --progress -avh --delete $(MESO_URL)/runs/ runs
 
 meso_push:
-	rsync --progress -avhuz runs $(MESO_URL)
-	# rsync --progress -avhuz --delete --exclude-from=.ExclusionRSync ../database $(MESO_URL)/..
+	#rsync --progress -avhuz runs $(MESO_URL)
+	rsync --progress -avhuz --delete --exclude-from=.ExclusionRSync ../database $(MESO_URL)/..
 
 load_modules:
 	module purge; module load userspace/all; module load python3/3.6.3; module load cuda/10.1
