@@ -11,7 +11,7 @@ run_simpsons:
 	python3 -c'import AEGEAN as AG; opt = AG.init(); opt.runs_path = "Simpsons_long"; opt.datapath="../database/Simpsons-Face_clear/cp/"; opt.n_epochs=16384; opt.sample_interval=128; AG.learn(opt)'
 
 run_butterflies:
-	python3 -c'import AEGEAN as AG; opt = AG.init(); opt.runs_path = "butterflies_long"; opt.n_epochs=16384; opt.sample_interval=128; AG.learn(opt)'
+	python3 -c'import AEGEAN as AG; opt = AG.init(); opt.runs_path = "butterflies_long"; opt.datapath="../database/swapnesh_butterflies/";  opt.n_epochs=16384; opt.sample_interval=128; AG.learn(opt)'
 
 # CODING
 pep8:
