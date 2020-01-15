@@ -1,6 +1,7 @@
 #!/bin/sh
 #SBATCH -J Job_GAN # <-- Change that
 #SBATCH -p gpu # kepler # <-- Could be also teslak40 (less memory)
+#SBATCH --mem-per-cpu=1gb
 #SBATCH --gres=gpu:1 # <-- Specify that you want to use 1 gpu for your python prog
 #SBATCH --gres-flags=enforce-binding # active l’affinité CPU:GPU
 #SBATCH -A h146  # <-- Do not change, we are all working under the same project
