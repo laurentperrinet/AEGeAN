@@ -210,7 +210,11 @@ def do_learn(opt):
             # add noise here to real_imgs
             real_imgs_ = real_imgs * 1.
             if opt.E_noise > 0:
-                noise = Variable(Tensor(np.random.normal(0, opt.E_noise, real_imgs.shape)), requires_grad=False)
+                # print(real_imgs.shape)
+                v_noise = np.random.normal(0, 1, real_imgs.shape) # one random image
+                v_noise *= np.abs(np.random.normal(0, 1, (real_imgs.shape[0], opt.channels, 1, 1))) # one contrast value per image
+                v_noise *= opt.E_noise # scaling
+                noise = Variable(Tensor(v_noise), requires_grad=False)
                 real_imgs_ = real_imgs_ + noise
 
             z_imgs = encoder(real_imgs_)
@@ -270,8 +274,10 @@ def do_learn(opt):
 
             real_imgs_ = real_imgs * 1.
             if opt.D_noise > 0:
-                # real_imgs_ += opt.D_noise * Variable(torch.randn(real_imgs.shape))
-                noise = Variable(Tensor(np.random.normal(0, opt.D_noise, real_imgs.shape)), requires_grad=False)
+                v_noise = np.random.normal(0, 1, real_imgs.shape) # one random image
+                v_noise *= np.abs(np.random.normal(0, 1, (real_imgs.shape[0], opt.channels, 1, 1))) # one contrast value per image
+                v_noise *= opt.D_noise # scaling
+                noise = Variable(Tensor(v_noise), requires_grad=False)
                 real_imgs_ = real_imgs_ + noise
 
             if opt.do_insight:
@@ -333,8 +339,10 @@ def do_learn(opt):
             # if opt.D_noise > 0:
             #     gen_imgs_ += opt.D_noise * Variable(torch.randn(gen_imgs.shape))
             if opt.D_noise > 0:
-                # real_imgs_ += opt.D_noise * Variable(torch.randn(real_imgs.shape))
-                noise = Variable(Tensor(np.random.normal(0, opt.D_noise, gen_imgs.shape)), requires_grad=False)
+                v_noise = np.random.normal(0, 1, real_imgs.shape) # one random image
+                v_noise *= np.abs(np.random.normal(0, 1, (real_imgs.shape[0], opt.channels, 1, 1))) # one contrast value per image
+                v_noise *= opt.D_noise # scaling
+                noise = Variable(Tensor(v_noise), requires_grad=False)
                 gen_imgs_ = gen_imgs_ + noise
 
             d_fake = discriminator(gen_imgs_.detach())
@@ -383,8 +391,10 @@ def do_learn(opt):
             # New discriminator decision (since we just updated D)
             gen_imgs_ = gen_imgs * 1.
             if opt.G_noise > 0:
-                # gen_imgs_ += opt.G_noise * Variable(torch.randn(gen_imgs.shape))
-                noise = Variable(Tensor(np.random.normal(0, opt.G_noise, gen_imgs.shape)), requires_grad=False)
+                v_noise = np.random.normal(0, 1, real_imgs.shape) # one random image
+                v_noise *= np.abs(np.random.normal(0, 1, (real_imgs.shape[0], opt.channels, 1, 1))) # one contrast value per image
+                v_noise *= opt.G_noise # scaling
+                noise = Variable(Tensor(v_noise), requires_grad=False)
                 gen_imgs_ = gen_imgs_ + noise
             d_g_z = discriminator(gen_imgs_)
 
