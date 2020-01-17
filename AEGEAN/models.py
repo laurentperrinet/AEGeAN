@@ -85,7 +85,8 @@ class Generator(nn.Module):
         self.channels = [opt.channel0, opt.channel1, opt.channel2, opt.channel3]
 
         def generator_block(in_channels, out_channels, bn=True):
-            block = [nn.UpsamplingNearest2d(scale_factor=opt.stride),
+            block = [#nn.UpsamplingNearest2d(scale_factor=opt.stride),
+                     nn.Upsample(scale_factor=opt.stride, mode='bilinear', align_corners=True),
                      nn.Conv2d(in_channels, out_channels, **opts_conv),
                      # TODO use nn.ConvTranspose2d(in_channels, out_channels, stride=opt.stride, **opts_conv),
                      ]
