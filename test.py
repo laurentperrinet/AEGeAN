@@ -7,6 +7,9 @@ import numpy as np
 # PID, HOST = os.getpid(), os.uname()[1]
 
 experiments = {}
+experiments['AEGEAN_64'] = [('img_size', 64), ('n_epochs', 512)]
+experiments['Simpsons_64'] = [('datapath', '../database/Simpsons-Face_clear/cp/'), ('img_size', 64), ('do_SSIM', False)]
+experiments['AEGEAN_128'] = [('img_size', 128), ('n_epochs', 512)]
 experiments['AEGEAN_256'] = [('img_size', 256), ]
 experiments['Simpsons_256'] = [('datapath', '../database/Simpsons-Face_clear/cp/'), ('img_size', 256), ('do_SSIM', False)]
 # experiments['AEGEAN_128'] = [('img_size', 128), ]
@@ -16,7 +19,7 @@ experiments['butterflies_256'] = [('datapath', '../database/swapnesh_butterflies
 # experiments['clouds'] = [('datapath', '../database/downloads/cloud/'), ('img_size', 256)]
 # experiments['Simpsons_64'] = [('datapath', '../database/Simpsons-Face_clear/cp/'), ('img_size', 64), ('n_epochs', 64), ('do_SSIM', False)]
 # experiments['Simpsons_128'] = [('datapath', '../database/Simpsons-Face_clear/cp/'), ('img_size', 128), ('n_epochs', 128), ('do_SSIM', False)]
-# experiments['AEGEAN_64'] = [('img_size', 64), ('n_epochs', 64)]
+#
 # experiments['AE'] = [('lrG', 0.), ('img_size', 64), ('n_epochs', 64)] # still training the discriminator but G is not supervised by D
 # experiments['AE'] = [('lrG', 0.), ('lrD', 0.)]
 # experiments['Holidays'] = [('datapath', '../../../../quantic/Photos/2019'), ('img_size', 128)]
@@ -138,7 +141,7 @@ for expname in experiments.keys():
         opt.lrG *= base
         AG.learn(opt)
 
-    if False:
+    if True:
 
         tag, opt = init()
         opt.gamma = .618 if opt.gamma==1. else 1.
@@ -194,6 +197,16 @@ for expname in experiments.keys():
         tag, opt = init()
         opt.runs_path = tag + 'big_channel3'
         opt.channel3 *= base
+        AG.learn(opt)
+
+        tag, opt = init()
+        opt.runs_path = tag + 'small_channel4'
+        opt.channel4 //= base
+        AG.learn(opt)
+
+        tag, opt = init()
+        opt.runs_path = tag + 'big_channel4'
+        opt.channel4 *= base
         AG.learn(opt)
 
     tag, opt = init()

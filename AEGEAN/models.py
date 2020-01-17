@@ -15,8 +15,8 @@ class Encoder(nn.Module):
         # NL = nn.LeakyReLU(opt.lrelu, inplace=True)
         NL = nn.ReLU(inplace=True)
         opts_conv = dict(kernel_size=opt.kernel_size, stride=opt.stride,
-                         padding=opt.padding, padding_mode='zeros')
-        self.channels = [opt.channel0, opt.channel1, opt.channel2, opt.channel3]
+                         padding=opt.padding, padding_mode='reflection')
+        self.channels = [opt.channel0, opt.channel1, opt.channel2, opt.channel3, opt.channel3]
 
         def encoder_block(in_channels, out_channels, bias, bn=True):
             block = [nn.Conv2d(in_channels, out_channels, bias=bias, **opts_conv), ]
@@ -32,9 +32,11 @@ class Encoder(nn.Module):
 
         self.init_size = opt.img_size // opt.stride**4
         # self.vector = nn.Linear(self.channels[3] * self.init_size ** 2, opt.latent_dim)
-        self.vector = nn.Sequential(
-            nn.Linear(self.channels[3] * self.init_size ** 2, opt.latent_dim),
-            # nn.Tanh(),
+        self.vector0 = nn.Sequential(
+            nn.Linear(self.channels[3] * self.init_size ** 2, self.channels[4]),
+        )
+        self.vector1 = nn.Sequential(
+            nn.Linear(self.channels[4], opt.latent_dim),
         )
 
         self.opt = opt
@@ -65,9 +67,12 @@ class Encoder(nn.Module):
         out = out.view(out.shape[0], -1)
         if self.opt.verbose:
             print("View out : ", out.shape, " init_size=", self.init_size)
-        out = self.vector(out)
+        out = self.vector0(out)
         if self.opt.verbose:
-            print("Z : ", out.shape)
+            print("Z0 : ", out.shape)
+        out = self.vector1(out)
+        if self.opt.verbose:
+            print("Z1 : ", out.shape)
 
         return out
 
@@ -81,8 +86,8 @@ class Generator(nn.Module):
         # NL = nn.LeakyReLU(opt.lrelu, inplace=True)
         NL = nn.ReLU(inplace=True)
         opts_conv = dict(kernel_size=opt.kernel_size, bias=opt.do_bias,
-                         padding=opt.padding, padding_mode='zeros')
-        self.channels = [opt.channel0, opt.channel1, opt.channel2, opt.channel3]
+                         padding=opt.padding, padding_mode='reflection')
+        self.channels = [opt.channel0, opt.channel1, opt.channel2, opt.channel3, opt.channel3]
 
         def generator_block(in_channels, out_channels, bn=True):
             block = [#nn.UpsamplingNearest2d(scale_factor=opt.stride),
@@ -95,9 +100,10 @@ class Generator(nn.Module):
             block.append(NL)
             return block
 
+        self.l0 = nn.Sequential(nn.Linear(opt.latent_dim, self.channels[4]), NL,)
         self.init_size = opt.img_size // opt.stride**3
         self.l1 = nn.Sequential(
-            nn.Linear(opt.latent_dim, self.channels[3] * self.init_size ** 2), NL,)
+            nn.Linear(self.channels[4], self.channels[3] * self.init_size ** 2), NL,)
 
         self.conv1 = nn.Sequential(*generator_block(self.channels[3], self.channels[2], bn=False),)
         self.conv2 = nn.Sequential(*generator_block(self.channels[2], self.channels[1]),)
@@ -116,7 +122,10 @@ class Generator(nn.Module):
         if self.opt.verbose:
             print("Generator")
         # Dim : opt.latent_dim
-        out = self.l1(z)
+        out = self.l0(z)
+        if self.opt.verbose:
+            print("l0 out : ", out.shape)
+        out = self.l1(out)
         if self.opt.verbose:
             print("l1 out : ", out.shape)
         out = out.view(out.shape[0], self.channels[3], self.init_size, self.init_size)
@@ -160,8 +169,8 @@ class Discriminator(nn.Module):
         # “Use LeakyReLU in the discriminator.” — Jonathan Hui https://link.medium.com/IYyQV6sMD0
         NL = nn.LeakyReLU(opt.lrelu, inplace=True)
         opts_conv = dict(kernel_size=opt.kernel_size, stride=opt.stride,
-                         padding=opt.padding, padding_mode='zeros')#,bias=opt.do_bias)
-        self.channels = [opt.channel0, opt.channel1, opt.channel2, opt.channel3]
+                         padding=opt.padding, padding_mode='reflection')#,bias=opt.do_bias)
+        self.channels = [opt.channel0, opt.channel1, opt.channel2, opt.channel3, opt.channel4]
 
         def discriminator_block(in_channels, out_channels, bn=True, bias=False):
             block = [nn.Conv2d(in_channels, out_channels, bias=bias, **opts_conv), ]  # , nn.Dropout2d(0.25)
@@ -180,8 +189,8 @@ class Discriminator(nn.Module):
 
         # The height and width of downsampled image
         self.init_size = opt.img_size // opt.stride**4
-        # self.adv_layer = nn.Sequential(nn.Linear(self.channels[3] * self.init_size ** 2, 1))#, nn.Sigmoid()
-        self.adv_layer = nn.Linear(self.channels[3] * self.init_size ** 2, 1)
+        self.LNL = nn.Sequential(nn.Linear(self.channels[3] * self.init_size ** 2, self.channels[4]), NL,)#, nn.Sigmoid()
+        self.adv_layer = nn.Linear(self.channels[4], 1)
 
     def forward(self, img):
         if self.opt.verbose:
@@ -209,6 +218,10 @@ class Discriminator(nn.Module):
         out = out.view(out.shape[0], -1)
         if self.opt.verbose:
             print("View out : ", out.shape)
+
+        out = self.LNL(out)
+        if self.opt.verbose:
+            print("LNL out : ", out.shape)
 
         validity = self.adv_layer(out)
         if self.opt.verbose:

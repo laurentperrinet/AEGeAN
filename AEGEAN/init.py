@@ -16,7 +16,7 @@ def init():
     parser = argparse.ArgumentParser()
     parser.add_argument("--runs_path", type=str, default='vanilla',
                         help="TensorBoard folder to save samples data and statistics")
-    parser.add_argument("--n_epochs", type=int, default=256,
+    parser.add_argument("--n_epochs", type=int, default=512,
                         help="number of epochs of training")
     parser.add_argument("--batch_size", type=int, default=32, help="size of the batches")
     parser.add_argument("--rand_hflip", type=bool, default=True,
@@ -50,9 +50,10 @@ def init():
     parser.add_argument("--beta2", type=float, default=0.975,
                         help="adam: decay of first order momentum of gradient")
     parser.add_argument("--channel0", type=int, default=16, help="size of channel 0")
-    parser.add_argument("--channel1", type=int, default=64, help="size of channel 1")
+    parser.add_argument("--channel1", type=int, default=32, help="size of channel 1")
     parser.add_argument("--channel2", type=int, default=64, help="size of channel 2")
-    parser.add_argument("--channel3", type=int, default=256, help="size of channel 3")
+    parser.add_argument("--channel3", type=int, default=128, help="size of channel 3")
+    parser.add_argument("--channel4", type=int, default=100, help="size of channel 4")
     parser.add_argument("--latent_dim", type=int, default=23,
                         help="dimensionality of the latent space")
     parser.add_argument("--latent_threshold", type=float, default=0., help="threshold for decimating the latent vector")
