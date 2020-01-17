@@ -18,7 +18,6 @@ matplotlib.use('Agg')
 
 # from .SimpsonsDataset import *
 
-# TODO use inception score from https://github.com/Zeleni9/pytorch-wgan/blob/master/utils/inception_score.py
 import torch
 from torch import nn
 from torch.autograd import Variable
@@ -28,6 +27,9 @@ from torchvision.models.inception import inception_v3
 import numpy as np
 from scipy.stats import entropy
 
+# TODO frechet distance
+
+#  inception score from https://github.com/Zeleni9/pytorch-wgan/blob/master/utils/inception_score.py
 def get_inception_score(imgs, cuda=True, batch_size=32, resize=False, splits=1):
     """
         Computes the inception score of the generated images imgs
