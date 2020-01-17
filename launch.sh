@@ -10,8 +10,8 @@
 #SBATCH -A h146  # <-- Do not change, we are all working under the same project
 #SBATCH -t 4-2  # <-- IMPORTANT :  this the duration of the simulation at the format : dd-hh:mm:ss. The simulation stopped even if not finished
 #SBATCH -N 1 # <-- The number of node you want to use
-#SBATCH -o %x.out.%a  # <-- the name of the file where the output of the simulation is written
-#SBATCH -e %x.err.%a  # <-- the name of the file where errors of the simulation are written
+#SBATCH -o log_%x_out_%a.log  # <-- the name of the file where the output of the simulation is written
+#SBATCH -e log_%x_err_%a.log  # <-- the name of the file where errors of the simulation are written
 
 module purge
 module load userspace/all
