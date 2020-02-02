@@ -89,9 +89,9 @@ class Generator(nn.Module):
                          padding=opt.padding, padding_mode='reflection')
         self.channels = [opt.channel0, opt.channel1, opt.channel2, opt.channel3, opt.channel3]
 
-        def generator_block(in_channels, out_channels, bn=True):
+        def generator_block(in_channels, out_channels, bn=True, stride=1):
             block = [#nn.UpsamplingNearest2d(scale_factor=opt.stride),
-                     nn.Upsample(scale_factor=opt.stride, mode='bilinear', align_corners=True),
+                     nn.Upsample(scale_factor=stride, mode='bilinear', align_corners=True),
                      nn.Conv2d(in_channels, out_channels, **opts_conv),
                      # TODO use
                      # nn.ConvTranspose2d(in_channels, out_channels, stride=opt.stride, **opts_conv),
@@ -102,14 +102,14 @@ class Generator(nn.Module):
             return block
 
         self.l0 = nn.Sequential(nn.Linear(opt.latent_dim, self.channels[4]), NL,)
-        self.l00 = nn.Sequential(nn.Linear(self.channels[4], self.channels[4]), NL,)
-        self.init_size = opt.img_size // opt.stride**3
+        # self.l00 = nn.Sequential(nn.Linear(self.channels[4], self.channels[4]), NL,)
+        self.init_size = opt.img_size // opt.stride**2 # no stride at the first conv
         self.l1 = nn.Sequential(
             nn.Linear(self.channels[4], self.channels[3] * self.init_size ** 2), NL,)
 
-        self.conv1 = nn.Sequential(*generator_block(self.channels[3], self.channels[2], bn=False),)
-        self.conv2 = nn.Sequential(*generator_block(self.channels[2], self.channels[1]),)
-        self.conv3 = nn.Sequential(*generator_block(self.channels[1], self.channels[0]),)
+        self.conv1 = nn.Sequential(*generator_block(self.channels[3], self.channels[2], bn=False, stride=1),)
+        self.conv2 = nn.Sequential(*generator_block(self.channels[2], self.channels[1], stride=opt.stride),)
+        self.conv3 = nn.Sequential(*generator_block(self.channels[1], self.channels[0], stride=opt.stride),)
 
 
         self.conv_blocks = nn.Sequential(
@@ -127,9 +127,9 @@ class Generator(nn.Module):
         out = self.l0(z)
         if self.opt.verbose:
             print("l0 out : ", out.shape)
-        out = self.l00(out)
-        if self.opt.verbose:
-            print("l00 out : ", out.shape)
+        # out = self.l00(out)
+        # if self.opt.verbose:
+        #     print("l00 out : ", out.shape)
         out = self.l1(out)
         if self.opt.verbose:
             print("l1 out : ", out.shape)
