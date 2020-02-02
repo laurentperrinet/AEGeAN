@@ -7,13 +7,13 @@ import numpy as np
 # PID, HOST = os.getpid(), os.uname()[1]
 
 experiments = {}
-experiments['AEGEAN_64'] = [('img_size', 64), ('n_epochs', 512)]
-experiments['Simpsons_64'] = [('datapath', '../database/Simpsons-Face_clear/cp/'), ('img_size', 64), ('do_SSIM', False)]
-experiments['AEGEAN_128'] = [('img_size', 128), ('n_epochs', 512)]
+# experiments['AEGEAN_64'] = [('img_size', 64), ('n_epochs', 512)]
+# experiments['Simpsons_64'] = [('datapath', '../database/Simpsons-Face_clear/cp/'), ('img_size', 64), ('do_SSIM', False)]
+# experiments['AEGEAN_128'] = [('img_size', 128), ('n_epochs', 512)]
 experiments['AEGEAN_256'] = [('img_size', 256), ]
-experiments['Simpsons_256'] = [('datapath', '../database/Simpsons-Face_clear/cp/'), ('img_size', 256), ('do_SSIM', False)]
+# experiments['Simpsons_256'] = [('datapath', '../database/Simpsons-Face_clear/cp/'), ('img_size', 256), ('do_SSIM', False)]
 # experiments['AEGEAN_128'] = [('img_size', 128), ]
-experiments['butterflies_256'] = [('datapath', '../database/swapnesh_butterflies/'), ('img_size', 256)]
+# experiments['butterflies_256'] = [('datapath', '../database/swapnesh_butterflies/'), ('img_size', 256)]
 # experiments['butterflies_64'] = [('datapath', '../database/swapnesh_butterflies/'), ('img_size', 64)]
 # experiments['butterflies_256'] = [('datapath', '../database/swapnesh_butterflies/'), ('img_size', 256)]
 # experiments['clouds'] = [('datapath', '../database/downloads/cloud/'), ('img_size', 256)]
@@ -23,6 +23,8 @@ experiments['butterflies_256'] = [('datapath', '../database/swapnesh_butterflies
 # experiments['AE'] = [('lrG', 0.), ('img_size', 64), ('n_epochs', 64)] # still training the discriminator but G is not supervised by D
 # experiments['AE'] = [('lrG', 0.), ('lrD', 0.)]
 # experiments['Holidays'] = [('datapath', '../../../../quantic/Photos/2019'), ('img_size', 128)]
+
+do_test = True
 
 for expname in experiments.keys():
     def init():
@@ -262,7 +264,7 @@ for expname in experiments.keys():
     AG.learn(opt)
 
 
-    if False:
+    if do_test:
 
         tag, opt = init()
         opt.init_weight = not opt.init_weight
@@ -348,7 +350,7 @@ for expname in experiments.keys():
     opt.lambdaE *= base
     AG.learn(opt)
 
-    if False:
+    if do_test:
 
         tag, opt = init()
         opt.runs_path = tag + 'small_bn_eps'
