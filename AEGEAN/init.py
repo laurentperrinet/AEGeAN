@@ -54,7 +54,7 @@ def init():
     parser.add_argument("--channel2", type=int, default=64, help="size of channel 2")
     parser.add_argument("--channel3", type=int, default=128, help="size of channel 3")
     parser.add_argument("--channel4", type=int, default=2048, help="size of layer 4")
-    parser.add_argument("--latent_dim", type=int, default=23,
+    parser.add_argument("--latent_dim", type=int, default=42,
                         help="dimensionality of the latent space")
     parser.add_argument("--latent_threshold", type=float, default=0., help="threshold for decimating the latent vector")
     parser.add_argument("--kernel_size", type=int, default=9, help="size of the kernels")
