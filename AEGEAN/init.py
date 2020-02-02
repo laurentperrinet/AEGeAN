@@ -58,7 +58,7 @@ def init():
                         help="dimensionality of the latent space")
     parser.add_argument("--latent_threshold", type=float, default=0., help="threshold for decimating the latent vector")
     parser.add_argument("--kernel_size", type=int, default=9, help="size of the kernels")
-    parser.add_argument("--stride", type=int, default=2, help="stride")
+    parser.add_argument("--stride", type=int, default=1, help="stride")
     parser.add_argument("--padding", type=int, default=4, help="padding")
     parser.add_argument("--img_size", type=int, default=128//DEBUG, help="size of each image dimension")
     parser.add_argument("--window_size", type=int, default=8, help="size of window_size for SSIM")
