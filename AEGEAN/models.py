@@ -93,7 +93,8 @@ class Generator(nn.Module):
             block = [#nn.UpsamplingNearest2d(scale_factor=opt.stride),
                      nn.Upsample(scale_factor=opt.stride, mode='bilinear', align_corners=True),
                      nn.Conv2d(in_channels, out_channels, **opts_conv),
-                     # TODO use nn.ConvTranspose2d(in_channels, out_channels, stride=opt.stride, **opts_conv),
+                     # TODO use
+                     # nn.ConvTranspose2d(in_channels, out_channels, stride=opt.stride, **opts_conv),
                      ]
             if bn and (not opt.bn_eps == np.inf):
                 block.append(nn.BatchNorm2d(num_features=out_channels, eps=opt.bn_eps, momentum=opt.bn_momentum))
@@ -101,6 +102,7 @@ class Generator(nn.Module):
             return block
 
         self.l0 = nn.Sequential(nn.Linear(opt.latent_dim, self.channels[4]), NL,)
+        self.l00 = nn.Sequential(nn.Linear(self.channels[4], self.channels[4]), NL,)
         self.init_size = opt.img_size // opt.stride**3
         self.l1 = nn.Sequential(
             nn.Linear(self.channels[4], self.channels[3] * self.init_size ** 2), NL,)
@@ -125,6 +127,9 @@ class Generator(nn.Module):
         out = self.l0(z)
         if self.opt.verbose:
             print("l0 out : ", out.shape)
+        out = self.l00(out)
+        if self.opt.verbose:
+            print("l00 out : ", out.shape)
         out = self.l1(out)
         if self.opt.verbose:
             print("l1 out : ", out.shape)
