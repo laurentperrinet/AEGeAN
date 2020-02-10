@@ -484,8 +484,8 @@ def do_learn(opt):
                 #     pass
 
             # inception score
-            IS, _ = get_inception_score(gen_imgs, cuda=use_cuda, batch_size=opt.batch_size//4, resize=True, splits=1)
-            writer.add_scalar('InceptionScore', IS, global_step=epoch)
+            # IS, _ = get_inception_score(gen_imgs, cuda=use_cuda, batch_size=opt.batch_size//4, resize=True, splits=1)
+            # writer.add_scalar('InceptionScore', IS, global_step=epoch)
 
             # writer.add_scalar('D_x/max', hist["D_x_max"][j], global_step=epoch)
             # writer.add_scalar('D_x/min', hist["D_x_min"][j], global_step=epoch)

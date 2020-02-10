@@ -120,12 +120,14 @@ class Generator(nn.Module):
             nn.Sigmoid(),
         )
         self.bg_block = nn.Sequential(
-            nn.Conv2d(opt.channel0_bg, opt.channels, **opts_conv),
+            nn.Conv2d(opt.channel0_bg, opt.channels, kernel_size=opt.kernel_size, bias=opt.do_bias,
+                             padding=opt.padding, padding_mode='circular'),
             nn.Sigmoid(),
         )
         self.mask_block = nn.Sequential(
             #nn.MaxPool2d(kernel_size=opt.kernel_size, padding=opt.padding, stride=1), # https://pytorch.org/docs/stable/nn.html#torch.nn.MaxPool2d
-            nn.Conv2d(self.channels[0], 1, **opts_conv),
+            nn.Conv2d(self.channels[0], 1, kernel_size=opt.kernel_size, bias=True,
+                             padding=opt.padding, padding_mode='reflection'),
             #nn.Sigmoid(),
         )
 
