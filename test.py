@@ -7,10 +7,10 @@ import numpy as np
 # PID, HOST = os.getpid(), os.uname()[1]
 
 experiments = {}
-# experiments['AEGEAN_64'] = [('img_size', 64), ('n_epochs', 512)]
+experiments['AEGEAN_64'] = [('img_size', 64)]# , ('n_epochs', 512)]
 # experiments['Simpsons_64'] = [('datapath', '../database/Simpsons-Face_clear/cp/'), ('img_size', 64), ('do_SSIM', False)]
 # experiments['AEGEAN_128'] = [('img_size', 128), ('n_epochs', 512)]
-experiments['AEGEAN_256'] = [('img_size', 256), ]
+# experiments['AEGEAN_256'] = [('img_size', 256), ]
 # experiments['Simpsons_256'] = [('datapath', '../database/Simpsons-Face_clear/cp/'), ('img_size', 256), ('do_SSIM', False)]
 # experiments['AEGEAN_128'] = [('img_size', 128), ]
 # experiments['butterflies_256'] = [('datapath', '../database/swapnesh_butterflies/'), ('img_size', 256)]
