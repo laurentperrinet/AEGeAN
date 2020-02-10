@@ -124,8 +124,8 @@ class Generator(nn.Module):
             nn.Sigmoid(),
         )
         self.mask_block = nn.Sequential(
+            nn.MaxPool2d(kernel_size=opt.kernel_size, padding=opt.padding, stride=1), # https://pytorch.org/docs/stable/nn.html#torch.nn.MaxPool2d
             nn.Conv2d(self.channels[0], 1, **opts_conv),
-            nn.MaxPool2d(kernel_size=opt.kernel_size, padding=opt.padding), # https://pytorch.org/docs/stable/nn.html#torch.nn.MaxPool2d
             #nn.Sigmoid(),
         )
 
@@ -163,9 +163,13 @@ class Generator(nn.Module):
         if self.opt.verbose:
             print("Conv3 out : ", out.shape)
 
-        # TODO: implement some sort of generator for the background + mask to merge it with the figure
+        # implement a prior in the generator for the background + mask to merge it with the figure
         img = self.img_block(out[:, :self.channel0_img, :, :])
         bg = self.bg_block(out[:, self.channel0_img:, :, :])
+        # random translation https://pytorch.org/docs/stable/torch.html#torch.roll
+        shift_x, shift_y = int(self.opt.img_size*np.random.rand()), int(self.opt.img_size*np.random.rand())
+        bg = torch.roll(bg, shifts=(shift_x, shift_y), dims=(-2, -1))
+
         mask = self.mask_block(out)
         # Dim : (opt.chanels, opt.img_size, opt.img_size)
         if self.opt.verbose:
