@@ -177,7 +177,7 @@ class Generator(nn.Module):
             print("mask shape : ", mask.shape)
             print("bg shape : ", bg.shape)
 
-        out = img * (mask>0) + bg * (mask<0)
+        out = img * (mask>0).type_as(mask) + bg * (mask<0).type_as(mask)
         # https://en.wikipedia.org/wiki/Gamma_correction
         if self.opt.verbose:
             print("out Image min-max : ", out.min(), out.max())
