@@ -49,7 +49,8 @@ def init():
                         help="adam: decay of first order momentum of gradient")
     parser.add_argument("--beta2", type=float, default=0.975,
                         help="adam: decay of first order momentum of gradient")
-    parser.add_argument("--channel0", type=int, default=16, help="size of channel 0")
+    parser.add_argument("--channel0_bg", type=int, default=8, help="size of channel 0")
+    parser.add_argument("--channel0", type=int, default=32, help="size of channel 0")
     parser.add_argument("--channel1", type=int, default=64, help="size of channel 1")
     parser.add_argument("--channel2", type=int, default=64, help="size of channel 2")
     parser.add_argument("--channel3", type=int, default=128, help="size of channel 3")

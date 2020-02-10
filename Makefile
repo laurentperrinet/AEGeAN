@@ -6,7 +6,7 @@ run:
 
 test:
 	rm -fr runs/AEGEAN_test
-	python3 -c'import AEGEAN as AG; opt = AG.init(); opt.runs_path = "AEGEAN_test"; opt.img_size = 64; AG.learn(opt)'
+	python3 -c'import AEGEAN as AG; opt = AG.init(); opt.runs_path = "AEGEAN_test"; opt.img_size = 64; opt.verbose=True; AG.learn(opt)'
 
 run_CFD:
 	python3 -c'import AEGEAN as AG; opt = AG.init(); opt.runs_path = "AEGEAN_long"; opt.n_epochs=16384; opt.sample_interval=128; AG.learn(opt)'

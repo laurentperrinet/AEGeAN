@@ -47,8 +47,11 @@ class Encoder(nn.Module):
         if self.opt.verbose:
             print("Image shape : ", img.shape)
             print("Image min-max : ", img.min(), img.max())
-        # https://en.wikipedia.org/wiki/Gamma_correction
-        out = torch.pow(img, self.opt.gamma)
+        if not(self.opt.gamma == 1.):
+            # https://en.wikipedia.org/wiki/Gamma_correction
+            out = torch.pow(img, self.opt.gamma)
+        else:
+            out = img * 1.
         if self.opt.verbose:
             print("Image shape : ", out.shape)
         out = self.conv1(out)
@@ -111,11 +114,18 @@ class Generator(nn.Module):
         self.conv2 = nn.Sequential(*generator_block(self.channels[2], self.channels[1], stride=opt.stride),)
         self.conv3 = nn.Sequential(*generator_block(self.channels[1], self.channels[0], stride=opt.stride),)
 
-
-        self.conv_blocks = nn.Sequential(
-            nn.Conv2d(self.channels[0], opt.channels, **opts_conv), #, kernel_size=3, stride=1, padding=1, bias=True),
-            # nn.Tanh(),
+        self.channel0_img = self.channels[0]-opt.channel0_bg
+        self.img_block = nn.Sequential(
+            nn.Conv2d(self.channel0_img, opt.channels, **opts_conv),
             nn.Sigmoid(),
+        )
+        self.bg_block = nn.Sequential(
+            nn.Conv2d(opt.channel0_bg, opt.channels, **opts_conv),
+            nn.Sigmoid(),
+        )
+        self.mask_block = nn.Sequential(
+            nn.Conv2d(self.channels[0], 1, **opts_conv),
+            #nn.Sigmoid(),
         )
 
         self.opt = opt
@@ -152,15 +162,22 @@ class Generator(nn.Module):
         if self.opt.verbose:
             print("Conv3 out : ", out.shape)
 
-        out = self.conv_blocks(out)
+        # TODO: implement some sort of generator for the background + mask to merge it with the figure
+        img = self.img_block(out[:, :self.channel0_img, :, :])
+        bg = self.bg_block(out[:, self.channel0_img:, :, :])
+        mask = self.mask_block(out)
         # Dim : (opt.chanels, opt.img_size, opt.img_size)
         if self.opt.verbose:
-            print("img out : ", out.shape)
+            print("img shape : ", img.shape)
+            print("mask shape : ", mask.shape)
+            print("bg shape : ", bg.shape)
 
+        out = img * (mask>0) + bg * (mask<0)
         # https://en.wikipedia.org/wiki/Gamma_correction
         if self.opt.verbose:
             print("out Image min-max : ", out.min(), out.max())
-        out = torch.pow(out, 1/self.opt.gamma)
+        if not(self.opt.gamma == 1.):
+            out = torch.pow(out, 1/self.opt.gamma)
 
         return out
 
