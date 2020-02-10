@@ -113,7 +113,7 @@ class Generator(nn.Module):
 
 
         self.conv_blocks = nn.Sequential(
-            nn.Conv2d(self.channels[0], opt.channels, kernel_size=3, stride=1, padding=1, bias=True),
+            nn.Conv2d(self.channels[0], opt.channels, **opts_conv), #, kernel_size=3, stride=1, padding=1, bias=True),
             # nn.Tanh(),
             nn.Sigmoid(),
         )

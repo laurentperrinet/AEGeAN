@@ -249,8 +249,7 @@ def do_learn(opt):
                 e_loss += opt.lambdaE * (torch.sum(z_imgs)/opt.batch_size/opt.latent_dim).pow(2)
                 e_loss += opt.lambdaE * (torch.sum(z_imgs.pow(2))/opt.batch_size/opt.latent_dim-1).pow(2).pow(.5)
 
-                # TODO check that E_x and z have similar stats
-                # TODO use wasserstein for this cost?
+                # in the TB, we check that E_x and z have similar stats
 
             # Backward
             e_loss.backward()
