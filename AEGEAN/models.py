@@ -121,7 +121,7 @@ class Generator(nn.Module):
         )
         self.bg_block = nn.Sequential(
             nn.Conv2d(opt.channel0_bg, opt.channels, kernel_size=opt.kernel_size, bias=opt.do_bias,
-                             padding=opt.padding, padding_mode='circular'),
+                             padding=opt.padding, padding_mode='constant'),
             nn.Sigmoid(),
         )
         self.mask_block = nn.Sequential(
