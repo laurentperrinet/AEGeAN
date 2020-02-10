@@ -356,40 +356,11 @@ def sampling(noise, generator, path, epoch, tag='', nrow=8):
     """
     generator.eval()
     gen_imgs = generator(noise)
-    save_image(gen_imgs.data[:], "%s/%s_%d.png" %
-               (path, tag, epoch), normalize=True, nrow=nrow, range=(0, 1))
+    save_image(gen_imgs.data[:], f"{path}/{tag}_{epoch:04d}.png", normalize=True, nrow=nrow, range=(0, 1))
     generator.train()
 
 
-def tensorboard_sampling(noise, generator, writer, epoch, nrow=8, image_type='Generated images'):
-    """
-    Use generator model and noise vector to generate images.
-    Save them to tensorboard
-    """
-    generator.eval()
-    gen_imgs = generator(noise)
-    grid = torchvision.utils.make_grid(gen_imgs, normalize=True, nrow=nrow, range=(0, 1))
-    writer.add_image(image_type, grid, epoch)
-    generator.train()
 
-
-def tensorboard_AE_comparator(imgs, generator, encoder, writer, epoch, nrow=8):
-    """
-    Use auto-encoder model and original images to generate images.
-    Save them to tensorboard
-
-    """
-    grid_imgs = torchvision.utils.make_grid(imgs, normalize=True, nrow=nrow, range=(0, 1))
-    writer.add_image('Images/original', grid_imgs, epoch)
-
-    generator.eval()
-    encoder.eval()
-    enc_imgs = encoder(imgs)
-    dec_imgs = generator(enc_imgs)
-    grid_dec = torchvision.utils.make_grid(dec_imgs, normalize=True, nrow=nrow, range=(0, 1))
-    writer.add_image('Images/auto-encoded', grid_dec, epoch)
-    generator.train()
-    encoder.train()
 #
 #
 # def tensorboard_LSD_comparator(imgs, vectors, generator, writer, epoch, nrow=8):
@@ -407,16 +378,16 @@ def tensorboard_AE_comparator(imgs, generator, encoder, writer, epoch, nrow=8):
 #     writer.add_image('Images/generated', grid_g_v, epoch)
 #     generator.train()
 #
-
-def AE_sampling(imgs, encoder, generator, path, epoch, nrow=8):
-    generator.eval()
-    enc_imgs = encoder(imgs)
-    dec_imgs = generator(enc_imgs)
-    save_image(imgs.data[:16], "%s/%d_img.png" %
-               (path, epoch), nrow=nrow, normalize=True, range=(0, 1))
-    save_image(dec_imgs.data[:16], "%s/%d_dec.png" %
-               (path, epoch), nrow=nrow, normalize=True, range=(0, 1))
-    generator.train()
+#
+# def AE_sampling(imgs, encoder, generator, path, epoch, nrow=8):
+#     generator.eval()
+#     enc_imgs = encoder(imgs)
+#     dec_imgs = generator(enc_imgs)
+#     save_image(imgs.data[:16], "%s/%d_img.png" %
+#                (path, epoch), nrow=nrow, normalize=True, range=(0, 1))
+#     save_image(dec_imgs.data[:16], "%s/%d_dec.png" %
+#                (path, epoch), nrow=nrow, normalize=True, range=(0, 1))
+#     generator.train()
 
 
 def print_network(net):

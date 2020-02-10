@@ -445,52 +445,49 @@ def do_learn(opt):
                     % (opt.runs_path, epoch, opt.n_epochs, i+1, len(dataloader), e_loss.item(), time.time()-t_batch)
                 )
 
-            if do_tensorboard:
-                # Tensorboard save
-                iteration = i + nb_batch * j
-                writer.add_scalar('loss/E', e_loss.item(), global_step=iteration)
-                writer.add_histogram('coeffs/z', z, global_step=iteration)
-                try:
-                    writer.add_histogram('coeffs/E_x', z_imgs, global_step=iteration)
-                except:
-                    pass
-                writer.add_histogram('image/x', real_imgs, global_step=iteration)
-                try:
-                    writer.add_histogram('image/E_G_x', decoded_imgs, global_step=iteration)
-                except:
-                    pass
-                try:
-                    writer.add_histogram('image/G_z', gen_imgs, global_step=iteration)
-                except:
-                    pass
-                if opt.lrG > 0:
-                    writer.add_scalar('loss/G', g_loss.item(), global_step=iteration)
-                    # writer.add_scalar('score/D_fake', hist["d_fake_mean"][i], global_step=iteration)
-                    writer.add_scalar('score/D_g_z', hist["d_g_z_mean"][i], global_step=iteration)
-                    # try:
-                    #     writer.add_histogram('D_G_z', d_g_z, global_step=iteration,
-                    #                          bins=np.linspace(0, 1, 20))
-                    # except:
-                    #     pass
-                if opt.lrD > 0:
-                    writer.add_scalar('loss/D', d_loss.item(), global_step=iteration)
-
-                    writer.add_scalar('score/D_x', hist["d_x_mean"][i], global_step=iteration)
-
-                    # writer.add_scalar('d_x_cv', hist["d_x_cv"][i], global_step=iteration)
-                    # writer.add_scalar('d_g_z_cv', hist["d_g_z_cv"][i], global_step=iteration)
-                    # try:
-                    #     writer.add_histogram('D_x', d_x, global_step=iteration,
-                    #                      bins=np.linspace(0, 1, 20))
-                    # except:
-                    #     pass
-
-                # inception score
-                IS, _ = get_inception_score(gen_imgs, cuda=use_cuda, batch_size=opt.batch_size//4, resize=True, splits=1)
-                writer.add_scalar('InceptionScore', IS, global_step=iteration)
-
-
         if do_tensorboard:
+            # Tensorboard save
+            writer.add_scalar('loss/E', e_loss.item(), global_step=epoch)
+            writer.add_histogram('coeffs/z', z, global_step=epoch)
+            try:
+                writer.add_histogram('coeffs/E_x', z_imgs, global_step=epoch)
+            except:
+                pass
+            writer.add_histogram('image/x', real_imgs, global_step=epoch)
+            try:
+                writer.add_histogram('image/E_G_x', decoded_imgs, global_step=epoch)
+            except:
+                pass
+            try:
+                writer.add_histogram('image/G_z', gen_imgs, global_step=epoch)
+            except:
+                pass
+            if opt.lrG > 0:
+                writer.add_scalar('loss/G', g_loss.item(), global_step=epoch)
+                # writer.add_scalar('score/D_fake', hist["d_fake_mean"][i], global_step=epoch)
+                writer.add_scalar('score/D_g_z', hist["d_g_z_mean"][i], global_step=epoch)
+                # try:
+                #     writer.add_histogram('D_G_z', d_g_z, global_step=epoch,
+                #                          bins=np.linspace(0, 1, 20))
+                # except:
+                #     pass
+            if opt.lrD > 0:
+                writer.add_scalar('loss/D', d_loss.item(), global_step=epoch)
+
+                writer.add_scalar('score/D_x', hist["d_x_mean"][i], global_step=epoch)
+
+                # writer.add_scalar('d_x_cv', hist["d_x_cv"][i], global_step=epoch)
+                # writer.add_scalar('d_g_z_cv', hist["d_g_z_cv"][i], global_step=epoch)
+                # try:
+                #     writer.add_histogram('D_x', d_x, global_step=epoch,
+                #                      bins=np.linspace(0, 1, 20))
+                # except:
+                #     pass
+
+            # inception score
+            IS, _ = get_inception_score(gen_imgs, cuda=use_cuda, batch_size=opt.batch_size//4, resize=True, splits=1)
+            writer.add_scalar('InceptionScore', IS, global_step=epoch)
+
             # writer.add_scalar('D_x/max', hist["D_x_max"][j], global_step=epoch)
             # writer.add_scalar('D_x/min', hist["D_x_min"][j], global_step=epoch)
             # writer.add_scalar('D_G_z/min', hist["D_G_z_min"][j], global_step=epoch)
@@ -498,8 +495,35 @@ def do_learn(opt):
 
             # Save samples
             if epoch % opt.sample_interval == 0:
-                tensorboard_sampling(fixed_noise, generator, writer, epoch)
-                tensorboard_AE_comparator(real_imgs_samples, generator, encoder, writer, epoch) # TODO use decoded_imgs_samples
+                """
+                Use generator model and noise vector to generate images.
+                Save them to tensorboard
+                """
+                generator.eval()
+                gen_imgs = generator(fixed_noise)
+                grid = torchvision.utils.make_grid(gen_imgs, normalize=True, nrow=8, range=(0, 1))
+                writer.add_image('Generated images', grid, epoch)
+                generator.train()
+
+
+                """
+                Use auto-encoder model and original images to generate images.
+                Save them to tensorboard
+
+                """
+                grid_imgs = torchvision.utils.make_grid(real_imgs_samples, normalize=True, nrow=8, range=(0, 1))
+                writer.add_image('Images/original', grid_imgs, epoch)
+
+                generator.eval()
+                encoder.eval()
+                enc_imgs = encoder(real_imgs_samples)
+                dec_imgs = generator(enc_imgs)
+                grid_dec = torchvision.utils.make_grid(dec_imgs, normalize=True, nrow=8, range=(0, 1))
+                writer.add_image('Images/auto-encoded', grid_dec, epoch)
+                generator.train()
+                encoder.train()
+
+                # TODO use decoded_imgs_samples
 
         if epoch % opt.sample_interval == 0 :
             sampling(fixed_noise, generator, path_data, epoch, tag)
