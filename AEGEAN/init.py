@@ -40,7 +40,7 @@ def init():
     parser.add_argument("--do_bias", type=bool, default=True, help="Should we use biases in convolutions?")
     parser.add_argument("--lrelu", type=float, default=0., help="LeakyReLU : alpha - zero for a standard ReLU")
     parser.add_argument("--do_joint", type=bool, default=True, help="Do a joint learning of E and G, dude.")
-    parser.add_argument("--do_insight", type=bool, default=True, help="D looks at G_E_x instead of x.")
+    parser.add_argument("--do_insight", type=bool, default=False, help="D looks at G_E_x instead of x.")
     parser.add_argument("--bn_eps", type=float, default=0.0001,
                         help="batchnorm: espilon for numerical stability")
     parser.add_argument("--bn_momentum", type=float, default=.5,
