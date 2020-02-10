@@ -27,9 +27,9 @@ def init():
                         help="initialize weights to normal")
     parser.add_argument("--gamma", type=float, default=1., help="gamma correction of images")
     parser.add_argument("--lambdaE", type=float, default=.00025, help="regularization parameter for E")
-    parser.add_argument("--lrE", type=float, default=0.0005, help="learning rate for E")
-    parser.add_argument("--lrD", type=float, default=0.0025, help="learning rate for D")
-    parser.add_argument("--lrG", type=float, default=0.0005, help="learning rate for G supervised by D")
+    parser.add_argument("--lrE", type=float, default=0.00005, help="learning rate for E")
+    parser.add_argument("--lrD", type=float, default=0.00025, help="learning rate for D")
+    parser.add_argument("--lrG", type=float, default=0.00005, help="learning rate for G supervised by D")
     parser.add_argument("--valid_smooth", type=float, default=1.,
                         help="Smoothing the results of D on real images")
     parser.add_argument("--E_noise", type=float, default=0.0, help="Add noise to the input images to G_E_x")
