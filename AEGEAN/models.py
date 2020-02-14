@@ -128,7 +128,7 @@ class Generator(nn.Module):
             #nn.MaxPool2d(kernel_size=opt.kernel_size, padding=opt.padding, stride=1), # https://pytorch.org/docs/stable/nn.html#torch.nn.MaxPool2d
             nn.Conv2d(self.channels[0], 1, kernel_size=opt.kernel_size, bias=True,
                              padding=opt.padding, padding_mode='reflection'),
-            #nn.Sigmoid(),
+            nn.Sigmoid(),
         )
 
         self.opt = opt
@@ -179,7 +179,9 @@ class Generator(nn.Module):
             print("mask shape : ", mask.shape)
             print("bg shape : ", bg.shape)
 
-        out = img * (mask>0).type_as(mask) + bg * (mask<0).type_as(mask)
+        # the mask represents the alpha channel of the figure.
+        out = img * mask + bg * (1 - mask)
+
         # https://en.wikipedia.org/wiki/Gamma_correction
         if self.opt.verbose:
             print("out Image min-max : ", out.min(), out.max())
