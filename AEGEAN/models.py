@@ -20,6 +20,7 @@ class Encoder(nn.Module):
 
         def encoder_block(in_channels, out_channels, bias, bn=True):
             block = [nn.Conv2d(in_channels, out_channels, bias=bias, **opts_conv), ]
+            block.append(nn.Dropout2d(opt.dropout))
             if bn and (not opt.bn_eps == np.inf):
                 block.append(nn.BatchNorm2d(num_features=out_channels, eps=opt.bn_eps, momentum=opt.bn_momentum))
             block.append(NL)
@@ -99,6 +100,7 @@ class Generator(nn.Module):
                      # TODO use
                      # nn.ConvTranspose2d(in_channels, out_channels, stride=opt.stride, **opts_conv),
                      ]
+            block.append(nn.Dropout2d(opt.dropout))
             if bn and (not opt.bn_eps == np.inf):
                 block.append(nn.BatchNorm2d(num_features=out_channels, eps=opt.bn_eps, momentum=opt.bn_momentum))
             block.append(NL)
@@ -204,7 +206,7 @@ class Discriminator(nn.Module):
         self.channels = [opt.channel0, opt.channel1, opt.channel2, opt.channel3, opt.channel4]
 
         def discriminator_block(in_channels, out_channels, bn=True, bias=False):
-            block = [nn.Conv2d(in_channels, out_channels, bias=bias, **opts_conv), ]  # , nn.Dropout2d(0.25)
+            block = [nn.Conv2d(in_channels, out_channels, bias=bias, **opts_conv), ]
             if bn and (not opt.bn_eps == np.inf):
                 # https://pytorch.org/docs/stable/nn.html#torch.nn.BatchNorm2d
                 block.append(nn.BatchNorm2d(num_features=out_channels, eps=opt.bn_eps, momentum=opt.bn_momentum))

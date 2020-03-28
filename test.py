@@ -284,6 +284,21 @@ for expname in experiments.keys():
 
 
         tag, opt = init()
+        opt.runs_path = tag + 'no_dropout'
+        opt.dropout = 0.
+        AG.learn(opt)
+
+        tag, opt = init()
+        opt.runs_path = tag + 'low_dropout'
+        opt.dropout = 0.01
+        AG.learn(opt)
+
+        tag, opt = init()
+        opt.runs_path = tag + 'high_dropout'
+        opt.dropout = 0.5
+        AG.learn(opt)
+
+        tag, opt = init()
         opt.runs_path = tag + 'low_beta1'
         opt.beta1 = 0.7
         AG.learn(opt)
