@@ -222,7 +222,7 @@ class Discriminator(nn.Module):
 
         # The height and width of downsampled image
         self.init_size = opt.img_size // opt.stride**4
-        self.LNL = nn.Sequential(nn.Linear(self.channels[3] * self.init_size ** 2, self.channels[4]), NL,)#, nn.Sigmoid()
+        self.lnl = nn.Sequential(nn.Linear(self.channels[3] * self.init_size ** 2, self.channels[4]), NL,)
         self.adv_layer = nn.Linear(self.channels[4], 1)
 
     def forward(self, img):
@@ -252,7 +252,7 @@ class Discriminator(nn.Module):
         if self.opt.verbose:
             print("View out : ", out.shape)
 
-        out = self.LNL(out)
+        out = self.lnl(out)
         if self.opt.verbose:
             print("LNL out : ", out.shape)
 

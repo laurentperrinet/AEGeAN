@@ -89,6 +89,7 @@ def do_learn(opt):
                            rand_hflip=opt.rand_hflip, rand_affine=opt.rand_affine)
 
     # Loss functions
+    # https://pytorch.org/docs/stable/nn.html?highlight=bcewithlogitsloss#torch.nn.BCEWithLogitsLoss
     adversarial_loss = torch.nn.BCEWithLogitsLoss()  # eq. 8 in https://arxiv.org/pdf/1701.00160.pdf
     if opt.do_SSIM:
         E_loss = NMSSSIM(window_size=opt.window_size, val_range=1., size_average=True, channel=3, normalize=True)
@@ -262,7 +263,6 @@ def do_learn(opt):
             optimizer_E.step()
 
             if opt.lrD > 0:
-
                 # ---------------------
                 #  Train Discriminator
                 # ---------------------
@@ -286,22 +286,16 @@ def do_learn(opt):
                 real_imgs_ = real_imgs_ + noise
 
             if opt.do_insight:
-                z_imgs = encoder(real_imgs_)
-                if opt.latent_threshold>0:
-                    z_imgs = hs(z_imgs)
-                decoded_imgs = generator(z_imgs)
-                d_x = discriminator(real_imgs_)
-            else:
-                # Real batch
-                # Discriminator decision (in logit units)
-                d_x = discriminator(real_imgs_)
+                real_imgs_ = generator(encoder(real_imgs_))
+
+            # Discriminator decision (in logit units)
+            logit_d_x = discriminator(real_imgs_)
 
             # Adversarial ground truths
             valid_smooth = Variable(Tensor(imgs.shape[0], 1).fill_(
                 float(np.random.uniform(opt.valid_smooth, 1.0, 1))), requires_grad=False)
 
             if opt.lrD > 0:
-
                 # ---------------------
                 #  Train Discriminator
                 # ---------------------
@@ -317,17 +311,20 @@ def do_learn(opt):
                 # Measure discriminator's ability to classify real from generated samples
                 if opt.GAN_loss == 'ian':
                     # eq. 14 in https://arxiv.org/pdf/1701.00160.pdf
-                    real_loss = - torch.sum(1 / (1. - 1/sigmoid(d_x)))
+                    real_loss = - torch.sum(1 / (1. - 1/sigmoid(logit_d_x)))
                 elif opt.GAN_loss == 'wasserstein':
-                    real_loss = torch.mean(torch.abs(valid_smooth - sigmoid(d_x)))
+                    real_loss = torch.mean(torch.abs(valid_smooth - sigmoid(logit_d_x)))
                 elif opt.GAN_loss == 'alternative':
                     # https://www.inference.vc/an-alternative-update-rule-for-generative-adversarial-networks/
-                    real_loss = - torch.sum(torch.log(sigmoid(d_x)))
+                    real_loss = - torch.sum(torch.log(sigmoid(logit_d_x)))
                 elif opt.GAN_loss == 'alternativ2':
                     # https://www.inference.vc/an-alternative-update-rule-for-generative-adversarial-networks/
-                    real_loss = - torch.sum(torch.log(sigmoid(d_x) / (1. - sigmoid(d_x))))
+                    real_loss = - torch.sum(torch.log(sigmoid(logit_d_x) / (1. - sigmoid(logit_d_x))))
+                elif opt.GAN_loss == 'alternativ3':
+                    # to maximize D(x), we minimize  - sum(logit_d_x)
+                    real_loss = - torch.sum(logit_d_x)
                 elif opt.GAN_loss == 'original':
-                    real_loss = adversarial_loss(d_x, valid_smooth)
+                    real_loss = adversarial_loss(logit_d_x, valid_smooth)
                 else:
                     print ('GAN_loss not defined', opt.GAN_loss)
 
@@ -350,24 +347,27 @@ def do_learn(opt):
                 noise = Variable(Tensor(v_noise), requires_grad=False)
                 gen_imgs_ = gen_imgs_ + noise
 
-            d_fake = discriminator(gen_imgs_.detach())
+            logit_d_fake = discriminator(gen_imgs_.detach())
 
             if opt.lrD > 0:
 
                 # Measure discriminator's ability to classify real from generated samples
                 # if opt.GAN_loss == 'ian':
                 #     # eq. 14 in https://arxiv.org/pdf/1701.00160.pdf
-                #     fake_loss = - torch.sum(1 / (1. - 1/(1-sigmoid(d_fake))))
+                #     fake_loss = - torch.sum(1 / (1. - 1/(1-sigmoid(logit_d_fake))))
                 if opt.GAN_loss == 'wasserstein':
-                    fake_loss = torch.mean(sigmoid(d_fake))
+                    fake_loss = torch.mean(sigmoid(logit_d_fake))
                 elif opt.GAN_loss == 'alternative':
                     # https://www.inference.vc/an-alternative-update-rule-for-generative-adversarial-networks/
-                    fake_loss = - torch.sum(torch.log(1-sigmoid(d_fake)))
+                    fake_loss = - torch.sum(torch.log(1-sigmoid(logit_d_fake)))
                 elif opt.GAN_loss == 'alternativ2':
                     # https://www.inference.vc/an-alternative-update-rule-for-generative-adversarial-networks/
-                    fake_loss = torch.sum(torch.log(sigmoid(d_fake) / (1. - sigmoid(d_fake))))
+                    fake_loss = torch.sum(torch.log(sigmoid(logit_d_fake) / (1. - sigmoid(logit_d_fake))))
+                elif opt.GAN_loss == 'alternativ3':
+                    # to minimize D(G(z)), we minimize sum(logit_d_fake)
+                    fake_loss = torch.sum(logit_d_fake)
                 elif opt.GAN_loss in ['original', 'ian']:
-                    fake_loss = adversarial_loss(d_fake, fake)
+                    fake_loss = adversarial_loss(logit_d_fake, fake)
                 else:
                     print ('GAN_loss not defined', opt.GAN_loss)
 
@@ -401,7 +401,7 @@ def do_learn(opt):
                 v_noise *= opt.G_noise # scaling
                 noise = Variable(Tensor(v_noise), requires_grad=False)
                 gen_imgs_ = gen_imgs_ + noise
-            d_g_z = discriminator(gen_imgs_)
+            logit_d_g_z = discriminator(gen_imgs_)
 
             if opt.lrG > 0:
                 optimizer_G.zero_grad()
@@ -410,19 +410,21 @@ def do_learn(opt):
                 if opt.GAN_loss == 'ian':
                     # eq. 14 in https://arxiv.org/pdf/1701.00160.pdf
                     # https://en.wikipedia.org/wiki/Logit
-                    g_loss = - torch.sum(sigmoid(d_g_z)/(1 - sigmoid(d_g_z)))
+                    g_loss = - torch.sum(sigmoid(logit_d_g_z)/(1 - sigmoid(logit_d_g_z)))
                 elif opt.GAN_loss == 'wasserstein':
-                    g_loss = torch.mean(torch.abs(valid - sigmoid(d_g_z)))
+                    g_loss = torch.mean(torch.abs(valid - sigmoid(logit_d_g_z)))
                 elif opt.GAN_loss == 'alternative':
                     # https://www.inference.vc/an-alternative-update-rule-for-generative-adversarial-networks/
-                    #g_loss = - adversarial_loss(1-d_g_z, valid)
-                    g_loss = - torch.sum(torch.log(sigmoid(d_g_z)))
+                    g_loss = - torch.sum(torch.log(sigmoid(logit_d_g_z)))
                 elif opt.GAN_loss == 'alternativ2':
                     # https://www.inference.vc/an-alternative-update-rule-for-generative-adversarial-networks/
-                    g_loss = - torch.sum(torch.log(sigmoid(d_g_z) / (1. - sigmoid(d_g_z))))
-                    # g_loss = torch.sum(torch.log(1./sigmoid(d_g_z) - 1.))
+                    g_loss = - torch.sum(torch.log(sigmoid(logit_d_g_z) / (1. - sigmoid(logit_d_g_z))))
+                    # g_loss = torch.sum(torch.log(1./sigmoid(logit_d_g_z) - 1.))
+                elif opt.GAN_loss == 'alternativ3':
+                    # to maximize D(G(z)), we minimize - sum(logit_d_fake)
+                    g_loss = - torch.sum(logit_d_g_z)
                 elif opt.GAN_loss == 'original':
-                    g_loss = adversarial_loss(d_g_z, valid)
+                    g_loss = adversarial_loss(logit_d_g_z, valid)
                 else:
                     print ('GAN_loss not defined', opt.GAN_loss)
 
@@ -437,8 +439,8 @@ def do_learn(opt):
             if opt.lrG > 0:
                 # Compensation pour le BCElogits
                 # d_fake = sigmoid(d_fake)
-                d_x = sigmoid(d_x)
-                d_g_z = sigmoid(d_g_z)
+                d_x = sigmoid(logit_d_x)
+                d_g_z = sigmoid(logit_d_g_z)
                 print(
                     "%s [Epoch %d/%d] [Batch %d/%d] [E loss: %f] [D loss: %f] [G loss: %f] [D score %f] [G score %f] [Time: %fs]"
                     % (opt.runs_path, epoch, opt.n_epochs, i+1, len(dataloader), e_loss.item(), d_loss.item(), g_loss.item(), torch.mean(d_x), torch.mean(d_g_z), time.time()-t_batch)
