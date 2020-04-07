@@ -16,9 +16,9 @@ def init():
     parser = argparse.ArgumentParser()
     parser.add_argument("--run_path", type=str, default='vanilla',
                         help="TensorBoard folder to save samples data and statistics")
-    parser.add_argument("--n_epochs", type=int, default=512*16,
+    parser.add_argument("--n_epochs", type=int, default=512*4,
                         help="number of epochs of training")
-    parser.add_argument("--batch_size", type=int, default=16, help="size of the batches")
+    parser.add_argument("--batch_size", type=int, default=32, help="size of the batches")
     parser.add_argument("--rand_hflip", type=bool, default=True,
                         help="data augmentation: horizontal flip")
     parser.add_argument("--rand_affine", type=float, default=2.,
@@ -56,7 +56,7 @@ def init():
     parser.add_argument("--channel3", type=int, default=32, help="size of channel 3")
     parser.add_argument("--channel4", type=int, default=128, help="size of layer 4 in discriminator")
     parser.add_argument("--latent_dim", type=int, default=42, help="dimensionality of the latent space")
-    parser.add_argument("--latent_bandwidth", type=float, default=0.1, help="bandwitdh for drawing a batch")
+    parser.add_argument("--latent_bandwidth", type=float, default=0.05, help="bandwitdh for drawing a batch")
     parser.add_argument("--latent_threshold", type=float, default=0., help="threshold for decimating the latent vector")
     parser.add_argument("--kernel_size", type=int, default=7, help="size of the kernels")
     parser.add_argument("--stride", type=int, default=2, help="stride")
