@@ -1,5 +1,10 @@
 import os
+import sys
+import time
 import numpy as np
+
+import torch
+# torch.autograd.set_detect_anomaly(True)
 from torch.autograd import Variable
 
 
@@ -7,48 +12,7 @@ from .init import init
 from .utils import *
 from .plot import *
 from .models import *
-from pytorch_msssim import NMSSSIM
 
-import torchvision.transforms as transforms
-from torchvision.utils import save_image
-
-# from torch.utils.data import DataLoader
-from torchvision import datasets
-
-import torch
-# torch.autograd.set_detect_anomaly(True)
-import torch.nn as nn
-import torch.nn.functional as F
-from torch.nn.functional import conv2d
-import os
-import sys
-import time
-import datetime
-
-#
-# # see research/UniStellar/AlignAndStack/2019-06-27-B1c_linear_inverter-decorrelation.ipynb
-# KW = torch.zeros(size=(1, 1, 3, 3))
-# KW[0, 0, :, 0] = torch.Tensor([0, -1, 0])
-# KW[0, 0, :, 1] = torch.Tensor([-1, 4, -1])
-# KW[0, 0, :, 2] = torch.Tensor([0, -1, 0])
-# # KW = KW * torch.ones(1, 3, 1, 1)
-# KW = KW * torch.eye(3).view(3, 3, 1, 1)
-# KW /= np.sqrt(4. * 3)
-# Kinv = torch.zeros((1, 1, 3, 3))
-# Kinv[0, 0, :, 0] = torch.Tensor([.75, 1.5, .75])
-# Kinv[0, 0, :, 1] = torch.Tensor([1.5, 4.5, 1.5])
-# Kinv[0, 0, :, 2] = torch.Tensor([.75, 1.5, .75])
-# # Kinv = Kinv * torch.ones(1, 3, 1, 1)
-# Kinv = Kinv * torch.eye(3).view(3, 3, 1, 1)
-# Kinv /= np.sqrt(4. * 3)
-# # print(conv2d(KW, Kinv, padding=1))
-# # print(conv2d(Kinv, KW, padding=1))
-# # print(KW, Kinv, conv2d(KW, Kinv, padding=1), conv2d(Kinv, KW, padding=1))
-
-# cuda = True if torch.cuda.is_available() else False
-# if cuda:
-#     KW = KW.to('cuda')
-#     Kinv = Kinv.to('cuda')
 
 try:
     # to use with `$ tensorboard --logdir runs`
@@ -56,25 +20,27 @@ try:
     do_tensorboard = True
 except:  # ImportError:
     do_tensorboard = False
-    print("Impossible de charger Tensorboard.")
+    print("Failed loading Tensorboard.")
 
-def learn(opt):
-    path_data = os.path.join("./runs", opt.runs_path)
+def learn(opt, run_dir="./runs"):
+    os.makedirs(run_dir, exist_ok=True)
+    path_data = os.path.join(run_dir, opt.run_path)
     if not os.path.isdir(path_data):
         os.makedirs(path_data, exist_ok=True)
         do_learn(opt)
 
-def do_learn(opt):
-    print('Starting ', opt.runs_path)
-    path_data = os.path.join("./runs", opt.runs_path) # + '_' + tag)
+def do_learn(opt, run_dir="./runs"):
+    print('Starting ', opt.run_path)
+    path_data = os.path.join(run_dir, opt.run_path)
     # ----------
     #  Tensorboard
     # ----------
     if do_tensorboard:
-        # stats are stored in "runs", within subfolder opt.runs_path.
+        # stats are stored in "runs", within subfolder opt.run_path.
         writer = SummaryWriter(log_dir=path_data)
 
     # Create a time tag
+    import datetime
     try:
         tag = datetime.datetime.now().isoformat(sep='_', timespec='seconds')
     except TypeError:
@@ -92,11 +58,13 @@ def do_learn(opt):
     # https://pytorch.org/docs/stable/nn.html?highlight=bcewithlogitsloss#torch.nn.BCEWithLogitsLoss
     adversarial_loss = torch.nn.BCEWithLogitsLoss()  # eq. 8 in https://arxiv.org/pdf/1701.00160.pdf
     if opt.do_SSIM:
+        from pytorch_msssim import NMSSSIM
+
         E_loss = NMSSSIM(window_size=opt.window_size, val_range=1., size_average=True, channel=3, normalize=True)
     else:
         E_loss = torch.nn.MSELoss(reduction='sum')
-    MSE_loss = torch.nn.MSELoss(reduction='sum')
-    sigmoid = nn.Sigmoid()
+    # MSE_loss = torch.nn.MSELoss(reduction='sum')
+    sigmoid = torch.nn.Sigmoid()
 
     # Initialize generator and discriminator
     generator = Generator(opt)
@@ -120,7 +88,7 @@ def do_learn(opt):
         discriminator.cuda()
         adversarial_loss.cuda()
         encoder.cuda()
-        MSE_loss.cuda()
+        # MSE_loss.cuda()
         E_loss.cuda()
 
         Tensor = torch.cuda.FloatTensor
@@ -135,41 +103,31 @@ def do_learn(opt):
         encoder.apply(weights_init_normal)
 
     # Optimizers
-    # https://pytorch.org/docs/stable/optim.html#torch.optim.RMSprop
-    optimizer_G = torch.optim.RMSprop(generator.parameters(), lr=opt.lrG, momentum=1-opt.beta1, alpha=opt.beta2)
-    optimizer_D = torch.optim.RMSprop(discriminator.parameters(), lr=opt.lrD, momentum=1-opt.beta1, alpha=opt.beta2)
+    if False:
+        # https://pytorch.org/docs/stable/optim.html#torch.optim.RMSprop
+        opts = dict(momentum=1-opt.beta1, alpha=opt.beta2)
+        optimizer = torch.optim.RMSprop
+    else:
+        # https://pytorch.org/docs/stable/optim.html#torch.optim.Adam
+        opts = dict(betas=(opt.beta1, opt.beta2))
+        optimizer = torch.optim.Adam
+
+    optimizer_G = optimizer(generator.parameters(), lr=opt.lrG, **opts)
+    optimizer_D = optimizer(discriminator.parameters(), lr=opt.lrD, **opts)
     if opt.do_joint:
         import itertools
-        optimizer_E = torch.optim.RMSprop(itertools.chain(
-            encoder.parameters(), generator.parameters()), lr=opt.lrE, momentum=1-opt.beta1, alpha=opt.beta2)
+        optimizer_E = optimizer(itertools.chain(encoder.parameters(), generator.parameters()), lr=opt.lrE, **opts)
     else:
-        optimizer_E = torch.optim.RMSprop(encoder.parameters(), lr=opt.lrE, momentum=1-opt.beta1, alpha=opt.beta2)
-
-    # ----------
-    #  Load models
-    # ----------
-    # start_epoch = 1
-    # if opt.load_model == True:
-    #     start_epoch = load_models(discriminator, optimizer_D, generator,
-    #                               optimizer_G, opt.n_epochs, opt.model_save_path, encoder, optimizer_E)
-
+        optimizer_E = optimizer(encoder.parameters(), lr=opt.lrE, **opts)
 
     # ----------
     #  Training
     # ----------
 
     nb_batch = len(dataloader)
-    # nb_epochs = 1 + opt.n_epochs - start_epoch
 
     hist = init_hist(opt.n_epochs, nb_batch)
 
-    # save_dot = 1 # Nombre d'epochs avant de sauvegarder un point des courbes
-    # batch_on_save_dot = save_dot*len(dataloader)
-
-    # Vecteur z fixe pour faire les samples
-    fixed_noise = Variable(Tensor(np.random.normal(
-        0, 1, (opt.N_samples, opt.latent_dim))), requires_grad=False)
-    real_imgs_samples = None
 
     def gen_z(threshold=opt.latent_threshold, bandwidth=opt.latent_bandwidth):
         if bandwidth==0:
@@ -184,13 +142,21 @@ def do_learn(opt):
         z = Variable(Tensor(z), requires_grad=False)
         return z
 
+    def gen_noise(real_imgs):
+        v_noise = np.random.normal(0, 1, real_imgs.shape) # one random image
+        v_noise *= np.abs(np.random.normal(0, 1, (real_imgs.shape[0], opt.channels, 1, 1))) # one contrast value per image
+        noise = Variable(Tensor(v_noise), requires_grad=False)
+        return noise
+
+    # Vecteur z fixe pour faire les samples
+    fixed_noise = gen_z()
+    real_imgs_samples = None
+
     z_zeros = Variable(Tensor(opt.batch_size, opt.latent_dim).fill_(0), requires_grad=False)
     z_ones = Variable(Tensor(opt.batch_size, opt.latent_dim).fill_(1), requires_grad=False)
     valid = Variable(Tensor(opt.batch_size, 1).fill_(1), requires_grad=False)
     fake = Variable(Tensor(opt.batch_size, 1).fill_(0), requires_grad=False)
 
-    # zero_target = Variable(Tensor(opt.batch_size, opt.channels,
-    #                           opt.img_size, opt.img_size).fill_(0), requires_grad=False)
 
     t_total = time.time()
     for j, epoch in enumerate(range(1, opt.n_epochs + 1)):
@@ -206,7 +172,7 @@ def do_learn(opt):
             for p in encoder.parameters():
                 p.requires_grad = True
             for p in discriminator.parameters():
-                p.requires_grad = False  # to avoid computation
+                p.requires_grad = False  # to avoid learning
 
             real_imgs = Variable(imgs.type(Tensor), requires_grad=False)
 
@@ -217,46 +183,32 @@ def do_learn(opt):
             # add noise here to real_imgs
             real_imgs_ = real_imgs * 1.
             if opt.E_noise > 0:
-                # print(real_imgs.shape)
+
                 v_noise = np.random.normal(0, 1, real_imgs.shape) # one random image
                 v_noise *= np.abs(np.random.normal(0, 1, (real_imgs.shape[0], opt.channels, 1, 1))) # one contrast value per image
                 v_noise *= opt.E_noise # scaling
                 noise = Variable(Tensor(v_noise), requires_grad=False)
-                real_imgs_ = real_imgs_ + noise
+                real_imgs_ = real_imgs_ + opt.E_noise * gen_noise(real_imgs)
 
             z_imgs = encoder(real_imgs_)
             if opt.latent_threshold>0:
                 z_imgs = hs(z_imgs)
-
             decoded_imgs = generator(z_imgs)
-            # decoded_imgs_samples = decoded_imgs[:opt.N_samples]
 
             optimizer_E.zero_grad()
 
             # Loss measures Encoder's ability to generate vectors suitable with the generator
-            energy = 1. # E_loss(real_imgs, zero_target)  # normalize on the energy of imgs
-            if opt.do_joint:
-                e_loss = E_loss(real_imgs, decoded_imgs) / energy
-            else:
-                e_loss = E_loss(real_imgs, decoded_imgs.detach()) / energy
+            e_loss = E_loss(real_imgs, decoded_imgs)
+            # energy = 1. # E_loss(real_imgs, zero_target)  # normalize on the energy of imgs
+            # if opt.do_joint:
+            #     e_loss = E_loss(real_imgs, decoded_imgs) / energy
+            # else:
+            #     e_loss = E_loss(real_imgs, decoded_imgs.detach()) / energy
 
             if opt.lambdaE > 0:
-                # We do not do a VAE, still we wish to make sure the z_imgs get closer to a gaussian
-                # https://github.com/pytorch/examples/blob/master/vae/main.py#L72
-                # # see Appendix B from VAE paper:
-                # # Kingma and Welling. Auto-Encoding Variational Bayes. ICLR, 2014
-                # # https://arxiv.org/abs/1312.6114
-                # KLD =  0.5 * sum(1 + log(sigma^2) - mu^2 - sigma^2)
-                # KLD = -0.5 * torch.sum(1 + logvar - mu.pow(2) - logvar.exp())
-
-                # add a loss for the distance between of z values
-                # e_loss += opt.lambdaE * MSE_loss(z_imgs, z_zeros)/opt.batch_size/opt.latent_dim
-                # e_loss += opt.lambdaE * \
-                #     MSE_loss(z_imgs.pow(2), z_ones).pow(.5)/opt.batch_size/opt.latent_dim
+                # We wish to make sure the z_imgs get closer to a gaussian
                 e_loss += opt.lambdaE * (torch.sum(z_imgs)/opt.batch_size/opt.latent_dim).pow(2)
                 e_loss += opt.lambdaE * (torch.sum(z_imgs.pow(2))/opt.batch_size/opt.latent_dim-1).pow(2).pow(.5)
-
-                # in the TB, we check that E_x and z have similar stats
 
             # Backward
             e_loss.backward()
@@ -443,14 +395,14 @@ def do_learn(opt):
                 d_g_z = sigmoid(logit_d_g_z)
                 print(
                     "%s [Epoch %d/%d] [Batch %d/%d] [E loss: %f] [D loss: %f] [G loss: %f] [D(x) %f] [D(G(z)) %f] [D(G(z)) %f] [Time: %fs]"
-                    % (opt.runs_path, epoch, opt.n_epochs, i+1, len(dataloader), e_loss.item(), d_loss.item(), g_loss.item(), torch.mean(d_x), torch.mean(d_fake), torch.mean(d_g_z), time.time()-t_batch)
+                    % (opt.run_path, epoch, opt.n_epochs, i+1, len(dataloader), e_loss.item(), d_loss.item(), g_loss.item(), torch.mean(d_x), torch.mean(d_fake), torch.mean(d_g_z), time.time()-t_batch)
                 )
                 # Save Losses and scores for Tensorboard
                 save_hist_batch(hist, i, j, g_loss, d_loss, e_loss, d_x, d_g_z)
             else:
                 print(
                     "%s [Epoch %d/%d] [Batch %d/%d] [E loss: %f] [Time: %fs]"
-                    % (opt.runs_path, epoch, opt.n_epochs, i+1, len(dataloader), e_loss.item(), time.time()-t_batch)
+                    % (opt.run_path, epoch, opt.n_epochs, i+1, len(dataloader), e_loss.item(), time.time()-t_batch)
                 )
 
         if do_tensorboard:
@@ -531,30 +483,16 @@ def do_learn(opt):
                 generator.train()
                 encoder.train()
 
-                # TODO use decoded_imgs_samples
 
         if epoch % opt.sample_interval == 0 :
             sampling(fixed_noise, generator, path_data, epoch, tag)
             # do_plot(hist, start_epoch, epoch)
-
-        # # Save models
-        # if epoch % opt.model_save_interval == 0 :
-        #     num = str(int(epoch / opt.model_save_interval))
-        #     save_model(discriminator, optimizer_D, epoch, opt.model_save_path + "/" + num + "_D.pt")
-        #     save_model(generator, optimizer_G, epoch, opt.model_save_path + "/" + num + "_G.pt")
-        #     save_model(encoder, optimizer_E, epoch, opt.model_save_path + "/" + num + "_E.pt")
 
         print("[Epoch Time: ", time.time() - t_epoch, "s]")
 
     t_final = time.gmtime(time.time() - t_total)
     print("[Total Time: ", t_final.tm_mday - 1, "j:",
           time.strftime("%Hh:%Mm:%Ss", t_final), "]", sep='')
-
-    # Save model for futur training
-    # if opt.model_save_interval < opt.n_epochs + 1:
-    #     save_model(discriminator, optimizer_D, epoch, opt.model_save_path + "/last_D.pt")
-    #     save_model(generator, optimizer_G, epoch, opt.model_save_path + "/last_G.pt")
-    #     save_model(encoder, optimizer_E, epoch, opt.model_save_path + "/last_E.pt")
 
     if do_tensorboard:
         writer.close()

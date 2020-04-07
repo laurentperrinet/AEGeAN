@@ -25,7 +25,6 @@ from torch.nn import functional as F
 import torch.utils.data
 from torchvision.models.inception import inception_v3
 import numpy as np
-from scipy.stats import entropy
 
 # TODO frechet distance
 
@@ -38,6 +37,8 @@ def get_inception_score(imgs, cuda=True, batch_size=32, resize=False, splits=1):
         batch_size -- batch size for feeding into Inception v3
         splits -- number of splits
     """
+    from scipy.stats import entropy
+
     N = len(imgs)
 
     assert batch_size > 0
@@ -240,19 +241,10 @@ import torch.nn as nn
 def weights_init_normal(m, weight_0=0.01, factor=1.0):
     # see https://pytorch.org/tutorials/beginner/dcgan_faces_tutorial.html#weight-initialization
     classname = m.__class__.__name__
-    # print('classname', classname)
     if classname.find("Conv") != -1:
-        # n = float(m.in_channels * m.kernel_size[0] * m.kernel_size[1])
-        # n += float(m.kernel_size[0] * m.kernel_size[1] * m.out_channels)
-        # n = n / 2.0
-        # m.weight.data.normal_(0, np.sqrt(factor / n))
-        # m.bias.data.zero_()
         nn.init.normal_(m.weight.data, 0.0, weight_0*factor)
         if m.bias is not None: nn.init.constant_(m.bias.data, 0.)
-    #
-    # elif classname.find('Conv2d') != -1:
-    #     print('classname', classname)
-    #     nn.init.normal_(m.weight.data, 0.0, 0.02)
+
     elif classname.find("Linear") != -1:
         n = float(m.in_features + m.out_features)
         n = n / 2.0
@@ -261,8 +253,6 @@ def weights_init_normal(m, weight_0=0.01, factor=1.0):
     elif classname.find("BatchNorm2d") != -1:
         nn.init.normal_(m.weight.data, 1.0, weight_0*factor)
         nn.init.constant_(m.bias.data, 0)
-        # m.weight.data.fill_(1.0)
-        # m.bias.data.zero_()
 
 
 def load_data(path, img_size, batch_size,

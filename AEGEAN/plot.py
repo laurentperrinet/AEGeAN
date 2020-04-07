@@ -8,7 +8,6 @@ import imageio
 import time
 import torch
 
-from skimage.color import hsv2rgb
 
 """
 Pour ajouter un plot :

@@ -14,7 +14,7 @@ else:
 
 def init():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--runs_path", type=str, default='vanilla',
+    parser.add_argument("--run_path", type=str, default='vanilla',
                         help="TensorBoard folder to save samples data and statistics")
     parser.add_argument("--n_epochs", type=int, default=512*16,
                         help="number of epochs of training")
