@@ -70,8 +70,6 @@ def do_learn(opt, run_dir="./runs"):
     generator = Generator(opt)
     discriminator = Discriminator(opt)
     encoder = Encoder(opt)
-    if opt.latent_threshold>0.:
-        hs = torch.nn.Hardshrink(lambd=opt.latent_threshold)
 
     if opt.verbose:
         print_network(generator)
@@ -129,7 +127,7 @@ def do_learn(opt, run_dir="./runs"):
     hist = init_hist(opt.n_epochs, nb_batch)
 
 
-    def gen_z(threshold=opt.latent_threshold, bandwidth=opt.latent_bandwidth):
+    def gen_z(threshold, bandwidth):
         if bandwidth==0:
             z = np.random.normal(0, 1, (opt.batch_size, opt.latent_dim))
         else:
@@ -149,7 +147,7 @@ def do_learn(opt, run_dir="./runs"):
         return noise
 
     # Vecteur z fixe pour faire les samples
-    fixed_noise = gen_z()
+    fixed_noise = gen_z(threshold=opt.latent_threshold, bandwidth=0.)
     real_imgs_samples = None
 
     z_zeros = Variable(Tensor(opt.batch_size, opt.latent_dim).fill_(0), requires_grad=False)
@@ -188,8 +186,6 @@ def do_learn(opt, run_dir="./runs"):
             if opt.E_noise > 0: real_imgs_ += opt.E_noise * gen_noise(real_imgs)
 
             z_imgs = encoder(real_imgs_)
-            if opt.latent_threshold>0:
-                z_imgs = hs(z_imgs)
             decoded_imgs = generator(z_imgs)
 
             optimizer_E.zero_grad()
@@ -267,15 +263,12 @@ def do_learn(opt, run_dir="./runs"):
                 real_loss.backward()
 
             # Generate a batch of fake images and learn the discriminator to treat them as such
-            z = gen_z()
-            if opt.latent_threshold>0:
-                z = hs(z)
+            z = gen_z(threshold=opt.latent_threshold, bandwidth=0.)
             gen_imgs = generator(z)
-            # Discriminator decision for fake data
-            gen_imgs_ = gen_imgs * 1.
-            if opt.D_noise > 0: gen_imgs_ += opt.D_noise * gen_noise(real_imgs)
+            if opt.D_noise > 0: gen_imgs += opt.D_noise * gen_noise(real_imgs)
 
-            logit_d_fake = discriminator(gen_imgs_.detach())
+            # Discriminator decision for fake data
+            logit_d_fake = discriminator(gen_imgs.detach())
             if opt.lrD > 0:
                 # Measure discriminator's ability to classify real from generated samples
                 if opt.GAN_loss == 'wasserstein':
@@ -296,17 +289,12 @@ def do_learn(opt, run_dir="./runs"):
 
                 # Backward
                 fake_loss.backward()
-
-            if opt.lrD > 0:
-                d_loss = real_loss + fake_loss
-
                 optimizer_D.step()
 
             if opt.lrG > 0:
                 # -----------------
                 #  Train Generator
                 # -----------------
-                # TODO : optimiser la distance z - E(G(z))
                 for p in generator.parameters():
                     p.requires_grad = True
                 for p in discriminator.parameters():
@@ -315,13 +303,12 @@ def do_learn(opt, run_dir="./runs"):
                     p.requires_grad = False  # to avoid computation
 
             # Generate a batch of fake images
-            z = gen_z()
+            z = gen_z(threshold=opt.latent_threshold, bandwidth=opt.latent_bandwidth)
             gen_imgs = generator(z)
-            # New discriminator decision (since we just updated D)
-            gen_imgs_ = gen_imgs * 1.
-            if opt.G_noise > 0: gen_imgs_ += opt.G_noise * gen_noise(real_imgs)
+            if opt.G_noise > 0: gen_imgs += opt.G_noise * gen_noise(real_imgs)
 
-            logit_d_g_z = discriminator(gen_imgs_)
+            # New discriminator decision (since we just updated D)
+            logit_d_g_z = discriminator(gen_imgs)
 
             if opt.lrG > 0:
                 optimizer_G.zero_grad()
@@ -357,6 +344,8 @@ def do_learn(opt, run_dir="./runs"):
             #  Recording stats
             # -----------------
             if opt.lrG > 0:
+                d_loss = real_loss + fake_loss
+
                 # Compensation pour le BCElogits
                 d_fake = sigmoid(logit_d_fake)
                 d_x = sigmoid(logit_d_x)

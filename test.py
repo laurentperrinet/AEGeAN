@@ -61,8 +61,9 @@ for expname in experiments.keys():
 
     if True:
 
-        # GAN_losses = ['original', 'wasserstein', 'ian', 'alternative']
-        GAN_losses = ['original', 'ian', 'alternativ3']
+        # GAN_losses = ['original', 'wasserstein', 'ian', 'alternative', 'alternativ2']
+        GAN_losses = ['original', 'ian', 'wasserstein', 'alternative', 'alternativ2', 'alternativ3']
+        # GAN_losses = ['original', 'ian', 'alternativ3']
 
         for GAN_loss in GAN_losses:
             tag, opt = init()
