@@ -438,12 +438,12 @@ def do_learn(opt):
             # -----------------
             if opt.lrG > 0:
                 # Compensation pour le BCElogits
-                # d_fake = sigmoid(d_fake)
+                d_fake = sigmoid(logit_d_fake)
                 d_x = sigmoid(logit_d_x)
                 d_g_z = sigmoid(logit_d_g_z)
                 print(
-                    "%s [Epoch %d/%d] [Batch %d/%d] [E loss: %f] [D loss: %f] [G loss: %f] [D score %f] [G score %f] [Time: %fs]"
-                    % (opt.runs_path, epoch, opt.n_epochs, i+1, len(dataloader), e_loss.item(), d_loss.item(), g_loss.item(), torch.mean(d_x), torch.mean(d_g_z), time.time()-t_batch)
+                    "%s [Epoch %d/%d] [Batch %d/%d] [E loss: %f] [D loss: %f] [G loss: %f] [D(x) %f] [D(G(z)) %f] [D(G(z)) %f] [Time: %fs]"
+                    % (opt.runs_path, epoch, opt.n_epochs, i+1, len(dataloader), e_loss.item(), d_loss.item(), g_loss.item(), torch.mean(d_x), torch.mean(d_fake), torch.mean(d_g_z), time.time()-t_batch)
                 )
                 # Save Losses and scores for Tensorboard
                 save_hist_batch(hist, i, j, g_loss, d_loss, e_loss, d_x, d_g_z)
