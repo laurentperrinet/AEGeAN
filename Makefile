@@ -25,7 +25,7 @@ pep8:
 	autopep8 $(DIR)/*.py -r -i --max-line-length 120 --ignore E402
 
 tb:
-	tensorboard --logdir runs
+	tensorboard --bind_all --logdir runs
 
 # FILES
 MARIA_URL = laurent@10.164.6.243:GAN-SDPC/AEGEAN
