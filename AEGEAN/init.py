@@ -34,7 +34,7 @@ def init():
     parser.add_argument("--dropout", type=float, default=.0, help="Dropout generalization factor in the encoder")
     parser.add_argument("--E_noise", type=float, default=0.02, help="Add noise to the input images to G_E_x")
     parser.add_argument("--D_noise", type=float, default=0.001, help="Add noise to the input images to D_x")
-    parser.add_argument("--G_noise", type=float, default=0.0O1, help="Add noise to the input images to D_G_z")
+    parser.add_argument("--G_noise", type=float, default=0.001, help="Add noise to the input images to D_G_z")
     parser.add_argument("--GAN_loss", type=str, default='original', help="Use different losses for G.")
     parser.add_argument("--do_SSIM", type=bool, default=True, help="Use contrasted images for the cost of E.")
     parser.add_argument("--do_bias", type=bool, default=True, help="Should we use biases in convolutions?")
