@@ -7,12 +7,9 @@ import torch
 # torch.autograd.set_detect_anomaly(True)
 from torch.autograd import Variable
 
-
 from .init import init
 from .utils import *
-from .plot import *
 from .models import *
-
 
 try:
     # to use with `$ tensorboard --logdir runs`
@@ -124,7 +121,7 @@ def do_learn(opt, run_dir="./runs"):
 
     nb_batch = len(dataloader)
 
-    hist = init_hist(opt.n_epochs, nb_batch)
+    stat_record = init_hist(opt.n_epochs, nb_batch)
 
 
     def gen_z(threshold, bandwidth):
@@ -152,17 +149,16 @@ def do_learn(opt, run_dir="./runs"):
 
     z_zeros = Variable(Tensor(opt.batch_size, opt.latent_dim).fill_(0), requires_grad=False)
     z_ones = Variable(Tensor(opt.batch_size, opt.latent_dim).fill_(1), requires_grad=False)
+    # Adversarial ground truths
     valid = Variable(Tensor(opt.batch_size, 1).fill_(1), requires_grad=False)
     fake = Variable(Tensor(opt.batch_size, 1).fill_(0), requires_grad=False)
-
-    # Adversarial ground truths
     valid_smooth = Variable(Tensor(opt.batch_size, 1).fill_(float(np.random.uniform(opt.valid_smooth, 1.0, 1))), requires_grad=False)
 
 
     t_total = time.time()
     for j, epoch in enumerate(range(1, opt.n_epochs + 1)):
         t_epoch = time.time()
-        for i, (imgs, _) in enumerate(dataloader):
+        for iteration, (imgs, _) in enumerate(dataloader):
             t_batch = time.time()
 
             # ---------------------
@@ -351,11 +347,11 @@ def do_learn(opt, run_dir="./runs"):
                 d_x = sigmoid(logit_d_x)
                 d_g_z = sigmoid(logit_d_g_z)
                 print(
-                    "%s [Epoch %d/%d] [Batch %d/%d] [E loss: %f] [D loss: %f] [G loss: %f] [D(x) %f] [D(G(z)) %f] [D(G(z)) %f] [Time: %fs]"
-                    % (opt.run_path, epoch, opt.n_epochs, i+1, len(dataloader), e_loss.item(), d_loss.item(), g_loss.item(), torch.mean(d_x), torch.mean(d_fake), torch.mean(d_g_z), time.time()-t_batch)
+                    "%s [Epoch %d/%d] [Batch %d/%d] [E loss: %f] [D loss: %f] [G loss: %f] [D(x) %f] [D(G(z)) %f] [D(G(z')) %f] [Time: %fs]"
+                    % (opt.run_path, epoch, opt.n_epochs, iteration+1, len(dataloader), e_loss.item(), d_loss.item(), g_loss.item(), torch.mean(d_x), torch.mean(d_fake), torch.mean(d_g_z), time.time()-t_batch)
                 )
                 # Save Losses and scores for Tensorboard
-                save_hist_batch(hist, i, j, g_loss, d_loss, e_loss, d_x, d_g_z)
+                save_hist_batch(stat_record, i, j, g_loss, d_loss, e_loss, d_x, d_g_z)
             else:
                 print(
                     "%s [Epoch %d/%d] [Batch %d/%d] [E loss: %f] [Time: %fs]"
@@ -365,50 +361,33 @@ def do_learn(opt, run_dir="./runs"):
         if do_tensorboard:
             # Tensorboard save
             writer.add_scalar('loss/E', e_loss.item(), global_step=epoch)
-            writer.add_histogram('coeffs/z', z, global_step=epoch)
+            # writer.add_histogram('coeffs/z', z, global_step=epoch)
             try:
                 writer.add_histogram('coeffs/E_x', z_imgs, global_step=epoch)
             except:
                 pass
-            writer.add_histogram('image/x', real_imgs, global_step=epoch)
-            try:
-                writer.add_histogram('image/E_G_x', decoded_imgs, global_step=epoch)
-            except:
-                pass
-            try:
-                writer.add_histogram('image/G_z', gen_imgs, global_step=epoch)
-            except:
-                pass
+            # writer.add_histogram('image/x', real_imgs, global_step=epoch)
+            # try:
+            #     writer.add_histogram('image/E_G_x', decoded_imgs, global_step=epoch)
+            # except:
+            #     pass
+            # try:
+            #     writer.add_histogram('image/G_z', gen_imgs, global_step=epoch)
+            # except:
+            #     pass
             if opt.lrG > 0:
                 writer.add_scalar('loss/G', g_loss.item(), global_step=epoch)
                 # writer.add_scalar('score/D_fake', hist["d_fake_mean"][i], global_step=epoch)
-                writer.add_scalar('score/D_g_z', hist["d_g_z_mean"][i], global_step=epoch)
-                # try:
-                #     writer.add_histogram('D_G_z', d_g_z, global_step=epoch,
-                #                          bins=np.linspace(0, 1, 20))
-                # except:
-                #     pass
+                writer.add_scalar('score/D_g_z', stat_record["d_g_z_mean"][i], global_step=epoch)
             if opt.lrD > 0:
                 writer.add_scalar('loss/D', d_loss.item(), global_step=epoch)
 
                 writer.add_scalar('score/D_x', hist["d_x_mean"][i], global_step=epoch)
 
-                # writer.add_scalar('d_x_cv', hist["d_x_cv"][i], global_step=epoch)
-                # writer.add_scalar('d_g_z_cv', hist["d_g_z_cv"][i], global_step=epoch)
-                # try:
-                #     writer.add_histogram('D_x', d_x, global_step=epoch,
-                #                      bins=np.linspace(0, 1, 20))
-                # except:
-                #     pass
 
             # inception score
             # IS, _ = get_inception_score(gen_imgs, cuda=use_cuda, batch_size=opt.batch_size//4, resize=True, splits=1)
             # writer.add_scalar('InceptionScore', IS, global_step=epoch)
-
-            # writer.add_scalar('D_x/max', hist["D_x_max"][j], global_step=epoch)
-            # writer.add_scalar('D_x/min', hist["D_x_min"][j], global_step=epoch)
-            # writer.add_scalar('D_G_z/min', hist["D_G_z_min"][j], global_step=epoch)
-            # writer.add_scalar('D_G_z/max', hist["D_G_z_max"][j], global_step=epoch)
 
             # Save samples
             if epoch % opt.sample_interval == 0:

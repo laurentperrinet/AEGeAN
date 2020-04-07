@@ -27,7 +27,6 @@ from torchvision.models.inception import inception_v3
 import numpy as np
 
 # TODO frechet distance
-
 #  inception score from https://github.com/Zeleni9/pytorch-wgan/blob/master/utils/inception_score.py
 def get_inception_score(imgs, cuda=True, batch_size=32, resize=False, splits=1):
     """
@@ -297,47 +296,6 @@ def load_data(path, img_size, batch_size,
 
     return dataloader
 
-#
-# def save_model(model, optimizer, epoch, path):
-#     print("Save model : ", model._name())
-#     info = {
-#         'epoch': epoch,
-#         'model_state_dict': model.state_dict(),
-#         'optimizer_state_dict': optimizer.state_dict(),
-#     }
-#     torch.save(info, path)
-
-#
-# def load_model(model, optimizer, path):
-#     print("Load model :", model._name())
-#     checkpoint = torch.load(path)
-#
-#     model.load_state_dict(checkpoint['model_state_dict'])
-#
-#     if optimizer is not None:
-#         optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
-#
-#     return checkpoint['epoch']
-#
-#
-# def load_models(discriminator, optimizer_D, generator, optimizer_G, n_epochs, model_save_path, encoder=None, optimizer_E=None):
-#     start_epochD = load_model(discriminator, optimizer_D, model_save_path + "/last_D.pt")
-#     start_epochG = load_model(generator, optimizer_G, model_save_path + "/last_G.pt")
-#
-#     if encoder is not None:
-#         start_epochE = load_model(encoder, optimizer_E, model_save_path + "/last_E.pt")
-#
-#     if start_epochG is not start_epochD:
-#         print("Something seems wrong : epochs used to train G and D are different !!")
-#         # exit(0)
-#     start_epoch = start_epochD
-#     # if start_epoch >= n_epochs:
-#     #    print("Something seems wrong : you epochs demander inférieur au nombre d'epochs déjà effectuer !!")
-#     #    #exit(0)
-#
-#     return start_epoch + 1  # Last epoch already done
-
-
 def sampling(noise, generator, path, epoch, tag='', nrow=8):
     """
     Use generator model and noise vector to generate images.
@@ -349,37 +307,6 @@ def sampling(noise, generator, path, epoch, tag='', nrow=8):
     save_image(gen_imgs.data[:], f"{path}/{tag}_{epoch:04d}.png", normalize=True, nrow=nrow, range=(0, 1))
     generator.train()
 
-
-
-#
-#
-# def tensorboard_LSD_comparator(imgs, vectors, generator, writer, epoch, nrow=8):
-#     """
-#     Use auto-encoder model and noise vector to generate images.
-#     Save them to tensorboard
-#
-#     """
-#     writer.add_image('Images/original', grid_imgs, epoch)
-#
-#     generator.eval()
-#     g_v = generator(vectors)
-#     grid_imgs = torchvision.utils.make_grid(imgs, normalize=True, nrow=nrow, range=(0, 1))
-#     grid_g_v = torchvision.utils.make_grid(g_v, normalize=True, nrow=nrow, range=(0, 1))
-#     writer.add_image('Images/generated', grid_g_v, epoch)
-#     generator.train()
-#
-#
-# def AE_sampling(imgs, encoder, generator, path, epoch, nrow=8):
-#     generator.eval()
-#     enc_imgs = encoder(imgs)
-#     dec_imgs = generator(enc_imgs)
-#     save_image(imgs.data[:16], "%s/%d_img.png" %
-#                (path, epoch), nrow=nrow, normalize=True, range=(0, 1))
-#     save_image(dec_imgs.data[:16], "%s/%d_dec.png" %
-#                (path, epoch), nrow=nrow, normalize=True, range=(0, 1))
-#     generator.train()
-
-
 def print_network(net):
     num_params = 0
     for param in net.parameters():
@@ -387,6 +314,55 @@ def print_network(net):
     print(net)
     print('Total number of parameters: %d' % num_params)
     print()
+
+
+
+def init_hist(nb_epochs, nb_batch):
+    """
+    Initialise et retourne un dictionnaire qui servira à sauvegarder les données que l'on voudrais afficher par la suite.
+    """
+
+    hist = {}
+
+    # Container for ploting (en minuscule pour les batchs et en majuscule pour les epochs)
+    # Losses G et D
+    hist["G_losses"] = np.zeros(nb_epochs)
+    hist["D_losses"] = np.zeros(nb_epochs)
+    hist["g_losses"] = np.zeros(nb_batch)
+    hist["d_losses"] = np.zeros(nb_batch)
+    hist["E_losses"] = np.zeros(nb_epochs)
+    hist["e_losses"] = np.zeros(nb_batch)
+
+    # Moyenne des réponse D(x) et D(G(z)) moyenner par epochs
+    hist["D_x_mean"] = np.zeros(nb_epochs)
+    hist["D_G_z_mean"] = np.zeros(nb_epochs)
+    hist["d_x_mean"] = np.zeros(nb_batch)
+    # hist["d_fake_mean"] = np.zeros(nb_batch)
+    hist["d_g_z_mean"] = np.zeros(nb_batch)
+
+    return hist
+
+
+def save_hist_batch(hist, idx_batch, idx_epoch, g_loss, d_loss, e_loss, d_x, d_g_z): #, d_fake
+    """
+    Sauvegarde les données du batch dans l'historique après traitement
+    """
+
+    d_x = d_x.detach().cpu().numpy()
+    # d_fake = d_fake.detach().cpu().numpy()
+    d_g_z = d_g_z.detach().cpu().numpy()
+    g_loss = g_loss.item()
+    d_loss = d_loss.item()
+    e_loss = e_loss.item()
+
+    hist["g_losses"][idx_batch] = g_loss
+    hist["d_losses"][idx_batch] = d_loss
+    hist["e_losses"][idx_batch] = e_loss
+
+
+    hist["d_x_mean"][idx_batch] = d_x.mean()
+    # hist["d_fake_mean"][idx_batch] = d_fake.mean()
+    hist["d_g_z_mean"][idx_batch] = d_g_z.mean()
 
 
 def generate_animation(path, fps=1):
@@ -399,72 +375,6 @@ def generate_animation(path, fps=1):
         images.append(imageio.imread(i))
 
     imageio.mimsave(path + 'training.gif', images, fps=fps)
-
-#
-# def scan(exp_name, params, permutation=True, gpu_repart=False):
-#     """
-#     Lance le fichier dcgan.py présent dans le dossier courant avec toutes les combinaisons de paramètres possible.
-#     exp_name : Une chaîne de caractère utiliser pour nommer le sous dossier de résultats tensorboard.
-#     params : Un dictionnaire où les clefs sont des noms de paramètre (ex : --lrG) et les valeurs sont les différentes
-#             valeurs à tester pour ce paramètre.
-#     permutation : Si == True alors toute les permutations (sans répétition) possible de params sont tester,
-#                   Sinon tout les paramètres sont ziper (tout les paramètres doivent contenir le même nombres d'éléments).
-#     gpu_repart (Non fonctionnel) : Si plusieurs GPU sont disponible les commandes seront répartis entre eux.
-#     """
-#   # Création d'une liste contenant les liste de valeurs à tester
-#     val_tab = list()
-#     for v in params.values():
-#         val_tab.append(v)
-#         # print(v)
-#     # print(val_tab)
-#
-#     # Création d'une liste contenant tout les combinaisons de paramètres à tester
-#     if permutation:
-#         perm = list(product(*val_tab))
-#     else:
-#         perm = list(zip(*val_tab))
-#     # print(perm)
-#
-#     # Construction du noms de chaque test en fonction des paramètre qui la compose
-#     names = list()
-#     for values in perm:
-#         b = values
-#         e = params.keys()
-#         l = list(zip(e, b))
-#         l_str = [str(ele) for el in l for ele in el]
-#         names.append(''.join(l_str).replace('-', ''))
-#     # print(names)
-#
-#     # Construction de toutes les commandes à lancer
-#     base = "python3 dcgan.py -r " + exp_name + "/"
-#     commandes = list()
-#     for j, values in enumerate(perm):
-#         com = base + names[j] + "/"
-#         for i, a in enumerate(params.keys()):
-#             com = com + " " + str(a) + " " + str(values[i])
-#         print(com)
-#         commandes.append(com)
-#     print("Nombre de commande à lancer :", len(commandes))
-#
-#     # Demande de validation
-#     print("Valider ? (Y/N)")
-#     reponse = input()
-#     #reponse = 'Y'
-#     if reponse == 'N':
-#         print("Annulation !")
-#         exit(0)
-#
-#     # Appelle successif des script avec différents paramètres
-#     log = list()
-#     for com in commandes:
-#         print("Lancement de : ", com)
-#         ret = os.system(com)
-#         log.append(ret)
-#
-#     # Récapitulatif
-#     for idx, com in enumerate(commandes):
-#         print("Code retour : ", log[idx], "\t| Commandes ", com)
-#
 
 if __name__ == "__main__":
 
