@@ -170,8 +170,14 @@ def do_learn(opt):
         0, 1, (opt.N_samples, opt.latent_dim))), requires_grad=False)
     real_imgs_samples = None
 
-    def gen_z(threshold=opt.latent_threshold):
-        z = np.random.normal(0, 1, (opt.batch_size, opt.latent_dim))
+    def gen_z(threshold=opt.latent_threshold, bandwidth=opt.latent_bandwidth):
+        if bandwidth==0:
+            z = np.random.normal(0, 1, (opt.batch_size, opt.latent_dim))
+        else:
+            z0 = np.random.normal(0, 1, (1, opt.latent_dim))
+            z = z0 + bandwidth * np.random.normal(0, 1, (opt.batch_size, opt.latent_dim))
+            z /= z.std() # TODO: could work without that
+
         if threshold > 0:
             z[np.abs(z)<threshold] = 0.
         z = Variable(Tensor(z), requires_grad=False)
@@ -414,6 +420,7 @@ def do_learn(opt):
                 elif opt.GAN_loss == 'alternativ2':
                     # https://www.inference.vc/an-alternative-update-rule-for-generative-adversarial-networks/
                     g_loss = - torch.sum(torch.log(sigmoid(d_g_z) / (1. - sigmoid(d_g_z))))
+                    # g_loss = torch.sum(torch.log(1./sigmoid(d_g_z) - 1.))
                 elif opt.GAN_loss == 'original':
                     g_loss = adversarial_loss(d_g_z, valid)
                 else:
