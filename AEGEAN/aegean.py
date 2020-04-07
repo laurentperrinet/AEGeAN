@@ -156,7 +156,7 @@ def do_learn(opt, run_dir="./runs"):
 
 
     t_total = time.time()
-    for j, epoch in enumerate(range(1, opt.n_epochs + 1)):
+    for i_epoch, epoch in enumerate(range(1, opt.n_epochs + 1)):
         t_epoch = time.time()
         for iteration, (imgs, _) in enumerate(dataloader):
             t_batch = time.time()
@@ -351,7 +351,7 @@ def do_learn(opt, run_dir="./runs"):
                     % (opt.run_path, epoch, opt.n_epochs, iteration+1, len(dataloader), e_loss.item(), d_loss.item(), g_loss.item(), torch.mean(d_x), torch.mean(d_fake), torch.mean(d_g_z), time.time()-t_batch)
                 )
                 # Save Losses and scores for Tensorboard
-                save_hist_batch(stat_record, i, j, g_loss, d_loss, e_loss, d_x, d_g_z)
+                save_hist_batch(stat_record, iteration, i_epoch, g_loss, d_loss, e_loss, d_x, d_g_z)
             else:
                 print(
                     "%s [Epoch %d/%d] [Batch %d/%d] [E loss: %f] [Time: %fs]"
@@ -378,11 +378,12 @@ def do_learn(opt, run_dir="./runs"):
             if opt.lrG > 0:
                 writer.add_scalar('loss/G', g_loss.item(), global_step=epoch)
                 # writer.add_scalar('score/D_fake', hist["d_fake_mean"][i], global_step=epoch)
-                writer.add_scalar('score/D_g_z', stat_record["d_g_z_mean"][i], global_step=epoch)
+                print(stat_record["d_g_z_mean"])
+                writer.add_scalar('score/D_g_z', np.mean(stat_record["d_g_z_mean"]), global_step=epoch)
             if opt.lrD > 0:
                 writer.add_scalar('loss/D', d_loss.item(), global_step=epoch)
 
-                writer.add_scalar('score/D_x', hist["d_x_mean"][i], global_step=epoch)
+                writer.add_scalar('score/D_x', np.mean(stat_record["d_x_mean"]), global_step=epoch)
 
 
             # inception score
