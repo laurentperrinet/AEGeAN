@@ -7,10 +7,10 @@ import numpy as np
 # PID, HOST = os.getpid(), os.uname()[1]
 
 experiments = {}
-experiments['Simpsons_128'] = [('datapath', '../database/Simpsons-Face_clear/cp/'), ('img_size', 128), ('n_epochs', 128), ('do_SSIM', False)]
-experiments['AEGEAN_64'] = [('img_size', 64)]# , ('n_epochs', 512)]
+# experiments['Simpsons_128'] = [('datapath', '../database/Simpsons-Face_clear/cp/'), ('img_size', 128), ('n_epochs', 128), ('do_SSIM', False)]
 experiments['Simpsons_64'] = [('datapath', '../database/Simpsons-Face_clear/cp/'), ('img_size', 64), ('do_SSIM', False)]
-experiments['AEGEAN_128'] = [('img_size', 128), ('n_epochs', 512)]
+experiments['AEGEAN_64'] = [('img_size', 64)]# , ('n_epochs', 512)]
+# experiments['AEGEAN_128'] = [('img_size', 128), ('n_epochs', 512)]
 # experiments['AEGEAN_256'] = [('img_size', 256), ]
 # experiments['Simpsons_256'] = [('datapath', '../database/Simpsons-Face_clear/cp/'), ('img_size', 256), ('do_SSIM', False)]
 # experiments['AEGEAN_128'] = [('img_size', 128), ]
@@ -62,7 +62,7 @@ for expname in experiments.keys():
     if True:
 
         # GAN_losses = ['original', 'wasserstein', 'ian', 'alternative']
-        GAN_losses = ['original', 'ian', ]
+        GAN_losses = ['original', 'ian', 'alternativ2']
         for GAN_loss in GAN_losses:
             tag, opt = init()
             if opt.lrD > 0:
@@ -108,6 +108,21 @@ for expname in experiments.keys():
     opt.runs_path = tag + 'no_latent_threshold' if opt.latent_threshold==0. else tag + f'latent_threshold_{str(opt.latent_threshold)}'
     AG.learn(opt)
 
+    tag, opt = init()
+    opt.latent_threshold = 0.1 if opt.latent_threshold==0. else 0.
+    opt.runs_path = tag + 'no_latent_bandwidth' if opt.latent_threshold==0. else tag + f'latent_bandwidth_{str(opt.latent_bandwidth)}'
+    AG.learn(opt)
+
+    if opt.latent_threshold>0.:
+        tag, opt = init()
+        opt.runs_path = tag + 'low_latent_bandwidth'
+        opt.latent_bandwidth //= base
+        AG.learn(opt)
+
+        tag, opt = init()
+        opt.runs_path = tag + 'high_latent_bandwidth'
+        opt.latent_bandwidth *= base
+        AG.learn(opt)
 
     tag, opt = init()
     opt.runs_path = tag + 'small_lrE'
@@ -159,6 +174,21 @@ for expname in experiments.keys():
         tag, opt = init()
         opt.runs_path = tag + 'big_window_size'
         opt.window_size *= base
+        AG.learn(opt)
+
+        tag, opt = init()
+        opt.runs_path = tag + 'no_channel0_bg'
+        opt.channel0_bg = 0
+        AG.learn(opt)
+
+        tag, opt = init()
+        opt.runs_path = tag + 'small_channel0_bg'
+        opt.channel0_bg //= base
+        AG.learn(opt)
+
+        tag, opt = init()
+        opt.runs_path = tag + 'big_channel0_bg'
+        opt.channel0_bg *= base
         AG.learn(opt)
 
         tag, opt = init()
@@ -310,12 +340,12 @@ for expname in experiments.keys():
 
         tag, opt = init()
         opt.runs_path = tag + 'low_beta2'
-        opt.beta2 = 0.9
+        opt.beta2 = 0.5
         AG.learn(opt)
 
         tag, opt = init()
         opt.runs_path = tag + 'high_beta2'
-        opt.beta2 = 0.99
+        opt.beta2 = 0.95
         AG.learn(opt)
 
         tag, opt = init()
