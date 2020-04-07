@@ -378,7 +378,7 @@ def do_learn(opt, run_dir="./runs"):
             if opt.lrG > 0:
                 writer.add_scalar('loss/G', g_loss.item(), global_step=epoch)
                 # writer.add_scalar('score/D_fake', hist["d_fake_mean"][i], global_step=epoch)
-                print(stat_record["d_g_z_mean"])
+                # print(stat_record["d_g_z_mean"])
                 writer.add_scalar('score/D_g_z', np.mean(stat_record["d_g_z_mean"]), global_step=epoch)
             if opt.lrD > 0:
                 writer.add_scalar('loss/D', d_loss.item(), global_step=epoch)
