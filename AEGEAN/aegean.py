@@ -346,35 +346,35 @@ def do_learn(opt):
                 noise = Variable(Tensor(v_noise), requires_grad=False)
                 gen_imgs_ = gen_imgs_ + noise
 
-            # logit_d_fake = discriminator(gen_imgs_.detach())
-            #
-            # if opt.lrD > 0:
-            #
-            #     # Measure discriminator's ability to classify real from generated samples
-            #     # if opt.GAN_loss == 'ian':
-            #     #     # eq. 14 in https://arxiv.org/pdf/1701.00160.pdf
-            #     #     fake_loss = - torch.sum(1 / (1. - 1/(1-sigmoid(logit_d_fake))))
-            #     if opt.GAN_loss == 'wasserstein':
-            #         fake_loss = torch.mean(sigmoid(logit_d_fake))
-            #     elif opt.GAN_loss == 'alternative':
-            #         # https://www.inference.vc/an-alternative-update-rule-for-generative-adversarial-networks/
-            #         fake_loss = - torch.sum(torch.log(1-sigmoid(logit_d_fake)))
-            #     elif opt.GAN_loss == 'alternativ2':
-            #         # https://www.inference.vc/an-alternative-update-rule-for-generative-adversarial-networks/
-            #         fake_loss = torch.sum(torch.log(sigmoid(logit_d_fake) / (1. - sigmoid(logit_d_fake))))
-            #     elif opt.GAN_loss == 'alternativ3':
-            #         # to minimize D(G(z)), we minimize sum(logit_d_fake)
-            #         fake_loss = torch.sum(logit_d_fake)
-            #     elif opt.GAN_loss in ['original', 'ian']:
-            #         fake_loss = adversarial_loss(logit_d_fake, fake)
-            #     else:
-            #         print ('GAN_loss not defined', opt.GAN_loss)
-            #
-            #     # Backward
-            #     fake_loss.backward()
+            logit_d_fake = discriminator(gen_imgs_.detach())
 
             if opt.lrD > 0:
-                d_loss = real_loss #+ fake_loss
+
+                # Measure discriminator's ability to classify real from generated samples
+                # if opt.GAN_loss == 'ian':
+                #     # eq. 14 in https://arxiv.org/pdf/1701.00160.pdf
+                #     fake_loss = - torch.sum(1 / (1. - 1/(1-sigmoid(logit_d_fake))))
+                if opt.GAN_loss == 'wasserstein':
+                    fake_loss = torch.mean(sigmoid(logit_d_fake))
+                elif opt.GAN_loss == 'alternative':
+                    # https://www.inference.vc/an-alternative-update-rule-for-generative-adversarial-networks/
+                    fake_loss = - torch.sum(torch.log(1-sigmoid(logit_d_fake)))
+                elif opt.GAN_loss == 'alternativ2':
+                    # https://www.inference.vc/an-alternative-update-rule-for-generative-adversarial-networks/
+                    fake_loss = torch.sum(torch.log(sigmoid(logit_d_fake) / (1. - sigmoid(logit_d_fake))))
+                elif opt.GAN_loss == 'alternativ3':
+                    # to minimize D(G(z)), we minimize sum(logit_d_fake)
+                    fake_loss = torch.sum(logit_d_fake)
+                elif opt.GAN_loss in ['original', 'ian']:
+                    fake_loss = adversarial_loss(logit_d_fake, fake)
+                else:
+                    print ('GAN_loss not defined', opt.GAN_loss)
+
+                # Backward
+                fake_loss.backward()
+
+            if opt.lrD > 0:
+                d_loss = real_loss + fake_loss
 
                 optimizer_D.step()
 

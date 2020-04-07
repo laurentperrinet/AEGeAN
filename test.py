@@ -63,6 +63,7 @@ for expname in experiments.keys():
 
         # GAN_losses = ['original', 'wasserstein', 'ian', 'alternative']
         GAN_losses = ['original', 'ian', 'alternativ3']
+        
         for GAN_loss in GAN_losses:
             tag, opt = init()
             if opt.lrD > 0:
