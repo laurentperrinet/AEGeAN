@@ -157,6 +157,9 @@ def do_learn(opt, run_dir="./runs"):
     valid = Variable(Tensor(opt.batch_size, 1).fill_(1), requires_grad=False)
     fake = Variable(Tensor(opt.batch_size, 1).fill_(0), requires_grad=False)
 
+    # Adversarial ground truths
+    valid_smooth = Variable(Tensor(opt.batch_size, 1).fill_(float(np.random.uniform(opt.valid_smooth, 1.0, 1))), requires_grad=False)
+
 
     t_total = time.time()
     for j, epoch in enumerate(range(1, opt.n_epochs + 1)):
@@ -182,13 +185,7 @@ def do_learn(opt, run_dir="./runs"):
 
             # add noise here to real_imgs
             real_imgs_ = real_imgs * 1.
-            if opt.E_noise > 0:
-
-                v_noise = np.random.normal(0, 1, real_imgs.shape) # one random image
-                v_noise *= np.abs(np.random.normal(0, 1, (real_imgs.shape[0], opt.channels, 1, 1))) # one contrast value per image
-                v_noise *= opt.E_noise # scaling
-                noise = Variable(Tensor(v_noise), requires_grad=False)
-                real_imgs_ = real_imgs_ + opt.E_noise * gen_noise(real_imgs)
+            if opt.E_noise > 0: real_imgs_ += opt.E_noise * gen_noise(real_imgs)
 
             z_imgs = encoder(real_imgs_)
             if opt.latent_threshold>0:
@@ -228,24 +225,12 @@ def do_learn(opt, run_dir="./runs"):
 
             # Configure input
             real_imgs = Variable(imgs.type(Tensor), requires_grad=False)
-
             real_imgs_ = real_imgs * 1.
-            if opt.D_noise > 0:
-                v_noise = np.random.normal(0, 1, real_imgs.shape) # one random image
-                v_noise *= np.abs(np.random.normal(0, 1, (real_imgs.shape[0], opt.channels, 1, 1))) # one contrast value per image
-                v_noise *= opt.D_noise # scaling
-                noise = Variable(Tensor(v_noise), requires_grad=False)
-                real_imgs_ = real_imgs_ + noise
-
-            if opt.do_insight:
-                real_imgs_ = generator(encoder(real_imgs_))
+            if opt.D_noise > 0: real_imgs_ += opt.D_noise * gen_noise(real_imgs)
+            if opt.do_insight: real_imgs_ = generator(encoder(real_imgs_))
 
             # Discriminator decision (in logit units)
             logit_d_x = discriminator(real_imgs_)
-
-            # Adversarial ground truths
-            valid_smooth = Variable(Tensor(imgs.shape[0], 1).fill_(
-                float(np.random.uniform(opt.valid_smooth, 1.0, 1))), requires_grad=False)
 
             if opt.lrD > 0:
                 # ---------------------
@@ -255,7 +240,6 @@ def do_learn(opt, run_dir="./runs"):
                     # weight clipping
                     for p in discriminator.parameters():
                         p.data.clamp_(-0.01, 0.01)
-
 
                 optimizer_D.zero_grad()
 
@@ -282,30 +266,18 @@ def do_learn(opt, run_dir="./runs"):
                 # Backward
                 real_loss.backward()
 
-            # Generate a batch of fake images
+            # Generate a batch of fake images and learn the discriminator to treat them as such
             z = gen_z()
             if opt.latent_threshold>0:
                 z = hs(z)
             gen_imgs = generator(z)
             # Discriminator decision for fake data
             gen_imgs_ = gen_imgs * 1.
-            # if opt.D_noise > 0:
-            #     gen_imgs_ += opt.D_noise * Variable(torch.randn(gen_imgs.shape))
-            if opt.D_noise > 0:
-                v_noise = np.random.normal(0, 1, real_imgs.shape) # one random image
-                v_noise *= np.abs(np.random.normal(0, 1, (real_imgs.shape[0], opt.channels, 1, 1))) # one contrast value per image
-                v_noise *= opt.D_noise # scaling
-                noise = Variable(Tensor(v_noise), requires_grad=False)
-                gen_imgs_ = gen_imgs_ + noise
+            if opt.D_noise > 0: gen_imgs_ += opt.D_noise * gen_noise(real_imgs)
 
             logit_d_fake = discriminator(gen_imgs_.detach())
-
             if opt.lrD > 0:
-
                 # Measure discriminator's ability to classify real from generated samples
-                # if opt.GAN_loss == 'ian':
-                #     # eq. 14 in https://arxiv.org/pdf/1701.00160.pdf
-                #     fake_loss = - torch.sum(1 / (1. - 1/(1-sigmoid(logit_d_fake))))
                 if opt.GAN_loss == 'wasserstein':
                     fake_loss = torch.mean(sigmoid(logit_d_fake))
                 elif opt.GAN_loss == 'alternative':
@@ -347,12 +319,8 @@ def do_learn(opt, run_dir="./runs"):
             gen_imgs = generator(z)
             # New discriminator decision (since we just updated D)
             gen_imgs_ = gen_imgs * 1.
-            if opt.G_noise > 0:
-                v_noise = np.random.normal(0, 1, real_imgs.shape) # one random image
-                v_noise *= np.abs(np.random.normal(0, 1, (real_imgs.shape[0], opt.channels, 1, 1))) # one contrast value per image
-                v_noise *= opt.G_noise # scaling
-                noise = Variable(Tensor(v_noise), requires_grad=False)
-                gen_imgs_ = gen_imgs_ + noise
+            if opt.G_noise > 0: gen_imgs_ += opt.G_noise * gen_noise(real_imgs)
+
             logit_d_g_z = discriminator(gen_imgs_)
 
             if opt.lrG > 0:

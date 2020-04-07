@@ -1,6 +1,6 @@
 #!/bin/sh
 #SBATCH -J Job_GAN # <-- Change that
-#SBATCH -p pascal # gpu # kepler # <-- Could be also teslak40 (less memory)
+#SBATCH -p kepler # pascal # gpu # <-- Could be also teslak40 (less memory)
 #SBATCH --mem-per-cpu=5gb
 #SBATCH --mem=5gb
 #SBATCH --ntasks=1  # Number of cores
