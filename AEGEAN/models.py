@@ -173,7 +173,8 @@ class Generator(nn.Module):
             img = self.img_block(out[:, :self.channel0_img, :, :])
             bg = self.bg_block(out[:, self.channel0_img:, :, :])
             # random translation https://pytorch.org/docs/stable/torch.html#torch.roll
-            shift_x, shift_y = int(self.opt.img_size*np.random.rand()), int(self.opt.img_size*np.random.rand())
+            #shift_x, shift_y = int(self.opt.img_size*np.random.rand()), int(self.opt.img_size*np.random.rand())
+            shift_x, shift_y = int(10*np.random.rand()-5), int(10*np.random.rand()-5)
             bg = torch.roll(bg, shifts=(shift_x, shift_y), dims=(-2, -1))
 
             mask = self.mask_block(out)
