@@ -121,17 +121,18 @@ class Generator(nn.Module):
             nn.Conv2d(self.channel0_img, opt.channels, **opts_conv),
             nn.Sigmoid(),
         )
-        self.bg_block = nn.Sequential(
-            nn.Conv2d(opt.channel0_bg, opt.channels, kernel_size=opt.kernel_size, bias=opt.do_bias,
-                             padding=opt.padding, padding_mode='constant'),
-            nn.Sigmoid(),
-        )
-        self.mask_block = nn.Sequential(
-            #nn.MaxPool2d(kernel_size=opt.kernel_size, padding=opt.padding, stride=1), # https://pytorch.org/docs/stable/nn.html#torch.nn.MaxPool2d
-            nn.Conv2d(self.channels[0], 1, kernel_size=opt.kernel_size, bias=True,
-                             padding=opt.padding, padding_mode='reflection'),
-            nn.Sigmoid(),
-        )
+        if opt.channel0_bg>0:
+            self.bg_block = nn.Sequential(
+                nn.Conv2d(opt.channel0_bg, opt.channels, kernel_size=opt.kernel_size, bias=opt.do_bias,
+                                 padding=opt.padding, padding_mode='constant'),
+                nn.Sigmoid(),
+            )
+            self.mask_block = nn.Sequential(
+                #nn.MaxPool2d(kernel_size=opt.kernel_size, padding=opt.padding, stride=1), # https://pytorch.org/docs/stable/nn.html#torch.nn.MaxPool2d
+                nn.Conv2d(self.channels[0], 1, kernel_size=opt.kernel_size, bias=True,
+                                 padding=opt.padding, padding_mode='reflection'),
+                nn.Sigmoid(),
+            )
 
         self.opt = opt
 
@@ -167,22 +168,28 @@ class Generator(nn.Module):
         if self.opt.verbose:
             print("Conv3 out : ", out.shape)
 
-        # implement a prior in the generator for the background + mask to merge it with the figure
-        img = self.img_block(out[:, :self.channel0_img, :, :])
-        bg = self.bg_block(out[:, self.channel0_img:, :, :])
-        # random translation https://pytorch.org/docs/stable/torch.html#torch.roll
-        shift_x, shift_y = int(self.opt.img_size*np.random.rand()), int(self.opt.img_size*np.random.rand())
-        bg = torch.roll(bg, shifts=(shift_x, shift_y), dims=(-2, -1))
+        if self.opt.channel0_bg>0:
+            # implement a prior in the generator for the background + mask to merge it with the figure
+            img = self.img_block(out[:, :self.channel0_img, :, :])
+            bg = self.bg_block(out[:, self.channel0_img:, :, :])
+            # random translation https://pytorch.org/docs/stable/torch.html#torch.roll
+            shift_x, shift_y = int(self.opt.img_size*np.random.rand()), int(self.opt.img_size*np.random.rand())
+            bg = torch.roll(bg, shifts=(shift_x, shift_y), dims=(-2, -1))
 
-        mask = self.mask_block(out)
-        # Dim : (opt.chanels, opt.img_size, opt.img_size)
-        if self.opt.verbose:
-            print("img shape : ", img.shape)
-            print("mask shape : ", mask.shape)
-            print("bg shape : ", bg.shape)
+            mask = self.mask_block(out)
+            # Dim : (opt.chanels, opt.img_size, opt.img_size)
+            if self.opt.verbose:
+                print("img shape : ", img.shape)
+                print("mask shape : ", mask.shape)
+                print("bg shape : ", bg.shape)
 
-        # the mask represents the alpha channel of the figure.
-        out = img * mask + bg * (1 - mask)
+            # the mask represents the alpha channel of the figure.
+            out = img * mask + bg * (1 - mask)
+        else:
+            out = self.img_block(out)
+            if self.opt.verbose:
+                print("img shape : ", out.shape)
+
 
         # https://en.wikipedia.org/wiki/Gamma_correction
         if self.opt.verbose:

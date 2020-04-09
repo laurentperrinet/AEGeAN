@@ -185,12 +185,12 @@ for expname in experiments.keys():
 
         tag, opt = init()
         opt.run_path = tag + 'small_channel0_bg'
-        opt.channel0_bg //= base
+        opt.channel0_bg = 4 # //= base
         AG.learn(opt)
 
         tag, opt = init()
         opt.run_path = tag + 'big_channel0_bg'
-        opt.channel0_bg *= base
+        opt.channel0_bg = 12 #*= base
         AG.learn(opt)
 
         tag, opt = init()
