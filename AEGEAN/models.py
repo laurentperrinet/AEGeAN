@@ -3,7 +3,7 @@ import numpy as np
 
 import itertools
 import torch.nn as nn
-import torch.nn.functional as F
+# import torch.nn.functional as F
 import torch
 
 cuda = True if torch.cuda.is_available() else False
@@ -174,8 +174,8 @@ class Generator(nn.Module):
             bg = self.bg_block(out[:, self.channel0_img:, :, :])
             # random translation https://pytorch.org/docs/stable/torch.html#torch.roll
             #shift_x, shift_y = int(self.opt.img_size*np.random.rand()), int(self.opt.img_size*np.random.rand())
-            shift_x, shift_y = int(10*np.random.rand()-5), int(10*np.random.rand()-5)
-            bg = torch.roll(bg, shifts=(shift_x, shift_y), dims=(-2, -1))
+            #shift_x, shift_y = int(10*np.random.rand()-5), int(10*np.random.rand()-5)
+            #bg = torch.roll(bg, shifts=(shift_x, shift_y), dims=(-2, -1))
 
             mask = self.mask_block(out)
             # Dim : (opt.chanels, opt.img_size, opt.img_size)
@@ -187,10 +187,9 @@ class Generator(nn.Module):
             # the mask represents the alpha channel of the figure.
             out = img * mask + bg * (1 - mask)
         else:
-            out = self.img_block(out)
+            out = self.img_block(out*1.)
             if self.opt.verbose:
                 print("img shape : ", out.shape)
-
 
         # https://en.wikipedia.org/wiki/Gamma_correction
         if self.opt.verbose:
