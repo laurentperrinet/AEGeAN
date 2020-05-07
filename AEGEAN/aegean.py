@@ -4,7 +4,7 @@ import time
 import numpy as np
 
 import torch
-# torch.autograd.set_detect_anomaly(True)
+torch.autograd.set_detect_anomaly(True)
 from torch.autograd import Variable
 
 from .init import init
