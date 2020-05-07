@@ -15,7 +15,7 @@ class Encoder(nn.Module):
         # NL = nn.LeakyReLU(opt.lrelu, inplace=True)
         NL = nn.ReLU(inplace=True)
         opts_conv = dict(kernel_size=opt.kernel_size, stride=opt.stride,
-                         padding=opt.padding, padding_mode='reflection')
+                         padding=opt.padding, padding_mode='reflect')
         self.channels = [opt.channel0, opt.channel1, opt.channel2, opt.channel3, opt.channel3]
 
         def encoder_block(in_channels, out_channels, bias, bn=True):
@@ -90,7 +90,7 @@ class Generator(nn.Module):
         # NL = nn.LeakyReLU(opt.lrelu, inplace=True)
         NL = nn.ReLU(inplace=True)
         opts_conv = dict(kernel_size=opt.kernel_size, bias=opt.do_bias,
-                         padding=opt.padding, padding_mode='reflection')
+                         padding=opt.padding, padding_mode='reflect')
         self.channels = [opt.channel0, opt.channel1, opt.channel2, opt.channel3, opt.channel3]
 
         def generator_block(in_channels, out_channels, bn=True, stride=1):
@@ -121,6 +121,7 @@ class Generator(nn.Module):
             nn.Conv2d(self.channel0_img, opt.channels, **opts_conv),
             nn.Sigmoid(),
         )
+
         if opt.channel0_bg>0:
             self.bg_block = nn.Sequential(
                 nn.Conv2d(opt.channel0_bg, opt.channels, kernel_size=opt.kernel_size, bias=opt.do_bias,
@@ -130,7 +131,7 @@ class Generator(nn.Module):
             self.mask_block = nn.Sequential(
                 #nn.MaxPool2d(kernel_size=opt.kernel_size, padding=opt.padding, stride=1), # https://pytorch.org/docs/stable/nn.html#torch.nn.MaxPool2d
                 nn.Conv2d(self.channels[0], 1, kernel_size=opt.kernel_size, bias=True,
-                                 padding=opt.padding, padding_mode='reflection'),
+                                 padding=opt.padding, padding_mode='reflect'),
                 nn.Sigmoid(),
             )
 
@@ -187,7 +188,7 @@ class Generator(nn.Module):
             # the mask represents the alpha channel of the figure.
             out = img * mask + bg * (1 - mask)
         else:
-            out = self.img_block(out*1.)
+            out = self.img_block(out)
             if self.opt.verbose:
                 print("img shape : ", out.shape)
 
@@ -209,7 +210,7 @@ class Discriminator(nn.Module):
         # “Use LeakyReLU in the discriminator.” — Jonathan Hui https://link.medium.com/IYyQV6sMD0
         NL = nn.LeakyReLU(opt.lrelu, inplace=True)
         opts_conv = dict(kernel_size=opt.kernel_size, stride=opt.stride,
-                         padding=opt.padding, padding_mode='reflection')#,bias=opt.do_bias)
+                         padding=opt.padding, padding_mode='reflect')#,bias=opt.do_bias)
         self.channels = [opt.channel0, opt.channel1, opt.channel2, opt.channel3, opt.channel4]
 
         def discriminator_block(in_channels, out_channels, bn=True, bias=False):
