@@ -4,11 +4,12 @@ numpy
 pillow
 scikit-image
 scipy
-tensorboard
-tensorflow-estimator
+tensorflow==1.14.0
+tensorflow-estimator==1.14.0
+tensorboard==1.14.0
 # PyTorch
-torch
-torchvision
+torch==1.1.0
+torchvision==0.2.1
 -e git+https://github.com/SpikeAI/pytorch-msssim#egg=pytorch-msssim
 # progress bars in model download and training scripts
 tqdm
