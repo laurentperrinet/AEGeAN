@@ -118,10 +118,10 @@ class Generator(nn.Module):
 
         self.channel0_img = self.channels[0]-opt.channel0_bg
         # self.img_block = nn.Sequential(
-        #     nn.Conv2d(self.img_block, opt.channels, **opts_conv),
+        #     nn.Conv2d(self.channel0_img, opt.channels, **opts_conv),
         #     nn.Sigmoid(),
         # )
-        self.img_block = nn.Sequential(*generator_block(self.img_block, opt.channels, stride=opt.stride),)
+        self.img_block = nn.Sequential(*generator_block(self.channel0_img, opt.channels, stride=opt.stride),)
         # self.img_block.append(nn.Sigmoid())
 
         if opt.channel0_bg>0:
