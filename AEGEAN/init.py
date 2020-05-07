@@ -31,7 +31,7 @@ def init():
     parser.add_argument("--lrD", type=float, default=0.0015, help="learning rate for D")
     parser.add_argument("--lrG", type=float, default=0.00005, help="learning rate for G supervised by D")
     parser.add_argument("--valid_smooth", type=float, default=1., help="Smoothing the results of D on real images")
-    parser.add_argument("--dropout", type=float, default=.0, help="Dropout generalization factor in the encoder")
+    parser.add_argument("--dropout", type=float, default=.01, help="Dropout generalization factor in the encoder & generator")
     parser.add_argument("--E_noise", type=float, default=0.02, help="Add noise to the input images to G_E_x")
     parser.add_argument("--D_noise", type=float, default=0.001, help="Add noise to the input images to D_x")
     parser.add_argument("--G_noise", type=float, default=0.001, help="Add noise to the input images to D_G_z")
