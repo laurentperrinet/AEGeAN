@@ -12,10 +12,10 @@ class Encoder(nn.Module):
     def __init__(self, opt):
         super(Encoder, self).__init__()
 
-        # NL = nn.LeakyReLU(opt.lrelu, inplace=True)
-        NL = nn.ReLU(inplace=True)
+        # NL = nn.LeakyReLU(opt.lrelu)
+        NL = nn.ReLU()
         opts_conv = dict(kernel_size=opt.kernel_size, stride=opt.stride,
-                         padding=opt.padding, padding_mode='reflect')
+                         padding=opt.padding, padding_mode='constant')
         self.channels = [opt.channel0, opt.channel1, opt.channel2, opt.channel3, opt.channel3]
 
         def encoder_block(in_channels, out_channels, bias, bn=True):
@@ -87,10 +87,10 @@ class Encoder(nn.Module):
 class Generator(nn.Module):
     def __init__(self, opt):
         super(Generator, self).__init__()
-        # NL = nn.LeakyReLU(opt.lrelu, inplace=True)
-        NL = nn.ReLU(inplace=True)
+        # NL = nn.LeakyReLU(opt.lrelu)
+        NL = nn.ReLU()
         opts_conv = dict(kernel_size=opt.kernel_size, bias=opt.do_bias,
-                         padding=opt.padding, padding_mode='reflect')
+                         padding=opt.padding, padding_mode='constant')
         self.channels = [opt.channel0, opt.channel1, opt.channel2, opt.channel3, opt.channel3]
 
         def generator_block(in_channels, out_channels, bn=True, stride=1):
@@ -131,7 +131,7 @@ class Generator(nn.Module):
             self.mask_block = nn.Sequential(
                 #nn.MaxPool2d(kernel_size=opt.kernel_size, padding=opt.padding, stride=1), # https://pytorch.org/docs/stable/nn.html#torch.nn.MaxPool2d
                 nn.Conv2d(self.channels[0], 1, kernel_size=opt.kernel_size, bias=True,
-                                 padding=opt.padding, padding_mode='reflect'),
+                                 padding=opt.padding, padding_mode='constant'),
                 nn.Sigmoid(),
             )
 
@@ -174,9 +174,9 @@ class Generator(nn.Module):
             img = self.img_block(out[:, :self.channel0_img, :, :])
             bg = self.bg_block(out[:, self.channel0_img:, :, :])
             # random translation https://pytorch.org/docs/stable/torch.html#torch.roll
-            #shift_x, shift_y = int(self.opt.img_size*np.random.rand()), int(self.opt.img_size*np.random.rand())
+            shift_x, shift_y = int(self.opt.img_size*np.random.rand()), int(self.opt.img_size*np.random.rand())
             #shift_x, shift_y = int(10*np.random.rand()-5), int(10*np.random.rand()-5)
-            #bg = torch.roll(bg, shifts=(shift_x, shift_y), dims=(-2, -1))
+            bg = torch.roll(bg, shifts=(shift_x, shift_y), dims=(-2, -1))
 
             mask = self.mask_block(out)
             # Dim : (opt.chanels, opt.img_size, opt.img_size)
@@ -186,17 +186,20 @@ class Generator(nn.Module):
                 print("bg shape : ", bg.shape)
 
             # the mask represents the alpha channel of the figure.
-            out = img * mask + bg * (1 - mask)
+            out = img * (mask) + bg * (1 - mask)
         else:
             out = self.img_block(out)
             if self.opt.verbose:
                 print("img shape : ", out.shape)
 
-        # https://en.wikipedia.org/wiki/Gamma_correction
         if self.opt.verbose:
-            print("out Image min-max : ", out.min(), out.max())
-        if not(self.opt.gamma == 1.):
-            out = torch.pow(out, 1/self.opt.gamma)
+            print("img shape : ", out.shape)
+
+        # # https://en.wikipedia.org/wiki/Gamma_correction
+        # if self.opt.verbose:
+        #     print("out Image min-max : ", out.min(), out.max())
+        # if not(self.opt.gamma == 1.):
+        #     out = torch.pow(out, 1/self.opt.gamma)
 
         return out
 
@@ -208,13 +211,14 @@ class Discriminator(nn.Module):
     def __init__(self, opt):
         super(Discriminator, self).__init__()
         # “Use LeakyReLU in the discriminator.” — Jonathan Hui https://link.medium.com/IYyQV6sMD0
-        NL = nn.LeakyReLU(opt.lrelu, inplace=True)
+        NL = nn.LeakyReLU(opt.lrelu)
         opts_conv = dict(kernel_size=opt.kernel_size, stride=opt.stride,
-                         padding=opt.padding, padding_mode='reflect')#,bias=opt.do_bias)
+                         padding=opt.padding, padding_mode='constant')#,bias=opt.do_bias)
         self.channels = [opt.channel0, opt.channel1, opt.channel2, opt.channel3, opt.channel4]
 
         def discriminator_block(in_channels, out_channels, bn=True, bias=False):
             block = [nn.Conv2d(in_channels, out_channels, bias=bias, **opts_conv), ]
+             # nn.MaxPool2d(kernel_size=opt.kernel_size, padding=opt.padding), # https://pytorch.org/docs/stable/nn.html#torch.nn.MaxPool2d
             if bn and (not opt.bn_eps == np.inf):
                 # https://pytorch.org/docs/stable/nn.html#torch.nn.BatchNorm2d
                 block.append(nn.BatchNorm2d(num_features=out_channels, eps=opt.bn_eps, momentum=opt.bn_momentum))
