@@ -15,7 +15,7 @@ class Encoder(nn.Module):
         # NL = nn.LeakyReLU(opt.lrelu)
         NL = nn.ReLU()
         opts_conv = dict(kernel_size=opt.kernel_size, stride=opt.stride,
-                         padding=opt.padding, padding_mode='constant')
+                         padding=opt.padding, padding_mode='reflect')
         self.channels = [opt.channel0, opt.channel1, opt.channel2, opt.channel3, opt.channel3]
 
         def encoder_block(in_channels, out_channels, bias, bn=True):
@@ -90,7 +90,7 @@ class Generator(nn.Module):
         # NL = nn.LeakyReLU(opt.lrelu)
         NL = nn.ReLU()
         opts_conv = dict(kernel_size=opt.kernel_size, bias=opt.do_bias,
-                         padding=opt.padding, padding_mode='constant')
+                         padding=opt.padding, padding_mode='reflect')
         self.channels = [opt.channel0, opt.channel1, opt.channel2, opt.channel3, opt.channel3]
 
         def generator_block(in_channels, out_channels, bn=True, stride=1):
@@ -119,20 +119,23 @@ class Generator(nn.Module):
         self.channel0_img = self.channels[0]-opt.channel0_bg
         self.img_block = nn.Sequential(
             nn.Conv2d(self.channel0_img, opt.channels, **opts_conv),
-            nn.Sigmoid(),
+                # nn.Sigmoid(),
+                nn.Hardtanh(min_val=0.0, max_val=1.0),
         )
 
         if opt.channel0_bg>0:
             self.bg_block = nn.Sequential(
                 nn.Conv2d(opt.channel0_bg, opt.channels, kernel_size=opt.kernel_size, bias=opt.do_bias,
-                                 padding=opt.padding, padding_mode='constant'),
-                nn.Sigmoid(),
+                                 padding=opt.padding, padding_mode='circular'),
+                # nn.Sigmoid(),
+                nn.Hardtanh(min_val=0.0, max_val=1.0),
             )
             self.mask_block = nn.Sequential(
                 #nn.MaxPool2d(kernel_size=opt.kernel_size, padding=opt.padding, stride=1), # https://pytorch.org/docs/stable/nn.html#torch.nn.MaxPool2d
                 nn.Conv2d(self.channels[0], 1, kernel_size=opt.kernel_size, bias=True,
                                  padding=opt.padding, padding_mode='constant'),
-                nn.Sigmoid(),
+                # nn.Sigmoid(),
+                nn.Hardtanh(min_val=0.0, max_val=1.0),
             )
 
         self.opt = opt
