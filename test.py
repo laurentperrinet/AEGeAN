@@ -63,6 +63,7 @@ for expname in experiments.keys():
 
         # GAN_losses = ['original', 'wasserstein', 'ian', 'alternative', 'alternativ2']
         GAN_losses = ['original', 'ian', 'wasserstein', 'alternative', 'alternativ2', 'alternativ3']
+        GAN_losses = ['original',  'wasserstein', 'alternativ3']
         # GAN_losses = ['original', 'ian', 'alternativ3']
 
         for GAN_loss in GAN_losses:
@@ -74,7 +75,7 @@ for expname in experiments.keys():
                 opt.bn_eps = np.inf
                 AG.learn(opt)
 
-        GAN_losses.remove(opt.GAN_loss)
+        #GAN_losses.remove(opt.GAN_loss)
         for GAN_loss in GAN_losses:
             tag, opt = init()
             if opt.lrD > 0:
@@ -83,7 +84,6 @@ for expname in experiments.keys():
                 AG.learn(opt)
 
     base = 2
-
 
     tag, opt = init()
     opt.run_path = tag + 'low_batch_size'
@@ -164,6 +164,12 @@ for expname in experiments.keys():
 
         tag, opt = init()
         opt.gamma = .618 if opt.gamma==1. else 1.
+        # opt.gamma = 1.
+        opt.run_path = tag + f'gamma_{str(opt.gamma)}'
+        AG.learn(opt)
+
+        tag, opt = init()
+        opt.gamma = 1.4 if opt.gamma==1. else 1.
         # opt.gamma = 1.
         opt.run_path = tag + f'gamma_{str(opt.gamma)}'
         AG.learn(opt)
@@ -332,22 +338,22 @@ for expname in experiments.keys():
 
         tag, opt = init()
         opt.run_path = tag + 'low_beta1'
-        opt.beta1 = 0.7
+        opt.beta1 = 0.8
         AG.learn(opt)
 
         tag, opt = init()
         opt.run_path = tag + 'high_beta1'
-        opt.beta1 = 0.91
+        opt.beta1 = 0.95
         AG.learn(opt)
 
         tag, opt = init()
         opt.run_path = tag + 'low_beta2'
-        opt.beta2 = 0.5
+        opt.beta2 = 0.9
         AG.learn(opt)
 
         tag, opt = init()
         opt.run_path = tag + 'high_beta2'
-        opt.beta2 = 0.95
+        opt.beta2 = 0.975
         AG.learn(opt)
 
         tag, opt = init()
