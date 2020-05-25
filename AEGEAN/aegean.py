@@ -129,16 +129,8 @@ def do_learn(opt, run_dir="./runs"):
     stat_record = init_hist(opt.n_epochs, nb_batch)
 
 
-    def gen_z(threshold, bandwidth):
-        if bandwidth==0:
-            z = np.random.normal(0, 1, (opt.batch_size, opt.latent_dim))
-        else:
-            z0 = np.random.normal(0, 1, (1, opt.latent_dim))
-            z = z0 + bandwidth * np.random.normal(0, 1, (opt.batch_size, opt.latent_dim))
-            z /= z.std() # TODO: could work without that
-
-        if threshold > 0:
-            z[np.abs(z)<threshold] = 0.
+    def gen_z():
+        z = np.random.normal(0, 1, (opt.batch_size, opt.latent_dim))
         z = Variable(Tensor(z), requires_grad=False)
         return z
 
@@ -149,7 +141,7 @@ def do_learn(opt, run_dir="./runs"):
         return noise
 
     # Vecteur z fixe pour faire les samples
-    fixed_noise = gen_z(threshold=opt.latent_threshold, bandwidth=0.)
+    fixed_noise = gen_z()
     real_imgs_samples = None
 
     z_zeros = Variable(Tensor(opt.batch_size, opt.latent_dim).fill_(0), requires_grad=False)
@@ -264,7 +256,7 @@ def do_learn(opt, run_dir="./runs"):
                 real_loss.backward()
 
             # Generate a batch of fake images and learn the discriminator to treat them as such
-            z = gen_z(threshold=opt.latent_threshold, bandwidth=0.)
+            z = gen_z()
             gen_imgs = generator(z)
             if opt.D_noise > 0: gen_imgs += opt.D_noise * gen_noise(real_imgs)
 
@@ -304,7 +296,7 @@ def do_learn(opt, run_dir="./runs"):
                     p.requires_grad = False  # to avoid computation
 
             # Generate a batch of fake images
-            z = gen_z(threshold=opt.latent_threshold, bandwidth=opt.latent_bandwidth)
+            z = gen_z()
             gen_imgs = generator(z)
             if opt.G_noise > 0: gen_imgs += opt.G_noise * gen_noise(real_imgs)
 
@@ -389,11 +381,6 @@ def do_learn(opt, run_dir="./runs"):
                 writer.add_scalar('loss/D', d_loss.item(), global_step=epoch)
 
                 writer.add_scalar('score/D_x', np.mean(stat_record["d_x_mean"]), global_step=epoch)
-
-
-            # inception score
-            # IS, _ = get_inception_score(gen_imgs, cuda=use_cuda, batch_size=opt.batch_size//4, resize=True, splits=1)
-            # writer.add_scalar('InceptionScore', IS, global_step=epoch)
 
             # Save samples
             if epoch % opt.sample_interval == 0:

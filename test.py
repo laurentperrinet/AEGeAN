@@ -106,27 +106,6 @@ for expname in experiments.keys():
     AG.learn(opt)
 
     tag, opt = init()
-    opt.latent_threshold = 0.3 if opt.latent_threshold==0. else 0.
-    opt.run_path = tag + 'no_latent_threshold' if opt.latent_threshold==0. else tag + f'latent_threshold_{str(opt.latent_threshold)}'
-    AG.learn(opt)
-
-    tag, opt = init()
-    opt.latent_threshold = 0.1 if opt.latent_threshold==0. else 0.
-    opt.run_path = tag + 'no_latent_bandwidth' if opt.latent_threshold==0. else tag + f'latent_bandwidth_{str(opt.latent_bandwidth)}'
-    AG.learn(opt)
-
-    if opt.latent_threshold>0.:
-        tag, opt = init()
-        opt.run_path = tag + 'low_latent_bandwidth'
-        opt.latent_bandwidth //= base
-        AG.learn(opt)
-
-        tag, opt = init()
-        opt.run_path = tag + 'high_latent_bandwidth'
-        opt.latent_bandwidth *= base
-        AG.learn(opt)
-
-    tag, opt = init()
     opt.run_path = tag + 'small_lrE'
     opt.lrE /= base
     AG.learn(opt)
