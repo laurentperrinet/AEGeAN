@@ -151,7 +151,7 @@ class Generator(nn.Module):
         out = self.l1(out)
         if self.opt.verbose:
             print("l1 out : ", out.shape)
-        out = out.view(out.shape[0], opt.channel3, self.init_size, self.init_size)
+        out = out.view(out.shape[0], self.opt.channel3, self.init_size, self.init_size)
         # Dim : (opt.channel3, opt.img_size/8, opt.img_size/8)
         if self.opt.verbose:
             print("View out : ", out.shape)
