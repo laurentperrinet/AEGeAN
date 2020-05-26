@@ -16,7 +16,6 @@ class Encoder(nn.Module):
         NL = nn.ReLU()
         opts_conv = dict(kernel_size=opt.kernel_size, stride=opt.stride,
                          padding=opt.padding, padding_mode='reflect')
-        self.channels = [opt.channel0, opt.channel1, opt.channel2, opt.channel3, opt.channel3]
 
         def encoder_block(in_channels, out_channels, bias, bn=True):
             block = [nn.Conv2d(in_channels, out_channels, bias=bias, **opts_conv), ]
@@ -26,18 +25,18 @@ class Encoder(nn.Module):
             block.append(NL)
             return block
 
-        self.conv1 = nn.Sequential(*encoder_block(opt.channels, self.channels[0], bn=False, bias=False),)
-        self.conv2 = nn.Sequential(*encoder_block(self.channels[0], self.channels[1], bias=opt.do_bias),)
-        self.conv3 = nn.Sequential(*encoder_block(self.channels[1], self.channels[2], bias=opt.do_bias),)
-        self.conv4 = nn.Sequential(*encoder_block(self.channels[2], self.channels[3], bias=opt.do_bias),)
+        self.conv1 = nn.Sequential(*encoder_block(opt.channels, opt.channel0, bn=False, bias=False),)
+        self.conv2 = nn.Sequential(*encoder_block(opt.channel0, opt.channel1, bias=opt.do_bias),)
+        self.conv3 = nn.Sequential(*encoder_block(opt.channel1, opt.channel2, bias=opt.do_bias),)
+        self.conv4 = nn.Sequential(*encoder_block(opt.channel2, opt.channel3, bias=opt.do_bias),)
 
         self.init_size = opt.img_size // opt.stride**4
-        # self.vector = nn.Linear(self.channels[3] * self.init_size ** 2, opt.latent_dim)
+        # self.vector = nn.Linear(opt.channel3 * self.init_size ** 2, opt.latent_dim)
         self.vector0 = nn.Sequential(
-            nn.Linear(self.channels[3] * self.init_size ** 2, self.channels[4]),
+            nn.Linear(opt.channel3 * self.init_size ** 2, opt.channel4),
         )
         self.vector1 = nn.Sequential(
-            nn.Linear(self.channels[4], opt.latent_dim),
+            nn.Linear(opt.channel4, opt.latent_dim),
         )
 
         self.opt = opt
@@ -91,7 +90,6 @@ class Generator(nn.Module):
         NL = nn.ReLU()
         opts_conv = dict(kernel_size=opt.kernel_size, bias=opt.do_bias,
                          padding=opt.padding, padding_mode='reflect')
-        self.channels = [opt.channel0, opt.channel1, opt.channel2, opt.channel3, opt.channel3]
 
         def generator_block(in_channels, out_channels, bn=True, stride=1):
             block = [#nn.UpsamplingNearest2d(scale_factor=opt.stride),
@@ -106,17 +104,17 @@ class Generator(nn.Module):
             block.append(NL)
             return block
 
-        self.l0 = nn.Sequential(nn.Linear(opt.latent_dim, self.channels[4]), NL,)
-        # self.l00 = nn.Sequential(nn.Linear(self.channels[4], self.channels[4]), NL,)
+        self.l0 = nn.Sequential(nn.Linear(opt.latent_dim, opt.channel4), NL,)
+        # self.l00 = nn.Sequential(nn.Linear(opt.channel4, opt.channel4), NL,)
         self.init_size = opt.img_size // opt.stride**2 # no stride at the first conv
         self.l1 = nn.Sequential(
-            nn.Linear(self.channels[4], self.channels[3] * self.init_size ** 2), NL,)
+            nn.Linear(opt.channel4, opt.channel3 * self.init_size ** 2), NL,)
 
-        self.conv1 = nn.Sequential(*generator_block(self.channels[3], self.channels[2], bn=False, stride=1),)
-        self.conv2 = nn.Sequential(*generator_block(self.channels[2], self.channels[1], stride=opt.stride),)
-        self.conv3 = nn.Sequential(*generator_block(self.channels[1], self.channels[0], stride=opt.stride),)
+        self.conv1 = nn.Sequential(*generator_block(opt.channel3, opt.channel2, bn=False, stride=1),)
+        self.conv2 = nn.Sequential(*generator_block(opt.channel2, opt.channel1, stride=opt.stride),)
+        self.conv3 = nn.Sequential(*generator_block(opt.channel1, opt.channel0, stride=opt.stride),)
 
-        self.channel0_img = self.channels[0]-opt.channel0_bg
+        self.channel0_img = opt.channel0-opt.channel0_bg
         self.img_block = nn.Sequential(
             nn.Conv2d(self.channel0_img, opt.channels, **opts_conv),
                 # nn.Sigmoid(),
@@ -132,7 +130,7 @@ class Generator(nn.Module):
             )
             self.mask_block = nn.Sequential(
                 #nn.MaxPool2d(kernel_size=opt.kernel_size, padding=opt.padding, stride=1), # https://pytorch.org/docs/stable/nn.html#torch.nn.MaxPool2d
-                nn.Conv2d(self.channels[0], 1, kernel_size=opt.kernel_size, bias=True,
+                nn.Conv2d(opt.channel0, 1, kernel_size=opt.kernel_size, bias=True,
                                  padding=opt.padding, padding_mode='constant'),
                 # nn.Sigmoid(),
                 nn.Hardtanh(min_val=0.0, max_val=1.0),
@@ -153,22 +151,22 @@ class Generator(nn.Module):
         out = self.l1(out)
         if self.opt.verbose:
             print("l1 out : ", out.shape)
-        out = out.view(out.shape[0], self.channels[3], self.init_size, self.init_size)
-        # Dim : (self.channels[3], opt.img_size/8, opt.img_size/8)
+        out = out.view(out.shape[0], opt.channel3, self.init_size, self.init_size)
+        # Dim : (opt.channel3, opt.img_size/8, opt.img_size/8)
         if self.opt.verbose:
             print("View out : ", out.shape)
 
         out = self.conv1(out)
-        # Dim : (self.channels[3]/2, opt.img_size/4, opt.img_size/4)
+        # Dim : (opt.channel3/2, opt.img_size/4, opt.img_size/4)
         if self.opt.verbose:
             print("Conv1 out : ", out.shape)
         out = self.conv2(out)
-        # Dim : (self.channels[3]/4, opt.img_size/2, opt.img_size/2)
+        # Dim : (opt.channel3/4, opt.img_size/2, opt.img_size/2)
         if self.opt.verbose:
             print("Conv2 out : ", out.shape)
 
         out = self.conv3(out)
-        # Dim : (self.channels[3]/8, opt.img_size, opt.img_size)
+        # Dim : (opt.channel3/8, opt.img_size, opt.img_size)
         if self.opt.verbose:
             print("Conv3 out : ", out.shape)
 
@@ -216,8 +214,7 @@ class Discriminator(nn.Module):
         # “Use LeakyReLU in the discriminator.” — Jonathan Hui https://link.medium.com/IYyQV6sMD0
         NL = nn.LeakyReLU(opt.lrelu)
         opts_conv = dict(kernel_size=opt.kernel_size, stride=opt.stride,
-                         padding=opt.padding, padding_mode='constant')#,bias=opt.do_bias)
-        self.channels = [opt.channel0, opt.channel1, opt.channel2, opt.channel3, opt.channel4]
+                         padding=opt.padding, padding_mode='constant')
 
         def discriminator_block(in_channels, out_channels, bn=True, bias=False):
             block = [nn.Conv2d(in_channels, out_channels, bias=bias, **opts_conv), ]
@@ -230,15 +227,15 @@ class Discriminator(nn.Module):
 
         self.opt = opt
 
-        self.conv1 = nn.Sequential(*discriminator_block(opt.channels, self.channels[0], bn=False, bias=False),)
-        self.conv2 = nn.Sequential(*discriminator_block(self.channels[0], self.channels[1], bias=opt.do_bias),)
-        self.conv3 = nn.Sequential(*discriminator_block(self.channels[1], self.channels[2], bias=opt.do_bias),)
-        self.conv4 = nn.Sequential(*discriminator_block(self.channels[2], self.channels[3], bias=opt.do_bias),)
+        self.conv1 = nn.Sequential(*discriminator_block(opt.channels, opt.channel0, bn=False, bias=False),)
+        self.conv2 = nn.Sequential(*discriminator_block(opt.channel0, opt.channel1, bias=opt.do_bias),)
+        self.conv3 = nn.Sequential(*discriminator_block(opt.channel1, opt.channel2, bias=opt.do_bias),)
+        self.conv4 = nn.Sequential(*discriminator_block(opt.channel2, opt.channel3, bias=opt.do_bias),)
 
         # The height and width of downsampled image
         self.init_size = opt.img_size // opt.stride**4
-        self.lnl = nn.Sequential(nn.Linear(self.channels[3] * self.init_size ** 2, self.channels[4]), NL,)
-        self.adv_layer = nn.Linear(self.channels[4], 1)
+        self.lnl = nn.Sequential(nn.Linear(opt.channel3 * self.init_size ** 2, opt.channel4), NL,)
+        self.adv_layer = nn.Linear(opt.channel4, 1)
 
     def forward(self, img):
         if self.opt.verbose:

@@ -48,6 +48,7 @@ class FolderDataset(Dataset):
                 #     ImageDraw.floodfill(img_as_pil, xy=(0, 0), value=(127, 127, 127), thresh=10)
                 #     ImageDraw.floodfill(img_as_pil, xy=(0, -1), value=(127, 127, 127), thresh=10)
                 img_as_pil = img_as_pil.resize((self.height, self.width), resample=Image.BILINEAR)
+                # TODO: use LAB color space for CFD / CMYK for simpsons
                 self.imgs.append(img_as_pil)
                 self.files.append(fname)
 
