@@ -83,6 +83,12 @@ for expname in experiments.keys():
                 opt.GAN_loss = GAN_loss
                 AG.learn(opt)
 
+    for padding_mode in ['reflect', 'border', 'zeros']: # https://pytorch.org/docs/1.4.0/nn.functional.html#grid-sample
+        tag, opt = init()
+        opt.run_path = tag + 'padding_mode_' + padding_mode
+        opt.padding_mode = padding_mode
+        AG.learn(opt)
+
     base = 2
 
     tag, opt = init()
@@ -170,12 +176,12 @@ for expname in experiments.keys():
 
         tag, opt = init()
         opt.run_path = tag + 'small_channel0_bg'
-        opt.channel0_bg = 4 # //= base
+        opt.channel0_bg //= base
         AG.learn(opt)
 
         tag, opt = init()
         opt.run_path = tag + 'big_channel0_bg'
-        opt.channel0_bg = 12 #*= base
+        opt.channel0_bg *= base
         AG.learn(opt)
 
         tag, opt = init()
@@ -307,32 +313,32 @@ for expname in experiments.keys():
 
         tag, opt = init()
         opt.run_path = tag + 'low_dropout'
-        opt.dropout = 0.01
+        opt.dropout = 0.001
         AG.learn(opt)
 
         tag, opt = init()
         opt.run_path = tag + 'high_dropout'
-        opt.dropout = 0.5
+        opt.dropout = 0.01
         AG.learn(opt)
 
         tag, opt = init()
         opt.run_path = tag + 'low_beta1'
-        opt.beta1 = 0.8
+        opt.beta1 = 0.7
         AG.learn(opt)
 
         tag, opt = init()
         opt.run_path = tag + 'high_beta1'
-        opt.beta1 = 0.95
+        opt.beta1 = 0.925
         AG.learn(opt)
 
         tag, opt = init()
         opt.run_path = tag + 'low_beta2'
-        opt.beta2 = 0.9
+        opt.beta2 = 0.8
         AG.learn(opt)
 
         tag, opt = init()
         opt.run_path = tag + 'high_beta2'
-        opt.beta2 = 0.975
+        opt.beta2 = 0.95
         AG.learn(opt)
 
         tag, opt = init()
@@ -396,7 +402,7 @@ for expname in experiments.keys():
 
         tag, opt = init()
         opt.run_path = tag + 'small_bn_momentum'
-        opt.bn_momentum = .3
+        opt.bn_momentum = .1
         AG.learn(opt)
 
         tag, opt = init()

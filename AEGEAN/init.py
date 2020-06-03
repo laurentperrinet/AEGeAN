@@ -31,22 +31,23 @@ def init():
     parser.add_argument("--valid_smooth", type=float, default=1., help="Smoothing the results of D on real images")
     parser.add_argument("--dropout", type=float, default=.005, help="Dropout generalization factor in the encoder & generator")
     parser.add_argument("--E_noise", type=float, default=0.01, help="Add noise to the input images to G_E_x")
-    parser.add_argument("--D_noise", type=float, default=0.0005, help="Add noise to the input images to D_x")
-    parser.add_argument("--G_noise", type=float, default=0.0005, help="Add noise to the input images to D_G_z")
+    parser.add_argument("--D_noise", type=float, default=0.001, help="Add noise to the input images to D_x")
+    parser.add_argument("--G_noise", type=float, default=0.001, help="Add noise to the input images to D_G_z")
     parser.add_argument("--GAN_loss", type=str, default='original', help="Use different losses for G.")
+    parser.add_argument("--padding_mode", type=str, default='border', help="Handling values outside the range.")
     parser.add_argument("--do_SSIM", type=bool, default=True, help="Use contrasted images for the cost of E.")
     parser.add_argument("--do_bias", type=bool, default=False, help="Should we use biases in convolutions?")
     parser.add_argument("--lrelu", type=float, default=0.1, help="LeakyReLU : alpha - zero for a standard ReLU")
     parser.add_argument("--do_joint", type=bool, default=True, help="Do a joint learning of E and G, dude.")
     parser.add_argument("--do_insight", type=bool, default=False, help="D looks at G_E_x instead of x.")
     parser.add_argument("--bn_eps", type=float, default=0.00001, help="batchnorm: espilon for numerical stability")
-    parser.add_argument("--bn_momentum", type=float, default=.5,
+    parser.add_argument("--bn_momentum", type=float, default=.25,
                         help="batchnorm: momentum for numerical stability")
-    parser.add_argument("--beta1", type=float, default=0.875,
+    parser.add_argument("--beta1", type=float, default=0.85,
                         help="adam: decay of first order momentum of gradient")
-    parser.add_argument("--beta2", type=float, default=0.95,
+    parser.add_argument("--beta2", type=float, default=0.9,
                         help="adam: decay of first order momentum of gradient")
-    parser.add_argument("--channel0_bg", type=int, default=16, help="size of the background mask channel")
+    parser.add_argument("--channel0_bg", type=int, default=8, help="size of the background mask channel")
     parser.add_argument("--channel0", type=int, default=256, help="size of channel 0")
     parser.add_argument("--channel1", type=int, default=128, help="size of channel 1")
     parser.add_argument("--channel2", type=int, default=64, help="size of channel 2")
