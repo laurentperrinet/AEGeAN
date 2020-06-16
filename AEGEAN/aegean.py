@@ -153,7 +153,8 @@ def do_learn(opt, run_dir="./runs"):
     # Adversarial ground truths
     valid = Variable(Tensor(opt.batch_size, 1).fill_(1), requires_grad=False)
     fake = Variable(Tensor(opt.batch_size, 1).fill_(0), requires_grad=False)
-    valid_smooth = Variable(Tensor(opt.batch_size, 1).fill_(float(np.random.uniform(opt.valid_smooth, 1.0, 1))), requires_grad=False)
+    valid_smooth = np.random.uniform(opt.valid_smooth, 1.0, (opt.batch_size, 1))
+    valid_smooth = Variable(Tensor(valid_smooth), requires_grad=False)
 
 
     t_total = time.time()
@@ -170,7 +171,7 @@ def do_learn(opt, run_dir="./runs"):
             for p in encoder.parameters():
                 p.requires_grad = True
             for p in discriminator.parameters():
-                p.requires_grad = False  # to avoid learning
+                p.requires_grad = False  # to avoid learning D when learning E
 
             real_imgs = Variable(imgs.type(Tensor), requires_grad=False)
 
