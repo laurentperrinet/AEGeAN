@@ -8,11 +8,11 @@ import numpy as np
 
 experiments = {}
 # experiments['Simpsons_128'] = [('datapath', '../database/Simpsons-Face_clear/cp/'), ('img_size', 128), ('n_epochs', 128), ('do_SSIM', False)]
-experiments['AEGEAN_64'] = [('img_size', 64)]# , ('n_epochs', 512)]
-experiments['Simpsons_64'] = [('datapath', '../database/Simpsons-Face_clear/cp/'), ('img_size', 64), ('do_SSIM', True)]
-# experiments['AEGEAN_128'] = [('img_size', 128), ('n_epochs', 512)]
-# experiments['AEGEAN_256'] = [('img_size', 256), ]
-# experiments['Simpsons_256'] = [('datapath', '../database/Simpsons-Face_clear/cp/'), ('img_size', 256), ('do_SSIM', False)]
+# experiments['AEGEAN_64'] = [('img_size', 64)]# , ('n_epochs', 512)]
+# experiments['Simpsons_64'] = [('datapath', '../database/Simpsons-Face_clear/cp/'), ('img_size', 64), ('do_SSIM', True)]
+# experiments['AEGEAN_128'] = [('img_size', 128)]#, ('n_epochs', 512)]
+experiments['AEGEAN_256'] = [('img_size', 256), ]
+experiments['Simpsons_256'] = [('datapath', '../database/Simpsons-Face_clear/cp/'), ('img_size', 256)] #, ('do_SSIM', False)]
 # experiments['AEGEAN_128'] = [('img_size', 128), ]
 # experiments['butterflies_256'] = [('datapath', '../database/swapnesh_butterflies/'), ('img_size', 256)]
 # experiments['butterflies_64'] = [('datapath', '../database/swapnesh_butterflies/'), ('img_size', 64)]
@@ -145,8 +145,7 @@ for expname in experiments.keys():
         opt.lrG *= base
         AG.learn(opt)
 
-    if True:
-
+    if False:
         tag, opt = init()
         opt.gamma = .618 if opt.gamma==1. else 1.
         # opt.gamma = 1.
@@ -159,6 +158,7 @@ for expname in experiments.keys():
         opt.run_path = tag + f'gamma_{str(opt.gamma)}'
         AG.learn(opt)
 
+    if True:
         tag, opt = init()
         opt.run_path = tag + 'small_window_size'
         opt.window_size //= base
@@ -176,12 +176,12 @@ for expname in experiments.keys():
 
         tag, opt = init()
         opt.run_path = tag + 'small_channel0_bg'
-        opt.channel0_bg //= base
+        opt.channel0_bg = 2
         AG.learn(opt)
 
         tag, opt = init()
         opt.run_path = tag + 'big_channel0_bg'
-        opt.channel0_bg *= base
+        opt.channel0_bg = opt.channel0 // 4
         AG.learn(opt)
 
         tag, opt = init()
