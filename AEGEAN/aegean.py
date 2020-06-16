@@ -399,21 +399,21 @@ def do_learn(opt, run_dir="./runs"):
                 writer.add_image('Generated images', grid, epoch)
                 generator.train()
 
-
                 """
                 Use auto-encoder model and original images to generate images.
                 Save them to tensorboard
 
                 """
-                grid_imgs = torchvision.utils.make_grid(real_imgs_samples, normalize=True, nrow=8, range=(0, 1))
-                writer.add_image('Images/original', grid_imgs, epoch)
+                # grid_imgs = torchvision.utils.make_grid(real_imgs_samples, normalize=True, nrow=8, range=(0, 1))
+                # writer.add_image('Images/original', grid_imgs, epoch)
 
                 generator.eval()
                 encoder.eval()
                 enc_imgs = encoder(real_imgs_samples)
                 dec_imgs = generator(enc_imgs)
                 grid_dec = torchvision.utils.make_grid(dec_imgs, normalize=True, nrow=8, range=(0, 1))
-                writer.add_image('Images/auto-encoded', grid_dec, epoch)
+                # writer.add_image('Images/auto-encoded', grid_dec, epoch)
+                writer.add_image('auto-encoded', grid_dec, epoch)
                 generator.train()
                 encoder.train()
 
