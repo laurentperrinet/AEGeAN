@@ -86,17 +86,17 @@ class Encoder(nn.Module):
 class Generator(nn.Module):
     def __init__(self, opt):
         super(Generator, self).__init__()
-        # NL = nn.LeakyReLU(opt.lrelu)
-        NL = nn.ReLU()
+        NL = nn.LeakyReLU(opt.lrelu)
+        # NL = nn.ReLU()
         opts_conv = dict(kernel_size=opt.kernel_size, bias=opt.do_bias,
                          padding=opt.padding, padding_mode=opt.padding_mode)
 
         def generator_block(in_channels, out_channels, bn=True, stride=1):
             block = [#nn.UpsamplingNearest2d(scale_factor=opt.stride),
                      nn.Upsample(scale_factor=stride, mode='bilinear', align_corners=True),
-                     nn.Conv2d(in_channels, out_channels, **opts_conv),
+                     #nn.Conv2d(in_channels, out_channels, **opts_conv),
                      # TODO use
-                     # nn.ConvTranspose2d(in_channels, out_channels, stride=opt.stride, **opts_conv),
+                     nn.ConvTranspose2d(in_channels, out_channels, **opts_conv), # stride=opt.stride, 
                      ]
             block.append(nn.Dropout2d(opt.dropout))
             if bn and (not opt.bn_eps == np.inf):
