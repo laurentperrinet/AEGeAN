@@ -45,7 +45,7 @@ def init():
                         help="batchnorm: momentum for numerical stability")
     parser.add_argument("--beta1", type=float, default=0.85,
                         help="adam: decay of first order momentum of gradient")
-    parser.add_argument("--beta2", type=float, default=0.9,
+    parser.add_argument("--beta2", type=float, default=0.9999,
                         help="adam: decay of first order momentum of gradient")
     parser.add_argument("--channel0_bg", type=int, default=8, help="size of the background mask channel")
     parser.add_argument("--channel0", type=int, default=256, help="size of channel 0")

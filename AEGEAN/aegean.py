@@ -104,8 +104,12 @@ def do_learn(opt, run_dir="./runs"):
         optimizer = torch.optim.RMSprop
     else:
         # https://pytorch.org/docs/stable/optim.html#torch.optim.Adam
-        opts = dict(betas=(opt.beta1, opt.beta2))
-        optimizer = torch.optim.Adam
+        if False: #opt.beta2 > 0:
+            opts = dict(betas=(opt.beta1, opt.beta2))
+            optimizer = torch.optim.Adam
+        else:
+            opts = dict(momentum=1-opt.beta1, nesterov=True, weight_decay=1-opt.beta2)
+            optimizer = torch.optim.SGD
 
     optimizer_G = optimizer(generator.parameters(), lr=opt.lrG, **opts)
     optimizer_D = optimizer(discriminator.parameters(), lr=opt.lrD, **opts)
