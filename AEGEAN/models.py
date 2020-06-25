@@ -92,7 +92,7 @@ class Generator(nn.Module):
                          padding=opt.padding)
 
         def generator_block(in_channels, out_channels, bn=True, stride=1):
-            if False:
+            if True:
                 block = [nn.Conv2d(in_channels, out_channels, padding_mode=opt.padding_mode, **opts_conv),
                          nn.Upsample(scale_factor=stride, mode='bilinear', align_corners=True),
                         ]
