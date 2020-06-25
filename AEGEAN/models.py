@@ -91,7 +91,7 @@ class Generator(nn.Module):
         opts_conv = dict(kernel_size=opt.kernel_size, bias=opt.do_bias)
 
         def generator_block(in_channels, out_channels, bn=True, stride=1):
-            if True:
+            if False:
                 block = [nn.Conv2d(in_channels, out_channels,
                                    padding=opt.padding, padding_mode=opt.padding_mode, **opts_conv),
                          nn.Upsample(scale_factor=stride, mode='bilinear', align_corners=True),
