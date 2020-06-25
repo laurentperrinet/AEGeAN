@@ -88,16 +88,18 @@ class Generator(nn.Module):
         super(Generator, self).__init__()
         NL = nn.LeakyReLU(opt.lrelu)
         # NL = nn.ReLU()
-        opts_conv = dict(kernel_size=opt.kernel_size, bias=opt.do_bias,
-                         padding=opt.padding, padding_mode='zeros')#opt.padding_mode)
+        opts_conv = dict(kernel_size=opt.kernel_size, bias=opt.do_bias)
 
         def generator_block(in_channels, out_channels, bn=True, stride=1):
-            block = [#nn.UpsamplingNearest2d(scale_factor=opt.stride),
-                     nn.Upsample(scale_factor=stride, mode='bilinear', align_corners=True),
-                     # nn.Conv2d(in_channels, out_channels, **opts_conv),
-                     # TODO use
-                     nn.ConvTranspose2d(in_channels, out_channels, **opts_conv), # stride=opt.stride,
-                     ]
+            if True:
+                block = [nn.Conv2d(in_channels, out_channels,
+                                   padding=opt.padding, padding_mode=opt.padding_mode, **opts_conv),
+                         nn.Upsample(scale_factor=stride, mode='bilinear', align_corners=True),
+                        ]
+            else:# TODO use
+                block = [nn.ConvTranspose2d(in_channels, out_channels, stride=opt.stride,
+                                            padding_mode='zeros', padding=opt.padding, output_padding=1, **opts_conv), #
+                        ]
             block.append(nn.Dropout2d(opt.dropout))
             if bn and (not opt.bn_eps == np.inf):
                 block.append(nn.BatchNorm2d(num_features=out_channels, eps=opt.bn_eps, momentum=opt.bn_momentum))
@@ -105,7 +107,7 @@ class Generator(nn.Module):
             return block
 
         self.l0 = nn.Sequential(nn.Linear(opt.latent_dim, opt.channel4), NL,)
-        # self.l00 = nn.Sequential(nn.Linear(opt.channel4, opt.channel4), NL,)
+
         self.init_size = opt.img_size // opt.stride**2 # no stride at the first conv
         self.l1 = nn.Sequential(
             nn.Linear(opt.channel4, opt.channel3 * self.init_size ** 2), NL,)
@@ -116,15 +118,14 @@ class Generator(nn.Module):
 
         self.channel0_img = opt.channel0-opt.channel0_bg
         self.img_block = nn.Sequential(
-            nn.Conv2d(self.channel0_img, opt.channels, **opts_conv),
+            nn.Conv2d(self.channel0_img, opt.channels, padding=opt.padding, padding_mode=opt.padding_mode, **opts_conv),
                 # nn.Sigmoid(),
                 nn.Hardtanh(min_val=0.0, max_val=1.0),
         )
 
         if opt.channel0_bg>0:
             self.bg_block = nn.Sequential(
-                nn.Conv2d(opt.channel0_bg, opt.channels, kernel_size=opt.kernel_size, bias=opt.do_bias,
-                                 padding=opt.padding, padding_mode=opt.padding_mode),
+                nn.Conv2d(opt.channel0_bg, opt.channels, padding=opt.padding, padding_mode=opt.padding_mode, **opts_conv),
                 # nn.Sigmoid(),
                 nn.Hardtanh(min_val=0.0, max_val=1.0),
             )
@@ -192,9 +193,6 @@ class Generator(nn.Module):
             out = self.img_block(out)
             if self.opt.verbose:
                 print("img shape : ", out.shape)
-
-        if self.opt.verbose:
-            print("img shape : ", out.shape)
 
         # # https://en.wikipedia.org/wiki/Gamma_correction
         # if self.opt.verbose:
