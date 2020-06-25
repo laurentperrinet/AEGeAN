@@ -93,10 +93,11 @@ class Generator(nn.Module):
 
         def generator_block(in_channels, out_channels, bn=True, stride=1):
             block = [#nn.UpsamplingNearest2d(scale_factor=opt.stride),
-                     nn.Upsample(scale_factor=stride, mode='bilinear', align_corners=True),
-                     #nn.Conv2d(in_channels, out_channels, **opts_conv),
-                     # TODO use
-                     nn.ConvTranspose2d(in_channels, out_channels, **opts_conv), # stride=opt.stride, 
+                     if False:
+                         nn.Conv2d(in_channels, out_channels, **opts_conv),
+                         nn.Upsample(scale_factor=stride, mode='bilinear', align_corners=True),
+                     else:# TODO use
+                        nn.ConvTranspose2d(in_channels, out_channels, stride=opt.stride, **opts_conv), #
                      ]
             block.append(nn.Dropout2d(opt.dropout))
             if bn and (not opt.bn_eps == np.inf):
