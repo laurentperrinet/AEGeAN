@@ -89,16 +89,16 @@ class Generator(nn.Module):
         NL = nn.LeakyReLU(opt.lrelu)
         # NL = nn.ReLU()
         opts_conv = dict(kernel_size=opt.kernel_size, bias=opt.do_bias)
-
+        do_transpose = True
         def generator_block(in_channels, out_channels, bn=True, stride=1):
-            if False:
+            if not do_transpose:
                 block = [nn.Conv2d(in_channels, out_channels,
                                    padding=opt.padding, padding_mode=opt.padding_mode, **opts_conv),
                          nn.Upsample(scale_factor=stride, mode='bilinear', align_corners=True),
                         ]
             else:# TODO use
-                block = [nn.ConvTranspose2d(in_channels, out_channels, stride=opt.stride,
-                                            padding_mode='zeros', padding=opt.padding, output_padding=1, **opts_conv), #
+                block = [nn.ConvTranspose2d(in_channels, out_channels, stride=stride,
+                                            padding_mode='zeros', padding=opt.padding, output_padding=stride-1, **opts_conv), #
                         ]
             block.append(nn.Dropout2d(opt.dropout))
             if bn and (not opt.bn_eps == np.inf):
@@ -117,21 +117,28 @@ class Generator(nn.Module):
         self.conv3 = nn.Sequential(*generator_block(opt.channel1, opt.channel0, stride=opt.stride),)
 
         self.channel0_img = opt.channel0-opt.channel0_bg
-        self.img_block = nn.Sequential(
-            nn.Conv2d(self.channel0_img, opt.channels, padding=opt.padding, padding_mode=opt.padding_mode, **opts_conv),
-                # nn.Sigmoid(),
+        if not do_transpose:
+            self.img_block = nn.Sequential(
+                nn.Conv2d(self.channel0_img, opt.channels, stride=1, padding=opt.padding, padding_mode=opt.padding_mode, **opts_conv),
+                    # nn.Sigmoid(),
                 nn.Hardtanh(min_val=0.0, max_val=1.0),
-        )
+            )
+        else:
+            self.img_block = nn.Sequential(
+                nn.ConvTranspose2d(self.channel0_img, opt.channels, stride=1,
+                                            padding_mode='zeros', padding=opt.padding, **opts_conv), #
+                nn.Hardtanh(min_val=0.0, max_val=1.0),
+            )
 
         if opt.channel0_bg>0:
             self.bg_block = nn.Sequential(
-                nn.Conv2d(opt.channel0_bg, opt.channels, padding=opt.padding, padding_mode=opt.padding_mode, **opts_conv),
+                nn.Conv2d(opt.channel0_bg, opt.channels, stride=1, padding=opt.padding, padding_mode=opt.padding_mode, **opts_conv),
                 # nn.Sigmoid(),
                 nn.Hardtanh(min_val=0.0, max_val=1.0),
             )
             self.mask_block = nn.Sequential(
                 #nn.MaxPool2d(kernel_size=opt.kernel_size, padding=opt.padding, stride=1), # https://pytorch.org/docs/stable/nn.html#torch.nn.MaxPool2d
-                nn.Conv2d(opt.channel0, 1, kernel_size=opt.kernel_size, bias=True,
+                nn.Conv2d(opt.channel0, 1, kernel_size=opt.kernel_size, stride=1, bias=True,
                                  padding=opt.padding, padding_mode=opt.padding_mode),
                 # nn.Sigmoid(),
                 nn.Hardtanh(min_val=0.0, max_val=1.0),
