@@ -1,4 +1,9 @@
 __version__ = '20191014'
+
+import numpy as np
+import warnings
+warnings.simplefilter(action='ignore', category=FutureWarning)
+
 import matplotlib
 matplotlib.use('Agg')
 
