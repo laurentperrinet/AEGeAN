@@ -7,12 +7,12 @@ import numpy as np
 # PID, HOST = os.getpid(), os.uname()[1]
 
 experiments = {}
-# experiments['Simpsons_128'] = [('datapath', '../database/Simpsons-Face_clear/cp/'), ('img_size', 128), ('n_epochs', 128), ('do_SSIM', False)]
+experiments['Simpsons_128'] = [('datapath', '../database/Simpsons-Face_clear/cp/'), ('img_size', 128), ('n_epochs', 128), ('do_SSIM', False)]
 # experiments['AEGEAN_64'] = [('img_size', 64)]# , ('n_epochs', 512)]
 # experiments['Simpsons_64'] = [('datapath', '../database/Simpsons-Face_clear/cp/'), ('img_size', 64), ('do_SSIM', True)]
-# experiments['AEGEAN_128'] = [('img_size', 128)]#, ('n_epochs', 512)]
-experiments['AEGEAN_256'] = [('img_size', 256), ]
-experiments['Simpsons_256'] = [('datapath', '../database/Simpsons-Face_clear/cp/'), ('img_size', 256)] #, ('do_SSIM', False)]
+experiments['AEGEAN_128'] = [('img_size', 128)]#, ('n_epochs', 512)]
+# experiments['AEGEAN_256'] = [('img_size', 256), ]
+# experiments['Simpsons_256'] = [('datapath', '../database/Simpsons-Face_clear/cp/'), ('img_size', 256)] #, ('do_SSIM', False)]
 # experiments['AEGEAN_128'] = [('img_size', 128), ]
 # experiments['butterflies_256'] = [('datapath', '../database/swapnesh_butterflies/'), ('img_size', 256)]
 # experiments['butterflies_64'] = [('datapath', '../database/swapnesh_butterflies/'), ('img_size', 64)]
@@ -62,8 +62,8 @@ for expname in experiments.keys():
     if True:
 
         # GAN_losses = ['original', 'wasserstein', 'ian', 'alternative', 'alternativ2']
-        GAN_losses = ['original', 'ian', 'wasserstein', 'alternative', 'alternativ2', 'alternativ3']
-        GAN_losses = ['original',  'wasserstein', 'alternativ3']
+        GAN_losses = ['original', 'ian',  'hinge', 'wasserstein', 'alternative', 'alternativ2', 'alternativ3']
+        GAN_losses = ['original',  'hinge', 'alternativ3']
         # GAN_losses = ['original', 'ian', 'alternativ3']
 
         for GAN_loss in GAN_losses:
@@ -99,16 +99,6 @@ for expname in experiments.keys():
     tag, opt = init()
     opt.run_path = tag + 'high_batch_size'
     opt.batch_size *= base
-    AG.learn(opt)
-
-    # what's the effect of a smaller latent_dim ?
-    tag, opt = init()
-    opt.latent_dim, opt.run_path = opt.latent_dim//base, tag + 'small_latent_dim'
-    AG.learn(opt)
-
-    # what's the effect of a smaller latent_dim ?
-    tag, opt = init()
-    opt.latent_dim, opt.run_path = opt.latent_dim*base, tag + 'large_latent_dim'
     AG.learn(opt)
 
     tag, opt = init()
@@ -322,8 +312,13 @@ for expname in experiments.keys():
         AG.learn(opt)
 
         tag, opt = init()
+        opt.run_path = tag + 'zero_beta1'
+        opt.beta1 = 0.0
+        AG.learn(opt)
+
+        tag, opt = init()
         opt.run_path = tag + 'low_beta1'
-        opt.beta1 = 0.7
+        opt.beta1 = 0.3
         AG.learn(opt)
 
         tag, opt = init()
@@ -377,6 +372,16 @@ for expname in experiments.keys():
     #     opt.bn_eps = np.inf
     # AG.learn(opt)
     base = 8
+
+    # what's the effect of a smaller latent_dim ?
+    tag, opt = init()
+    opt.latent_dim, opt.run_path = opt.latent_dim//base, tag + 'small_latent_dim'
+    AG.learn(opt)
+
+    # what's the effect of a smaller latent_dim ?
+    tag, opt = init()
+    opt.latent_dim, opt.run_path = opt.latent_dim*base, tag + 'large_latent_dim'
+    AG.learn(opt)
 
     tag, opt = init()
     opt.run_path = tag + 'small_lambdaE'

@@ -98,13 +98,13 @@ def do_learn(opt, run_dir="./runs"):
         encoder.apply(weights_init_normal)
 
     # Optimizers
-    if False:
+    if opt.optimizer == 'rmsprop':
         # https://pytorch.org/docs/stable/optim.html#torch.optim.RMSprop
         opts = dict(momentum=1-opt.beta1, alpha=opt.beta2)
         optimizer = torch.optim.RMSprop
-    else:
+    elif opt.optimizer == 'adam':
         # https://pytorch.org/docs/stable/optim.html#torch.optim.Adam
-        if False: #opt.beta2 > 0:
+        if True: #opt.beta2 > 0:
             opts = dict(betas=(opt.beta1, opt.beta2))
             optimizer = torch.optim.Adam
         else:
@@ -119,6 +119,7 @@ def do_learn(opt, run_dir="./runs"):
     else:
         optimizer_E = optimizer(encoder.parameters(), lr=opt.lrE, **opts)
 
+    # TODO parameterize scheuler !
     gamma = .1 ** (1 / opt.n_epochs)
     schedulers = []
     for optimizer in [optimizer_G, optimizer_D, optimizer_E]:
@@ -170,6 +171,7 @@ def do_learn(opt, run_dir="./runs"):
                 p.requires_grad = opt.do_joint
             for p in encoder.parameters():
                 p.requires_grad = True
+            # the following is not necessary as we do not use D here and only optimize ||G(E(x)) - x ||^2
             for p in discriminator.parameters():
                 p.requires_grad = False  # to avoid learning D when learning E
 
@@ -197,7 +199,7 @@ def do_learn(opt, run_dir="./runs"):
             #     e_loss = E_loss(real_imgs, decoded_imgs.detach()) / energy
 
             if opt.lambdaE > 0:
-                # We wish to make sure the z_imgs get closer to a gaussian
+                # We wish to make sure the intermediate vector z_imgs get closer to a iid normal (centered gausian of variance 1)
                 e_loss += opt.lambdaE * (torch.sum(z_imgs)/opt.batch_size/opt.latent_dim).pow(2)
                 e_loss += opt.lambdaE * (torch.sum(z_imgs.pow(2))/opt.batch_size/opt.latent_dim-1).pow(2).pow(.5)
 
@@ -224,6 +226,8 @@ def do_learn(opt, run_dir="./runs"):
             if opt.do_insight: real_imgs_ = generator(encoder(real_imgs_))
 
             # Discriminator decision (in logit units)
+            # TODO : group images by sub-batches and train to discriminate from all together
+            # should allow to avoid mode collapse
             logit_d_x = discriminator(real_imgs_)
 
             if opt.lrD > 0:
@@ -241,6 +245,9 @@ def do_learn(opt, run_dir="./runs"):
                 if opt.GAN_loss == 'ian':
                     # eq. 14 in https://arxiv.org/pdf/1701.00160.pdf
                     real_loss = - torch.sum(1 / (1. - 1/sigmoid(logit_d_x)))
+                elif opt.GAN_loss == 'hinge':
+                    # TODO check if we use p or log p
+                    real_loss = nn.ReLU()(1.0 - sigmoid(logit_d_x)).mean()
                 elif opt.GAN_loss == 'wasserstein':
                     real_loss = torch.mean(torch.abs(valid_smooth - sigmoid(logit_d_x)))
                 elif opt.GAN_loss == 'alternative':
@@ -254,8 +261,7 @@ def do_learn(opt, run_dir="./runs"):
                     real_loss = - torch.sum(logit_d_x)
                 elif opt.GAN_loss == 'original':
                     real_loss = adversarial_loss(logit_d_x, valid_smooth)
-                else:
-                    print ('GAN_loss not defined', opt.GAN_loss)
+                else: print ('GAN_loss not defined', opt.GAN_loss)
 
                 # Backward
                 real_loss.backward()
@@ -271,6 +277,9 @@ def do_learn(opt, run_dir="./runs"):
                 # Measure discriminator's ability to classify real from generated samples
                 if opt.GAN_loss == 'wasserstein':
                     fake_loss = torch.mean(sigmoid(logit_d_fake))
+                elif opt.GAN_loss == 'hinge':
+                    # TODO check if we use p or log p
+                    real_loss = nn.ReLU()(1.0 + sigmoid(logit_d_fake)).mean()
                 elif opt.GAN_loss == 'alternative':
                     # https://www.inference.vc/an-alternative-update-rule-for-generative-adversarial-networks/
                     fake_loss = - torch.sum(torch.log(1-sigmoid(logit_d_fake)))
@@ -287,6 +296,7 @@ def do_learn(opt, run_dir="./runs"):
 
                 # Backward
                 fake_loss.backward()
+                # apply the gradients
                 optimizer_D.step()
 
             if opt.lrG > 0:
@@ -316,7 +326,7 @@ def do_learn(opt, run_dir="./runs"):
                     # eq. 14 in https://arxiv.org/pdf/1701.00160.pdf
                     # https://en.wikipedia.org/wiki/Logit
                     g_loss = - torch.sum(sigmoid(logit_d_g_z)/(1 - sigmoid(logit_d_g_z)))
-                elif opt.GAN_loss == 'wasserstein':
+                elif opt.GAN_loss == 'wasserstein' or  opt.GAN_loss == 'hinge':
                     g_loss = torch.mean(torch.abs(valid - sigmoid(logit_d_g_z)))
                 elif opt.GAN_loss == 'alternative':
                     # https://www.inference.vc/an-alternative-update-rule-for-generative-adversarial-networks/
@@ -335,6 +345,7 @@ def do_learn(opt, run_dir="./runs"):
 
                 # Backward
                 g_loss.backward()
+                # apply the gradients
                 optimizer_G.step()
 
 

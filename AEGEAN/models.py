@@ -42,8 +42,7 @@ class Encoder(nn.Module):
         self.opt = opt
 
     def forward(self, img):
-        if self.opt.verbose:
-            print("Encoder")
+        if self.opt.verbose: print("Encoder")
         if self.opt.verbose:
             print("Image shape : ", img.shape)
             print("Image min-max : ", img.min(), img.max())
@@ -52,36 +51,27 @@ class Encoder(nn.Module):
             out = torch.pow(img, self.opt.gamma)
         else:
             out = img * 1.
-        if self.opt.verbose:
-            print("Image shape : ", out.shape)
+        if self.opt.verbose: print("Image shape : ", out.shape)
         out = self.conv1(out)
-        if self.opt.verbose:
-            print("Conv1 out : ", out.shape)
+        if self.opt.verbose: print("Conv1 out : ", out.shape)
         out = self.conv2(out)
-        if self.opt.verbose:
-            print("Conv2 out : ", out.shape)
+        if self.opt.verbose: print("Conv2 out : ", out.shape)
         out = self.conv3(out)
-        if self.opt.verbose:
-            print("Conv3 out : ", out.shape)
+        if self.opt.verbose: print("Conv3 out : ", out.shape)
         out = self.conv4(out)
-        if self.opt.verbose:
-            print("Conv4 out : ", out.shape)
+        if self.opt.verbose: print("Conv4 out : ", out.shape)
 
         out = out.view(out.shape[0], -1)
-        if self.opt.verbose:
-            print("View out : ", out.shape, " init_size=", self.init_size)
+        if self.opt.verbose: print("View out : ", out.shape, " init_size=", self.init_size)
         out = self.vector0(out)
-        if self.opt.verbose:
-            print("Z0 : ", out.shape)
+        if self.opt.verbose: print("Z0 : ", out.shape)
         out = self.vector1(out)
-        if self.opt.verbose:
-            print("Z1 : ", out.shape)
+        if self.opt.verbose: print("Z1 : ", out.shape)
 
         return out
 
     def _name(self):
         return "Encoder"
-
 
 class Generator(nn.Module):
     def __init__(self, opt):
@@ -147,36 +137,28 @@ class Generator(nn.Module):
         self.opt = opt
 
     def forward(self, z):
-        if self.opt.verbose:
-            print("Generator")
+        if self.opt.verbose: print("Generator")
         # Dim : opt.latent_dim
         out = self.l0(z)
-        if self.opt.verbose:
-            print("l0 out : ", out.shape)
+        if self.opt.verbose: print("l0 out : ", out.shape)
         # out = self.l00(out)
-        # if self.opt.verbose:
-        #     print("l00 out : ", out.shape)
+        # if self.opt.verbose: #     print("l00 out : ", out.shape)
         out = self.l1(out)
-        if self.opt.verbose:
-            print("l1 out : ", out.shape)
+        if self.opt.verbose: print("l1 out : ", out.shape)
         out = out.view(out.shape[0], self.opt.channel3, self.init_size, self.init_size)
         # Dim : (opt.channel3, opt.img_size/8, opt.img_size/8)
-        if self.opt.verbose:
-            print("View out : ", out.shape)
+        if self.opt.verbose: print("View out : ", out.shape)
 
         out = self.conv1(out)
         # Dim : (opt.channel3/2, opt.img_size/4, opt.img_size/4)
-        if self.opt.verbose:
-            print("Conv1 out : ", out.shape)
+        if self.opt.verbose: print("Conv1 out : ", out.shape)
         out = self.conv2(out)
         # Dim : (opt.channel3/4, opt.img_size/2, opt.img_size/2)
-        if self.opt.verbose:
-            print("Conv2 out : ", out.shape)
+        if self.opt.verbose: print("Conv2 out : ", out.shape)
 
         out = self.conv3(out)
         # Dim : (opt.channel3/8, opt.img_size, opt.img_size)
-        if self.opt.verbose:
-            print("Conv3 out : ", out.shape)
+        if self.opt.verbose: print("Conv3 out : ", out.shape)
 
         if self.opt.channel0_bg>0:
             # implement a prior in the generator for the background + mask to merge it with the figure
@@ -198,8 +180,7 @@ class Generator(nn.Module):
             out = img * (mask) + bg * (1 - mask)
         else:
             out = self.img_block(out)
-            if self.opt.verbose:
-                print("img shape : ", out.shape)
+            if self.opt.verbose: print("img shape : ", out.shape)
 
         # # https://en.wikipedia.org/wiki/Gamma_correction
         # if self.opt.verbose:
@@ -250,33 +231,25 @@ class Discriminator(nn.Module):
             print("img Image min-max : ", img.min(), img.max())
 
         out = self.conv1(img)
-        if self.opt.verbose:
-            print("Conv1 out : ", out.shape)
+        if self.opt.verbose: print("Conv1 out : ", out.shape)
 
         out = self.conv2(out)
-        if self.opt.verbose:
-            print("Conv2 out : ", out.shape)
+        if self.opt.verbose: print("Conv2 out : ", out.shape)
 
         out = self.conv3(out)
-        if self.opt.verbose:
-            print("Conv3 out : ", out.shape)
+        if self.opt.verbose: print("Conv3 out : ", out.shape)
 
         out = self.conv4(out)
-        if self.opt.verbose:
-            print("Conv4 out : ", out.shape)
+        if self.opt.verbose: print("Conv4 out : ", out.shape)
 
         out = out.view(out.shape[0], -1)
-        if self.opt.verbose:
-            print("View out : ", out.shape)
+        if self.opt.verbose: print("View out : ", out.shape)
 
         out = self.lnl(out)
-        if self.opt.verbose:
-            print("LNL out : ", out.shape)
+        if self.opt.verbose: print("LNL out : ", out.shape)
 
         validity = self.adv_layer(out)
-        if self.opt.verbose:
-            print("Val out : ", validity.shape)
-            # Dim : (1)
+        if self.opt.verbose: print("Val out : ", validity.shape)
 
         return validity
 
