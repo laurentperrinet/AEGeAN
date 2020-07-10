@@ -155,8 +155,6 @@ def do_learn(opt, run_dir="./runs"):
     # Adversarial ground truths
     valid = Variable(Tensor(opt.batch_size, 1).fill_(1), requires_grad=False)
     fake = Variable(Tensor(opt.batch_size, 1).fill_(0), requires_grad=False)
-    valid_smooth = np.random.uniform(opt.valid_smooth, 1.0, (opt.batch_size, 1))
-    valid_smooth = Variable(Tensor(valid_smooth), requires_grad=False)
 
 
     t_total = time.time()
@@ -208,6 +206,11 @@ def do_learn(opt, run_dir="./runs"):
             e_loss.backward()
             optimizer_E.step()
 
+            valid_smooth = np.random.uniform(opt.valid_smooth, 1.0-(1-opt.valid_smooth)/2, (opt.batch_size, 1))
+            valid_smooth = Variable(Tensor(valid_smooth), requires_grad=False)
+            fake_smooth = np.random.uniform((1-opt.valid_smooth)/2, 1-opt.valid_smooth, (opt.batch_size, 1))
+            fake_smooth = Variable(Tensor(fake_smooth), requires_grad=False)
+
             if opt.lrD > 0:
                 # ---------------------
                 #  Train Discriminator
@@ -248,7 +251,7 @@ def do_learn(opt, run_dir="./runs"):
                     real_loss = - torch.sum(1 / (1. - 1/sigmoid(logit_d_x)))
                 elif opt.GAN_loss == 'hinge':
                     # TODO check if we use p or log p
-                    real_loss = nn.ReLU()(1.0 - sigmoid(logit_d_x)).mean()
+                    real_loss = nn.ReLU()(valid_smooth - sigmoid(logit_d_x)).mean()
                 elif opt.GAN_loss == 'wasserstein':
                     real_loss = torch.mean(torch.abs(valid_smooth - sigmoid(logit_d_x)))
                 elif opt.GAN_loss == 'alternative':
@@ -291,7 +294,7 @@ def do_learn(opt, run_dir="./runs"):
                     # to minimize D(G(z)), we minimize sum(logit_d_fake)
                     fake_loss = torch.sum(logit_d_fake)
                 elif opt.GAN_loss in ['original', 'ian']:
-                    fake_loss = adversarial_loss(logit_d_fake, fake)
+                    fake_loss = adversarial_loss(logit_d_fake, fake_smooth)
                 else:
                     print ('GAN_loss not defined', opt.GAN_loss)
 
@@ -328,7 +331,7 @@ def do_learn(opt, run_dir="./runs"):
                     # https://en.wikipedia.org/wiki/Logit
                     g_loss = - torch.sum(sigmoid(logit_d_g_z)/(1 - sigmoid(logit_d_g_z)))
                 elif opt.GAN_loss == 'wasserstein' or  opt.GAN_loss == 'hinge':
-                    g_loss = torch.mean(torch.abs(valid - sigmoid(logit_d_g_z)))
+                    g_loss = torch.mean(torch.abs(valid_smooth - sigmoid(logit_d_g_z)))
                 elif opt.GAN_loss == 'alternative':
                     # https://www.inference.vc/an-alternative-update-rule-for-generative-adversarial-networks/
                     g_loss = - torch.sum(torch.log(sigmoid(logit_d_g_z)))
@@ -340,7 +343,7 @@ def do_learn(opt, run_dir="./runs"):
                     # to maximize D(G(z)), we minimize - sum(logit_d_fake)
                     g_loss = - torch.sum(logit_d_g_z)
                 elif opt.GAN_loss == 'original':
-                    g_loss = adversarial_loss(logit_d_g_z, valid)
+                    g_loss = adversarial_loss(logit_d_g_z, valid_smooth)
                 else:
                     print ('GAN_loss not defined', opt.GAN_loss)
 
