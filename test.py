@@ -89,6 +89,12 @@ for expname in experiments.keys():
         opt.padding_mode = padding_mode
         AG.learn(opt)
 
+    for optimizer in ['sgd', 'adam', 'rmsprop']: # https://pytorch.org/docs/1.4.0/nn.functional.html#grid-sample
+        tag, opt = init()
+        opt.run_path = tag + 'optimizer_' + optimizer
+        opt.optimizer = optimizer
+        AG.learn(opt)
+
     base = 2
 
     tag, opt = init()
