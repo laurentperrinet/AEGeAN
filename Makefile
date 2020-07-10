@@ -12,7 +12,7 @@ debug:
 	python3 -c'import AEGEAN as AG; opt = AG.init(); opt.run_path = "AEGEAN_test"; opt.datapath="../database/swapnesh_butterflies/";  opt.n_epochs=5;  opt.padding_mode="zeros"; opt.img_size = 64; opt.verbose=True; AG.learn(opt)'
 
 run_CFD:
-	python3 -c'import AEGEAN as AG; opt = AG.init(); opt.run_path = "AEGEAN_long"; opt.n_epochs=16384; opt.sample_interval=128; AG.learn(opt)'
+	python3 -c'import AEGEAN as AG; opt = AG.init(); opt.img_size = 256; opt.run_path = "AEGEAN_long"; opt.n_epochs=16384; opt.sample_interval=128; AG.learn(opt)'
 
 run_128:
 	python3 -c'import AEGEAN as AG; opt = AG.init(); opt.img_size = 128; opt.run_path = "AEGEAN_128_long"; opt.n_epochs=16384; opt.sample_interval=1; AG.learn(opt)'
