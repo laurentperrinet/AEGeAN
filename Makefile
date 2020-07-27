@@ -5,7 +5,7 @@ run:
 	sbatch launch.sh
 
 test:
-	python3 -OO test.py
+	python3 test.py
 
 debug:
 	rm -fr runs/AEGEAN_test
