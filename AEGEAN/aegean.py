@@ -433,11 +433,13 @@ def do_learn(opt, run_dir="./runs"):
                 encoder.train()
 
 
-        if epoch % opt.sample_interval == 0 :
-            sampling(fixed_noise, generator, path_data, epoch, tag)
-            # do_plot(hist, start_epoch, epoch)
+        # if epoch % opt.sample_interval == 0 :
+        #     sampling(fixed_noise, generator, path_data, epoch, tag)
+        #     # do_plot(hist, start_epoch, epoch)
 
         print("[Epoch Time: ", time.time() - t_epoch, "s]")
+        
+    sampling(fixed_noise, generator, path_data, epoch, tag)
 
     for scheduler in schedulers: scheduler.step()
     t_final = time.gmtime(time.time() - t_total)

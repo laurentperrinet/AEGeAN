@@ -8,7 +8,7 @@ import numpy as np
 
 experiments = {}
 experiments['AEGEAN_128'] = [('img_size', 128), ]
-experiments['Simpsons_128'] = [('datapath', '../database/Simpsons-Face_clear/cp/'), ('img_size', 128), ('n_epochs', 128), ('do_SSIM', False)]
+# experiments['Simpsons_128'] = [('datapath', '../database/Simpsons-Face_clear/cp/'), ('img_size', 128), ('n_epochs', 128), ('do_SSIM', False)]
 # experiments['AEGEAN_64'] = [('img_size', 64)]# , ('n_epochs', 512)]
 # experiments['Simpsons_64'] = [('datapath', '../database/Simpsons-Face_clear/cp/'), ('img_size', 64), ('do_SSIM', True)]
 # experiments['AEGEAN_256'] = [('img_size', 256), ]
@@ -356,6 +356,11 @@ for expname in experiments.keys():
         AG.learn(opt)
 
 
+        tag, opt = init()
+        if opt.lrD > 0:
+            opt.run_path = tag + 'high_valid_smooth'
+            opt.valid_smooth = 0.99
+            AG.learn(opt)
         tag, opt = init()
         if opt.lrD > 0:
             opt.run_path = tag + 'low_valid_smooth'
