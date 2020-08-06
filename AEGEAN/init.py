@@ -34,7 +34,7 @@ def init():
     parser.add_argument("--D_noise", type=float, default=0.001, help="Add noise to the input images to D_x")
     parser.add_argument("--G_noise", type=float, default=0.001, help="Add noise to the input images to D_G_z")
     parser.add_argument("--GAN_loss", type=str, default='original', help="Use different optimizers.")
-    parser.add_argument("--optimizer", type=str, default='adam', help="Use different losses for G.")
+    parser.add_argument("--optimizer", type=str, default='sgd', help="Use different losses for G.")
     parser.add_argument("--padding_mode", type=str, default='border', help="Handling values outside the range.")
     parser.add_argument("--do_SSIM", type=bool, default=True, help="Use contrasted images for the cost of E.")
     parser.add_argument("--do_bias", type=bool, default=False, help="Should we use biases in convolutions?")
