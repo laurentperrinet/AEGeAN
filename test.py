@@ -30,7 +30,8 @@ for expname in experiments.keys():
         opt = AG.init()
         for variable, value in experiments[expname]:
             vars(opt)[variable] = value
-        tag = f'{expname}_' #{opt.img_size}_'
+        # tag = f'{expname}_' #{opt.img_size}_'
+        tag = expname + '_' #{opt.img_size}_'
         return tag, opt
 
     # VANILLA
