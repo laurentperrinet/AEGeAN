@@ -18,5 +18,4 @@ module load userspace/all
 module load cuda/10.1
 module load python3/3.6.3
 
-mkdir -p runs
-python3 test.py
+mkdir -p runs; python3 test.py
