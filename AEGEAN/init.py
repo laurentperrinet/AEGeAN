@@ -34,7 +34,7 @@ def init():
     parser.add_argument("--D_noise", type=float, default=0.001, help="Add noise to the input images to D_x")
     parser.add_argument("--G_noise", type=float, default=0.001, help="Add noise to the input images to D_G_z")
     parser.add_argument("--GAN_loss", type=str, default='original', help="Use different optimizers.")
-    parser.add_argument("--optimizer", type=str, default='sgd', help="Use different losses for G.")
+    parser.add_argument("--optimizer", type=str, default='sgd', help="Use different losses.")
     parser.add_argument("--padding_mode", type=str, default='border', help="Handling values outside the range.")
     parser.add_argument("--do_SSIM", type=bool, default=True, help="Use contrasted images for the cost of E.")
     parser.add_argument("--do_bias", type=bool, default=False, help="Should we use biases in convolutions?")
@@ -43,9 +43,9 @@ def init():
     parser.add_argument("--do_insight", type=bool, default=False, help="D looks at G_E_x instead of x.")
     parser.add_argument("--do_transpose", type=bool, default=True, help="use of Conv2Dtranspose.")
     parser.add_argument("--bn_eps", type=float, default=0.001, help="batchnorm: espilon for numerical stability")
-    parser.add_argument("--bn_momentum", type=float, default=.2,
+    parser.add_argument("--bn_momentum", type=float, default=.1,
                         help="batchnorm: momentum for numerical stability")
-    parser.add_argument("--beta1", type=float, default=0.85,
+    parser.add_argument("--beta1", type=float, default=0.9,
                         help="adam: decay of first order momentum of gradient")
     parser.add_argument("--beta2", type=float, default=0.9999,
                         help="adam: decay of first order momentum of gradient")

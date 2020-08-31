@@ -332,12 +332,12 @@ for expname in experiments.keys():
 
         tag, opt = init()
         opt.run_path = tag + 'low_beta1'
-        opt.beta1 = 0.3
+        opt.beta1 = 0.5
         AG.learn(opt)
 
         tag, opt = init()
         opt.run_path = tag + 'high_beta1'
-        opt.beta1 = 0.925
+        opt.beta1 = 0.95
         AG.learn(opt)
 
         tag, opt = init()
