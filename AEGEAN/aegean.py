@@ -121,10 +121,10 @@ def do_learn(opt, run_dir="./runs"):
         optimizer_E = optimizer(encoder.parameters(), lr=opt.lrE, **opts)
 
     # TODO parameterize scheuler !
-    gamma = .1 ** (1 / opt.n_epochs)
-    schedulers = []
-    for optimizer in [optimizer_G, optimizer_D, optimizer_E]:
-        schedulers.append(torch.optim.lr_scheduler.StepLR(optimizer, step_size=1, gamma=gamma))
+    # gamma = .1 ** (1 / opt.n_epochs)
+    # schedulers = []
+    # for optimizer in [optimizer_G, optimizer_D, optimizer_E]:
+    #     schedulers.append(torch.optim.lr_scheduler.StepLR(optimizer, step_size=1, gamma=gamma))
 
     # ----------
     #  Training
@@ -438,10 +438,10 @@ def do_learn(opt, run_dir="./runs"):
         #     # do_plot(hist, start_epoch, epoch)
 
         print("[Epoch Time: ", time.time() - t_epoch, "s]")
-        
+
     sampling(fixed_noise, generator, path_data, epoch, tag)
 
-    for scheduler in schedulers: scheduler.step()
+    # for scheduler in schedulers: scheduler.step()
     t_final = time.gmtime(time.time() - t_total)
     print("[Total Time: ", t_final.tm_mday - 1, "j:",
           time.strftime("%Hh:%Mm:%Ss", t_final), "]", sep='')
