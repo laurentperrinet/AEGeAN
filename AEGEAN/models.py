@@ -106,7 +106,7 @@ class Generator(nn.Module):
         self.conv3 = nn.Sequential(*generator_block(opt.channel1, opt.channel0, stride=opt.stride),)
 
         self.channel0_img = opt.channel0-opt.channel0_bg
-        if not do_transpose:
+        if not opt.do_transpose:
             self.img_block = nn.Sequential(
                 nn.Conv2d(self.channel0_img, opt.channels, stride=1, padding=opt.padding, padding_mode=opt.padding_mode, **opts_conv),
                     # nn.Sigmoid(),
