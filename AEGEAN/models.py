@@ -79,14 +79,13 @@ class Generator(nn.Module):
         NL = nn.LeakyReLU(opt.lrelu)
         # NL = nn.ReLU()
         opts_conv = dict(kernel_size=opt.kernel_size, bias=opt.do_bias)
-        do_transpose = True
         def generator_block(in_channels, out_channels, bn=True, stride=1):
-            if not do_transpose:
+            if not opt.do_transpose:
                 block = [nn.Conv2d(in_channels, out_channels,
                                    padding=opt.padding, padding_mode=opt.padding_mode, **opts_conv),
                          nn.Upsample(scale_factor=stride, mode='bilinear', align_corners=True),
                         ]
-            else:# TODO use
+            else:#
                 block = [nn.ConvTranspose2d(in_channels, out_channels, stride=stride,
                                             padding_mode='zeros', padding=opt.padding, output_padding=stride-1, **opts_conv), #
                         ]

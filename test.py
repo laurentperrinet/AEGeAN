@@ -58,6 +58,15 @@ for expname in experiments.keys():
         opt.run_path = tag + 'no_insight'
     AG.learn(opt)
 
+    # What if the discriminator has only acces to the image reconstructed by the AE ?
+    tag, opt = init()
+    opt.do_transpose = not opt.do_transpose
+    if opt.do_transpose:
+        opt.run_path = tag + 'do_transpose'
+    else:
+        opt.run_path = tag + 'no_transpose'
+    AG.learn(opt)
+
     if True:
 
         # GAN_losses = ['original', 'wasserstein', 'ian', 'alternative', 'alternativ2']
