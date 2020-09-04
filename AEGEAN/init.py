@@ -18,21 +18,21 @@ def init():
                         help="TensorBoard folder to save samples data and statistics")
     parser.add_argument("--n_epochs", type=int, default=2048,
                         help="number of epochs of training")
-    parser.add_argument("--batch_size", type=int, default=16, help="size of the batches")
+    parser.add_argument("--batch_size", type=int, default=128, help="size of the batches")
     parser.add_argument("--rand_hflip", type=bool, default=True, help="data augmentation: horizontal flip")
     parser.add_argument("--rand_affine", type=float, default=0.5,
                         help="data augmentation: angle in degrees")
     parser.add_argument("--init_weight", type=bool, default=True, help="initialize weights to normal")
     parser.add_argument("--gamma", type=float, default=1., help="gamma correction of images")
-    parser.add_argument("--lambdaE", type=float, default=.001, help="regularization parameter for E")
-    parser.add_argument("--lrE", type=float, default=0.005, help="learning rate for E")
-    parser.add_argument("--lrD", type=float, default=0.005, help="learning rate for D")
-    parser.add_argument("--lrG", type=float, default=0.0005, help="learning rate for G supervised by D")
-    parser.add_argument("--valid_smooth", type=float, default=.975, help="Smoothing the results of D on real images")
-    parser.add_argument("--dropout", type=float, default=.002, help="Dropout generalization factor in the encoder & generator")
-    parser.add_argument("--E_noise", type=float, default=0.005, help="Add noise to the input images to G_E_x")
-    parser.add_argument("--D_noise", type=float, default=0.001, help="Add noise to the input images to D_x")
-    parser.add_argument("--G_noise", type=float, default=0.001, help="Add noise to the input images to D_G_z")
+    parser.add_argument("--lambdaE", type=float, default=.005, help="regularization parameter for E")
+    parser.add_argument("--lrE", type=float, default=0.01, help="learning rate for E")
+    parser.add_argument("--lrD", type=float, default=0.01, help="learning rate for D")
+    parser.add_argument("--lrG", type=float, default=0.005, help="learning rate for G supervised by D")
+    parser.add_argument("--valid_smooth", type=float, default=.94, help="Smoothing the results of D on real images")
+    parser.add_argument("--dropout", type=float, default=.0, help="Dropout generalization factor in the encoder & generator")
+    parser.add_argument("--E_noise", type=float, default=0.05, help="Add noise to the input images to G_E_x")
+    parser.add_argument("--D_noise", type=float, default=0.01, help="Add noise to the input images to D_x")
+    parser.add_argument("--G_noise", type=float, default=0.01, help="Add noise to the input images to D_G_z")
     parser.add_argument("--GAN_loss", type=str, default='original', help="Use different optimizers.")
     parser.add_argument("--optimizer", type=str, default='sgd', help="Use different losses.")
     parser.add_argument("--padding_mode", type=str, default='border', help="Handling values outside the range.")
@@ -41,13 +41,13 @@ def init():
     parser.add_argument("--lrelu", type=float, default=0.1, help="LeakyReLU : alpha - zero for a standard ReLU")
     parser.add_argument("--do_joint", type=bool, default=True, help="Do a joint learning of E and G, dude.")
     parser.add_argument("--do_insight", type=bool, default=False, help="D looks at G_E_x instead of x.")
-    parser.add_argument("--do_transpose", type=bool, default=True, help="use of Conv2Dtranspose.")
+    parser.add_argument("--do_transpose", type=bool, default=False, help="use of Conv2Dtranspose.")
     parser.add_argument("--bn_eps", type=float, default=0.001, help="batchnorm: espilon for numerical stability")
     parser.add_argument("--bn_momentum", type=float, default=.1,
                         help="batchnorm: momentum for numerical stability")
-    parser.add_argument("--beta1", type=float, default=0.9,
+    parser.add_argument("--beta1", type=float, default=0.95,
                         help="adam: decay of first order momentum of gradient")
-    parser.add_argument("--beta2", type=float, default=0.9999,
+    parser.add_argument("--beta2", type=float, default=0.99,
                         help="adam: decay of first order momentum of gradient")
     parser.add_argument("--channel0_bg", type=int, default=0, help="size of the background mask channel")
     parser.add_argument("--channel0", type=int, default=16, help="size of channel 0")

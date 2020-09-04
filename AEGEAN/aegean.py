@@ -52,15 +52,15 @@ def do_learn(opt, run_dir="./runs"):
                            rand_hflip=opt.rand_hflip, rand_affine=opt.rand_affine)
 
     # Loss functions
-    # https://pytorch.org/docs/stable/nn.html?highlight=bcewithlogitsloss#torch.nn.BCEWithLogitsLoss
-    adversarial_loss = torch.nn.BCEWithLogitsLoss()  # eq. 8 in https://arxiv.org/pdf/1701.00160.pdf
+    if opt.GAN_loss in ['original', 'ian']:
+        # https://pytorch.org/docs/stable/nn.html?highlight=bcewithlogitsloss#torch.nn.BCEWithLogitsLoss
+        adversarial_loss = torch.nn.BCEWithLogitsLoss()  # eq. 8 in https://arxiv.org/pdf/1701.00160.pdf
     if opt.do_SSIM:
         from pytorch_msssim import NMSSSIM
-
         E_loss = NMSSSIM(window_size=opt.window_size, val_range=1., size_average=True, channel=3, normalize=True)
     else:
         E_loss = torch.nn.MSELoss(reduction='sum')
-    # MSE_loss = torch.nn.MSELoss(reduction='sum')
+
     sigmoid = torch.nn.Sigmoid()
 
     # Initialize generator and discriminator
@@ -120,7 +120,7 @@ def do_learn(opt, run_dir="./runs"):
     else:
         optimizer_E = optimizer(encoder.parameters(), lr=opt.lrE, **opts)
 
-    # TODO parameterize scheuler !
+    # TODO parameterize scheduler !
     # gamma = .1 ** (1 / opt.n_epochs)
     # schedulers = []
     # for optimizer in [optimizer_G, optimizer_D, optimizer_E]:
@@ -137,24 +137,22 @@ def do_learn(opt, run_dir="./runs"):
 
     def gen_z():
         z = np.random.normal(0, 1, (opt.batch_size, opt.latent_dim))
-        z = Variable(Tensor(z), requires_grad=False)
-        return z
+        return Variable(Tensor(z), requires_grad=False)
 
     def gen_noise(real_imgs):
         v_noise = np.random.normal(0, 1, real_imgs.shape) # one random image
         v_noise *= np.abs(np.random.normal(0, 1, (real_imgs.shape[0], opt.channels, 1, 1))) # one contrast value per image
-        noise = Variable(Tensor(v_noise), requires_grad=False)
-        return noise
+        return Variable(Tensor(v_noise), requires_grad=False)
 
     # Vecteur z fixe pour faire les samples
     fixed_noise = gen_z()
     real_imgs_samples = None
 
-    z_zeros = Variable(Tensor(opt.batch_size, opt.latent_dim).fill_(0), requires_grad=False)
-    z_ones = Variable(Tensor(opt.batch_size, opt.latent_dim).fill_(1), requires_grad=False)
+    # z_zeros = Variable(Tensor(opt.batch_size, opt.latent_dim).fill_(0), requires_grad=False)
+    # z_ones = Variable(Tensor(opt.batch_size, opt.latent_dim).fill_(1), requires_grad=False)
     # Adversarial ground truths
-    valid = Variable(Tensor(opt.batch_size, 1).fill_(1), requires_grad=False)
-    fake = Variable(Tensor(opt.batch_size, 1).fill_(0), requires_grad=False)
+    # valid = Variable(Tensor(opt.batch_size, 1).fill_(1), requires_grad=False)
+    # fake = Variable(Tensor(opt.batch_size, 1).fill_(0), requires_grad=False)
 
 
     t_total = time.time()
@@ -227,7 +225,10 @@ def do_learn(opt, run_dir="./runs"):
             real_imgs = Variable(imgs.type(Tensor), requires_grad=False)
             real_imgs_ = real_imgs * 1.
             if opt.D_noise > 0: real_imgs_ += opt.D_noise * gen_noise(real_imgs)
-            if opt.do_insight: real_imgs_ = generator(encoder(real_imgs_))
+            if opt.do_insight:
+                # the discriminator can not access the images directly but only
+                # what is visible through the auto-encoder
+                real_imgs_ = generator(encoder(real_imgs_))
 
             # Discriminator decision (in logit units)
             # TODO : group images by sub-batches and train to discriminate from all together
@@ -408,11 +409,11 @@ def do_learn(opt, run_dir="./runs"):
                 Use generator model and noise vector to generate images.
                 Save them to tensorboard
                 """
-                generator.eval()
+                # generator.eval()
                 gen_imgs = generator(fixed_noise)
                 grid = torchvision.utils.make_grid(gen_imgs, normalize=True, nrow=8, range=(0, 1))
                 writer.add_image('Generated images', grid, epoch)
-                generator.train()
+                # generator.train()
 
                 """
                 Use auto-encoder model and original images to generate images.
@@ -422,15 +423,15 @@ def do_learn(opt, run_dir="./runs"):
                 # grid_imgs = torchvision.utils.make_grid(real_imgs_samples, normalize=True, nrow=8, range=(0, 1))
                 # writer.add_image('Images/original', grid_imgs, epoch)
 
-                generator.eval()
-                encoder.eval()
+                # generator.eval()
+                # encoder.eval()
                 enc_imgs = encoder(real_imgs_samples)
                 dec_imgs = generator(enc_imgs)
                 grid_dec = torchvision.utils.make_grid(dec_imgs, normalize=True, nrow=8, range=(0, 1))
                 # writer.add_image('Images/auto-encoded', grid_dec, epoch)
-                writer.add_image('auto-encoded', grid_dec, epoch)
-                generator.train()
-                encoder.train()
+                writer.add_image('Auto-encoded', grid_dec, epoch)
+                # generator.train()
+                # encoder.train()
 
 
         # if epoch % opt.sample_interval == 0 :

@@ -5,11 +5,11 @@ import AEGEAN as AG
 import numpy as np
 # import os
 # PID, HOST = os.getpid(), os.uname()[1]
- 
+
 experiments = {}
-# experiments['AEGEAN_128'] = [('img_size', 128), ]
+# experiments['AEGEAN_64'] = [('img_size', 64)]# , ('n_epochs', 512)]
+experiments['AEGEAN_128'] = [('img_size', 128), ]
 # experiments['Simpsons_128'] = [('datapath', '../database/Simpsons-Face_clear/cp/'), ('img_size', 128), ('n_epochs', 128), ('do_SSIM', False)]
-experiments['AEGEAN_64'] = [('img_size', 64)]# , ('n_epochs', 512)]
 # experiments['Simpsons_64'] = [('datapath', '../database/Simpsons-Face_clear/cp/'), ('img_size', 64), ('do_SSIM', True)]
 # experiments['AEGEAN_256'] = [('img_size', 256), ]
 # experiments['Simpsons_256'] = [('datapath', '../database/Simpsons-Face_clear/cp/'), ('img_size', 256)] #, ('do_SSIM', False)]
@@ -104,7 +104,7 @@ for expname in experiments.keys():
         opt.optimizer = optimizer
         AG.learn(opt)
 
-    base = 2
+    base = 4
 
     tag, opt = init()
     opt.run_path = tag + 'low_batch_size'
@@ -150,7 +150,7 @@ for expname in experiments.keys():
         opt.lrG *= base
         AG.learn(opt)
 
-    if False:
+    if True:
         tag, opt = init()
         opt.gamma = .618 if opt.gamma==1. else 1.
         # opt.gamma = 1.
@@ -333,22 +333,22 @@ for expname in experiments.keys():
 
         tag, opt = init()
         opt.run_path = tag + 'low_beta1'
-        opt.beta1 = 0.5
+        opt.beta1 = 0.9
         AG.learn(opt)
 
         tag, opt = init()
         opt.run_path = tag + 'high_beta1'
-        opt.beta1 = 0.95
+        opt.beta1 = 0.99
         AG.learn(opt)
 
         tag, opt = init()
         opt.run_path = tag + 'low_beta2'
-        opt.beta2 = 0.8
+        opt.beta2 = 0.9
         AG.learn(opt)
 
         tag, opt = init()
         opt.run_path = tag + 'high_beta2'
-        opt.beta2 = 0.95
+        opt.beta2 = 0.99999
         AG.learn(opt)
 
         tag, opt = init()
