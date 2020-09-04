@@ -5,7 +5,7 @@ import AEGEAN as AG
 import numpy as np
 # import os
 # PID, HOST = os.getpid(), os.uname()[1]
-
+ 
 experiments = {}
 # experiments['AEGEAN_128'] = [('img_size', 128), ]
 # experiments['Simpsons_128'] = [('datapath', '../database/Simpsons-Face_clear/cp/'), ('img_size', 128), ('n_epochs', 128), ('do_SSIM', False)]
