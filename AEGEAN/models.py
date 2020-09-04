@@ -19,7 +19,7 @@ class Encoder(nn.Module):
 
         def encoder_block(in_channels, out_channels, bias, bn=True):
             block = [nn.Conv2d(in_channels, out_channels, bias=bias, **opts_conv), ]
-            block.append(nn.Dropout2d(opt.dropout))
+            if opt.dropout >0: block.append(nn.Dropout2d(opt.dropout))
             if bn and (not opt.bn_eps == np.inf):
                 block.append(nn.BatchNorm2d(num_features=out_channels, eps=opt.bn_eps, momentum=opt.bn_momentum))
             block.append(NL)
@@ -34,9 +34,11 @@ class Encoder(nn.Module):
         # self.vector = nn.Linear(opt.channel3 * self.init_size ** 2, opt.latent_dim)
         self.vector0 = nn.Sequential(
             nn.Linear(opt.channel3 * self.init_size ** 2, opt.channel4),
+            NL,
         )
         self.vector1 = nn.Sequential(
             nn.Linear(opt.channel4, opt.latent_dim),
+            NL,
         )
 
         self.opt = opt
@@ -76,8 +78,8 @@ class Encoder(nn.Module):
 class Generator(nn.Module):
     def __init__(self, opt):
         super(Generator, self).__init__()
-        NL = nn.LeakyReLU(opt.lrelu)
-        # NL = nn.ReLU()
+        # NL = nn.LeakyReLU(opt.lrelu)
+        NL = nn.ReLU()
         opts_conv = dict(kernel_size=opt.kernel_size, bias=opt.do_bias)
         def generator_block(in_channels, out_channels, bn=True, stride=1):
             if not opt.do_transpose:
@@ -89,17 +91,22 @@ class Generator(nn.Module):
                 block = [nn.ConvTranspose2d(in_channels, out_channels, stride=stride,
                                             padding_mode='zeros', padding=opt.padding, output_padding=stride-1, **opts_conv), #
                         ]
-            block.append(nn.Dropout2d(opt.dropout))
+            if opt.dropout >0: block.append(nn.Dropout2d(opt.dropout))
             if bn and (not opt.bn_eps == np.inf):
                 block.append(nn.BatchNorm2d(num_features=out_channels, eps=opt.bn_eps, momentum=opt.bn_momentum))
             block.append(NL)
             return block
 
-        self.l0 = nn.Sequential(nn.Linear(opt.latent_dim, opt.channel4), NL,)
+        self.l0 = nn.Sequential(
+                        nn.Linear(opt.latent_dim, opt.channel4),
+                        NL,
+                        )
 
         self.init_size = opt.img_size // opt.stride**2 # no stride at the first conv
         self.l1 = nn.Sequential(
-            nn.Linear(opt.channel4, opt.channel3 * self.init_size ** 2), NL,)
+                        nn.Linear(opt.channel4, opt.channel3 * self.init_size ** 2),
+                        NL,
+                        )
 
         self.conv1 = nn.Sequential(*generator_block(opt.channel3, opt.channel2, bn=False, stride=1),)
         self.conv2 = nn.Sequential(*generator_block(opt.channel2, opt.channel1, stride=opt.stride),)
@@ -184,8 +191,8 @@ class Generator(nn.Module):
         # # https://en.wikipedia.org/wiki/Gamma_correction
         # if self.opt.verbose:
         #     print("out Image min-max : ", out.min(), out.max())
-        # if not(self.opt.gamma == 1.):
-        #     out = torch.pow(out, 1/self.opt.gamma)
+        if not(self.opt.gamma == 1.):
+            out = torch.pow(out, 1/self.opt.gamma)
 
         return out
 
@@ -198,12 +205,13 @@ class Discriminator(nn.Module):
         super(Discriminator, self).__init__()
         # “Use LeakyReLU in the discriminator.” — Jonathan Hui https://link.medium.com/IYyQV6sMD0
         NL = nn.LeakyReLU(opt.lrelu)
-        opts_conv = dict(kernel_size=opt.kernel_size, stride=opt.stride,
-                         padding=opt.padding, padding_mode=opt.padding_mode)
+        opts_conv = dict(kernel_size=opt.kernel_size,
+                         padding=opt.padding)
 
         def discriminator_block(in_channels, out_channels, bn=True, bias=False):
-            block = [nn.Conv2d(in_channels, out_channels, bias=bias, **opts_conv), ]
-             # nn.MaxPool2d(kernel_size=opt.kernel_size, padding=opt.padding), # https://pytorch.org/docs/stable/nn.html#torch.nn.MaxPool2d
+            block = [nn.Conv2d(in_channels, out_channels, bias=bias, stride=1, padding_mode=opt.padding_mode, **opts_conv), ]
+             # https://pytorch.org/docs/stable/nn.html#torch.nn.MaxPool2d
+            block.append(nn.MaxPool2d(stride=opt.stride, **opts_conv))
             if bn and (not opt.bn_eps == np.inf):
                 # https://pytorch.org/docs/stable/nn.html#torch.nn.BatchNorm2d
                 block.append(nn.BatchNorm2d(num_features=out_channels, eps=opt.bn_eps, momentum=opt.bn_momentum))
