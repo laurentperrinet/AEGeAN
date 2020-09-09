@@ -53,12 +53,13 @@ def do_learn(opt, run_dir="./runs"):
                            rand_hflip=opt.rand_hflip, rand_affine=opt.rand_affine)
 
     # Loss functions
-    if opt.GAN_loss in ['original', 'ian']:
+    # if opt.GAN_loss in ['original', 'ian']:
         # https://pytorch.org/docs/stable/nn.html?highlight=bcewithlogitsloss#torch.nn.BCEWithLogitsLoss
         #adversarial_loss = torch.nn.BCEWithLogitsLoss()  # eq. 8 in https://arxiv.org/pdf/1701.00160.pdf
         #
         # https://medium.com/swlh/gan-to-generate-images-of-cars-5f706ca88da
-        adversarial_loss = F.binary_cross_entropy  # eq. 8 in https://arxiv.org/pdf/1701.00160.pdf
+        # adversarial_loss = torch.nn.BCE()  # eq. 8 in https://arxiv.org/pdf/1701.00160.pdf
+
     if opt.do_SSIM:
         from pytorch_msssim import NMSSSIM
         E_loss = NMSSSIM(window_size=opt.window_size, val_range=1., size_average=True, channel=3, normalize=True)
@@ -85,7 +86,7 @@ def do_learn(opt, run_dir="./runs"):
         #     torch.cuda.set_device(opt.GPU)
         generator.cuda()
         discriminator.cuda()
-        adversarial_loss.cuda()
+        # adversarial_loss.cuda()
         encoder.cuda()
         # MSE_loss.cuda()
         E_loss.cuda()
@@ -269,7 +270,7 @@ def do_learn(opt, run_dir="./runs"):
                     # to maximize D(x), we minimize  - sum(logit_d_x)
                     real_loss = - torch.sum(logit_d_x)
                 elif opt.GAN_loss == 'original':
-                    real_loss = adversarial_loss(sigmoid(logit_d_x), valid_smooth)
+                    real_loss = F.binary_cross_entropy(sigmoid(logit_d_x), valid_smooth)
                 else: print ('GAN_loss not defined', opt.GAN_loss)
 
                 # Backward
@@ -299,7 +300,7 @@ def do_learn(opt, run_dir="./runs"):
                     # to minimize D(G(z)), we minimize sum(logit_d_fake)
                     fake_loss = torch.sum(logit_d_fake)
                 elif opt.GAN_loss in ['original', 'ian']:
-                    fake_loss = adversarial_loss(sigmoid(logit_d_fake), fake_smooth)
+                    fake_loss = F.binary_cross_entropy(sigmoid(logit_d_fake), fake_smooth)
                 else:
                     print ('GAN_loss not defined', opt.GAN_loss)
 
@@ -348,7 +349,7 @@ def do_learn(opt, run_dir="./runs"):
                     # to maximize D(G(z)), we minimize - sum(logit_d_fake)
                     g_loss = - torch.sum(logit_d_g_z)
                 elif opt.GAN_loss == 'original':
-                    g_loss = adversarial_loss(sigmoid(logit_d_g_z), valid_smooth)
+                    g_loss = F.binary_cross_entropy(sigmoid(logit_d_g_z), valid_smooth)
                 else:
                     print ('GAN_loss not defined', opt.GAN_loss)
 
