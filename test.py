@@ -9,13 +9,14 @@ import numpy as np
 experiments = {}
 # experiments['AEGEAN_64'] = [('img_size', 64)]# , ('n_epochs', 512)]
 experiments['AEGEAN_128'] = [('img_size', 128), ]
-# experiments['Simpsons_128'] = [('datapath', '../database/Simpsons-Face_clear/cp/'), ('img_size', 128), ('n_epochs', 128), ('do_SSIM', False)]
+experiments['Simpsons_128'] = [('datapath', '../database/Simpsons-Face_clear/cp/'), ('img_size', 128), ('n_epochs', 128), ('do_SSIM', False)]
 # experiments['Simpsons_64'] = [('datapath', '../database/Simpsons-Face_clear/cp/'), ('img_size', 64), ('do_SSIM', True)]
 # experiments['AEGEAN_256'] = [('img_size', 256), ]
 # experiments['Simpsons_256'] = [('datapath', '../database/Simpsons-Face_clear/cp/'), ('img_size', 256)] #, ('do_SSIM', False)]
 # experiments['butterflies_256'] = [('datapath', '../database/swapnesh_butterflies/'), ('img_size', 256)]
 # experiments['butterflies_64'] = [('datapath', '../database/swapnesh_butterflies/'), ('img_size', 64)]
 # experiments['butterflies_256'] = [('datapath', '../database/swapnesh_butterflies/'), ('img_size', 256)]
+experiments['butterflies_128'] = [('datapath', '../database/swapnesh_butterflies/'), ('img_size', 128)]
 # experiments['clouds'] = [('datapath', '../database/downloads/cloud/'), ('img_size', 256)]
 # experiments['Simpsons_64'] = [('datapath', '../database/Simpsons-Face_clear/cp/'), ('img_size', 64), ('n_epochs', 64), ('do_SSIM', False)]
 #
@@ -104,7 +105,7 @@ for expname in experiments.keys():
         opt.optimizer = optimizer
         AG.learn(opt)
 
-    base = 4
+    base = 2
 
     tag, opt = init()
     opt.run_path = tag + 'low_batch_size'
@@ -338,7 +339,7 @@ for expname in experiments.keys():
 
         tag, opt = init()
         opt.run_path = tag + 'high_beta1'
-        opt.beta1 = 0.99
+        opt.beta1 = 0.995
         AG.learn(opt)
 
         tag, opt = init()

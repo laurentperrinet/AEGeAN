@@ -75,11 +75,40 @@ class Encoder(nn.Module):
     def _name(self):
         return "Encoder"
 
+# TODO: use more blocks:
+# norm_layer = nn.InstanceNorm2d
+# class ResBlock(nn.Module):
+#     def __init__(self, f):
+#         super(ResBlock, self).__init__()
+#         self.conv = nn.Sequential(nn.Conv2d(f, f, 3, 1, 1), norm_layer(f), nn.ReLU(),
+#                                   nn.Conv2d(f, f, 3, 1, 1))
+#         self.norm = norm_layer(f)
+#     def forward(self, x):
+#         return F.relu(self.norm(self.conv(x)+x))
+#
+# class Generator(nn.Module):
+#     def __init__(self, f=64, blocks=6):
+#         super(Generator, self).__init__()
+#         layers = [nn.ReflectionPad2d(3),
+#                   nn.Conv2d(  3,   f, 7, 1, 0), norm_layer(  f), nn.ReLU(True),
+#                   nn.Conv2d(  f, 2*f, 3, 2, 1), norm_layer(2*f), nn.ReLU(True),
+#                   nn.Conv2d(2*f, 4*f, 3, 2, 1), norm_layer(4*f), nn.ReLU(True)]
+#         for i in range(int(blocks)):
+#             layers.append(ResBlock(4*f))
+#         layers.extend([
+#                 nn.ConvTranspose2d(4*f, 4*2*f, 3, 1, 1), nn.PixelShuffle(2), norm_layer(2*f), nn.ReLU(True),
+#                 nn.ConvTranspose2d(2*f,   4*f, 3, 1, 1), nn.PixelShuffle(2), norm_layer(  f), nn.ReLU(True),
+#                 nn.ReflectionPad2d(3), nn.Conv2d(f, 3, 7, 1, 0),
+#                 nn.Tanh()])
+#         self.conv = nn.Sequential(*layers)
+#
+#     def forward(self, x):
+#         return self.conv(x)
+#
 class Generator(nn.Module):
     def __init__(self, opt):
         super(Generator, self).__init__()
-        # NL = nn.LeakyReLU(opt.lrelu)
-        NL = nn.ReLU()
+        NL = nn.LeakyReLU(opt.lrelu, inplace = True)
         opts_conv = dict(kernel_size=opt.kernel_size, bias=opt.do_bias)
         def generator_block(in_channels, out_channels, bn=True, stride=1):
             if not opt.do_transpose:
@@ -137,7 +166,8 @@ class Generator(nn.Module):
                 nn.Conv2d(opt.channel0, 1, kernel_size=opt.kernel_size, stride=1, bias=True,
                                  padding=opt.padding, padding_mode=opt.padding_mode),
                 # nn.Sigmoid(),
-                nn.Hardtanh(min_val=0.0, max_val=1.0),
+                # nn.Hardtanh(min_val=0.0, max_val=1.0),
+                nn.Tanh(),
             )
 
         self.opt = opt
@@ -204,7 +234,7 @@ class Discriminator(nn.Module):
     def __init__(self, opt):
         super(Discriminator, self).__init__()
         # “Use LeakyReLU in the discriminator.” — Jonathan Hui https://link.medium.com/IYyQV6sMD0
-        NL = nn.LeakyReLU(opt.lrelu)
+        NL = nn.LeakyReLU(opt.lrelu, inplace = True)
         opts_conv = dict(kernel_size=opt.kernel_size,
                          padding=opt.padding)
 
