@@ -14,6 +14,7 @@ experiments['Simpsons_128'] = [('datapath', '../database/Simpsons-Face_clear/cp/
 # experiments['AEGEAN_256'] = [('img_size', 256), ]
 # experiments['Simpsons_256'] = [('datapath', '../database/Simpsons-Face_clear/cp/'), ('img_size', 256)] #, ('do_SSIM', False)]
 # experiments['butterflies_256'] = [('datapath', '../database/swapnesh_butterflies/'), ('img_size', 256)]
+experiments['cats_64'] = [('datapath', '../database/cats/'), ('img_size', 64)]
 # experiments['butterflies_64'] = [('datapath', '../database/swapnesh_butterflies/'), ('img_size', 64)]
 # experiments['butterflies_256'] = [('datapath', '../database/swapnesh_butterflies/'), ('img_size', 256)]
 experiments['butterflies_128'] = [('datapath', '../database/swapnesh_butterflies/'), ('img_size', 128)]

@@ -346,7 +346,7 @@ def do_learn(opt, run_dir="./runs"):
                     g_loss = - torch.sum(torch.log(sigmoid(logit_d_g_z) / (1. - sigmoid(logit_d_g_z))))
                     # g_loss = torch.sum(torch.log(1./sigmoid(logit_d_g_z) - 1.))
                 elif opt.GAN_loss == 'alternativ3':
-                    # to maximize D(G(z)), we minimize - sum(logit_d_fake)
+                    # to maximize D(G(z)), we minimize - sum(logit_d_g_z)
                     g_loss = - torch.sum(logit_d_g_z)
                 elif opt.GAN_loss == 'original':
                     g_loss = F.binary_cross_entropy(sigmoid(logit_d_g_z), valid_smooth)
