@@ -140,14 +140,41 @@ def do_learn(opt, run_dir="./runs"):
     stat_record = init_hist(opt.n_epochs, nb_batch)
 
 
-    def gen_z():
-        z = np.random.normal(0, 1, (opt.batch_size, opt.latent_dim))
-        return Variable(Tensor(z), requires_grad=False)
+    def norm2(z):
+        """
+        L2-norm of a tensor.
 
-    def gen_noise(real_imgs):
-        v_noise = np.random.normal(0, 1, real_imgs.shape) # one random image
-        v_noise *= np.abs(np.random.normal(0, 1, (real_imgs.shape[0], opt.channels, 1, 1))) # one contrast value per image
-        return Variable(Tensor(v_noise), requires_grad=False)
+        """
+        return torch.mean(z.pow(2)).pow(.5)
+
+    def gen_z(imgs=None, rho=.1):
+        """
+        Generate noise in the feature space.
+
+        """
+        z = np.random.normal(0, 1, (opt.batch_size, opt.latent_dim))
+        # convert to tensor
+        z = Variable(Tensor(z), requires_grad=False)
+
+        if not imgs is None:
+            z /= norm2(z)
+            z_imgs = encoder(imgs)
+            z_imgs /= norm2(z_imgs)
+            z = (1-rho) * z_imgs + rho * z
+            z /= norm2(z)
+        return z
+
+    def gen_noise(imgs):
+        """
+        Generate noise in the image space
+
+        """
+        v_noise = np.random.normal(0, 1, imgs.shape) # one random image
+        # one contrast value per image
+        v_noise *= np.abs(np.random.normal(0, 1, (imgs.shape[0], opt.channels, 1, 1)))
+        # convert to tensor
+        v_noise =  Variable(Tensor(v_noise), requires_grad=False)
+        return v_noise
 
     # Vecteur z fixe pour faire les samples
     fixed_noise = gen_z()
@@ -158,7 +185,6 @@ def do_learn(opt, run_dir="./runs"):
     # Adversarial ground truths
     # valid = Variable(Tensor(opt.batch_size, 1).fill_(1), requires_grad=False)
     # fake = Variable(Tensor(opt.batch_size, 1).fill_(0), requires_grad=False)
-
 
     t_total = time.time()
     for i_epoch, epoch in enumerate(range(1, opt.n_epochs + 1)):
@@ -277,7 +303,7 @@ def do_learn(opt, run_dir="./runs"):
                 real_loss.backward()
 
             # Generate a batch of fake images and learn the discriminator to treat them as such
-            z = gen_z()
+            z = gen_z(imgs=real_imgs_)
             gen_imgs = generator(z)
             if opt.D_noise > 0: gen_imgs += opt.D_noise * gen_noise(real_imgs)
 
@@ -321,7 +347,7 @@ def do_learn(opt, run_dir="./runs"):
                     p.requires_grad = False  # to avoid computation
 
             # Generate a batch of fake images
-            z = gen_z()
+            z = gen_z(imgs=real_imgs_)
             gen_imgs = generator(z)
             if opt.G_noise > 0: gen_imgs += opt.G_noise * gen_noise(real_imgs)
 
