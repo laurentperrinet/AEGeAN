@@ -32,7 +32,7 @@ def init():
     parser.add_argument("--dropout", type=float, default=.0, help="Dropout generalization factor in the encoder & generator")
     parser.add_argument("--E_noise", type=float, default=0.05, help="Add noise to the input images to G_E_x")
     parser.add_argument("--D_noise", type=float, default=0.01, help="Add noise to the input images to D_x")
-    parser.add_argument("--G_noise", type=float, default=0.05, help="Add noise to the input images to D_G_z")
+    parser.add_argument("--G_noise", type=float, default=0.01, help="Add noise to the input images to D_G_z")
     parser.add_argument("--GAN_loss", type=str, default='original', help="Use different optimizers.")
     parser.add_argument("--optimizer", type=str, default='sgd', help="Use different losses.")
     parser.add_argument("--padding_mode", type=str, default='border', help="Handling values outside the range.")

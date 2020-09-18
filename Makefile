@@ -5,23 +5,23 @@ run:
 	sbatch launch.sh
 
 test:
-	python3 test.py
+	python test.py
 
 debug:
 	rm -fr runs/AEGEAN_test
-	python3 -c'import AEGEAN as AG; opt = AG.init(); opt.run_path = "AEGEAN_test"; opt.datapath="../database/cats/";  opt.n_epochs=5;  opt.padding_mode="zeros"; opt.img_size = 64; opt.verbose=True; AG.learn(opt)'
+	KMP_DUPLICATE_LIB_OK=TRUE  python -c'import AEGEAN as AG; opt = AG.init(); opt.run_path = "AEGEAN_test"; opt.datapath="../database/cats/";  opt.n_epochs=5;  opt.padding_mode="zeros"; opt.img_size = 64; opt.verbose=True; AG.learn(opt)'
 
 run_CFD:
-	python3 -c'import AEGEAN as AG; opt = AG.init(); opt.img_size = 256; opt.run_path = "AEGEAN_long"; opt.n_epochs=16384; opt.sample_interval=128; AG.learn(opt)'
+	python -c'import AEGEAN as AG; opt = AG.init(); opt.img_size = 256; opt.run_path = "AEGEAN_long"; opt.n_epochs=16384; opt.sample_interval=128; AG.learn(opt)'
 
 run_128:
-	python3 -c'import AEGEAN as AG; opt = AG.init(); opt.img_size = 128; opt.run_path = "AEGEAN_128_long"; opt.n_epochs=16384; opt.sample_interval=128; AG.learn(opt)'
+	python -c'import AEGEAN as AG; opt = AG.init(); opt.img_size = 128; opt.run_path = "AEGEAN_128_long"; opt.n_epochs=16384; opt.sample_interval=128; AG.learn(opt)'
 
 run_simpsons:
-	python3 -c'import AEGEAN as AG; opt = AG.init(); opt.run_path = "Simpsons_long"; opt.datapath="../database/Simpsons-Face_clear/cp/"; opt.img_size = 128; opt.n_epochs=16384; opt.sample_interval=128; AG.learn(opt)'
+	python -c'import AEGEAN as AG; opt = AG.init(); opt.run_path = "Simpsons_long"; opt.datapath="../database/Simpsons-Face_clear/cp/"; opt.img_size = 128; opt.n_epochs=16384; opt.sample_interval=128; AG.learn(opt)'
 
 run_butterflies:
-	python3 -c'import AEGEAN as AG; opt = AG.init(); opt.run_path = "butterflies_long"; opt.datapath="../database/swapnesh_butterflies/";  opt.n_epochs=16384; opt.sample_interval=128; AG.learn(opt)'
+	python -c'import AEGEAN as AG; opt = AG.init(); opt.run_path = "butterflies_long"; opt.datapath="../database/swapnesh_butterflies/";  opt.n_epochs=16384; opt.sample_interval=128; AG.learn(opt)'
 
 # CODING
 pep8:
@@ -67,5 +67,5 @@ clean:
 
 ## INSTALL
 install:
-	python3 -m pip install --user -r requirements.txt
-	python3 -m pip install --user -e .
+	python -m pip install --user -r requirements.txt
+	python -m pip install --user -e .
