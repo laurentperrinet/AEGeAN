@@ -216,7 +216,7 @@ def load_data(path, img_size, batch_size,
         torch.save(dataset, file_path)
 
     use_cuda = True if torch.cuda.is_available() else False
-    kwargs = {'num_workers': 1, 'pin_memory': True} if use_cuda else {}
+    kwargs = {'num_workers': 4, 'pin_memory': True} if use_cuda else {}
     dataloader = torch.utils.data.DataLoader(
         dataset, batch_size=batch_size, shuffle=True, drop_last=True, **kwargs)
 

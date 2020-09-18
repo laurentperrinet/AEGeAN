@@ -105,6 +105,8 @@ class Encoder(nn.Module):
 #     def forward(self, x):
 #         return self.conv(x)
 #
+# see also https://towardsdatascience.com/simpsonize-yourself-using-cyclegan-and-pytorch-cea94ee199ca
+
 class Generator(nn.Module):
     def __init__(self, opt):
         super(Generator, self).__init__()
