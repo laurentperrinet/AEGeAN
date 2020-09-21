@@ -8,9 +8,10 @@ torch.autograd.set_detect_anomaly(True)
 from torch.autograd import Variable
 import torch.nn.functional as F
 
-from .init import init
-from .utils import *
-from .models import *
+# from .init import init
+from .utils import print_network, sampling
+from .utils import init_hist, load_data, weights_init_normal
+from .models import Generator, Discriminator, Encoder
 
 try:
     # to use with `$ tensorboard --logdir runs`
@@ -140,49 +141,50 @@ def do_learn(opt, run_dir="./runs"):
     stat_record = init_hist(opt.n_epochs, nb_batch)
 
     # https://github.com/soumith/dcgan.torch/issues/14  dribnet commented on 21 Mar 2016
-    def slerp(val, low, high):
-        omega = np.arccos(np.dot(low/np.linalg.norm(low), high/np.linalg.norm(high)))
-        so = np.sin(omega)
-        return np.sin((1.0-val)*omega) / so * low + np.sin(val*omega)/so * high
-    
     # https://arxiv.org/abs/1609.04468
-    # def slerp(val, low, high):
-    #     omega = np.arccos(np.clip(np.dot(low/np.linalg.norm(low), high/np.linalg.norm(high)), -1, 1))
-    #     so = np.sin(omega)
-    #     if so == 0:
-    #         return (1.0-val) * low + val * high # L'Hopital's rule/LERP
-    #     return np.sin((1.0-val)*omega) / so * low + np.sin(val*omega) / so * high
-
-
+    def slerp(val, low, high):
+        corr = np.diag((low/np.linalg.norm(low)) @ (high/np.linalg.norm(high)).T)
+        omega = np.arccos(np.clip(corr, -1, 1))[:, None]
+        so = np.sin(omega)
+        out =  np.sin((1.0-val)*omega) / so * low + np.sin(val*omega) / so * high
+        out[so[:, 0] == 0, :] = (1.0-val) * low[so[:, 0] == 0, :] + val * high[so[:, 0] == 0, :] # L'Hopital's rule/LERP
+        return out
 
     def norm2(z):
         """
         L2-norm of a tensor.
 
+        outputs a scalar
         """
-        return torch.mean(z.pow(2)).pow(.5)
+        # return torch.mean(z.pow(2)).pow(.5)
+        return (z**2).sum().sqrt()
 
-    def gen_z(imgs=None, rho=.1):
+    def gen_z(imgs=None, rho=.25, do_slerp=True):
         """
         Generate noise in the feature space.
 
+        outputs a vector
         """
         z = np.random.normal(0, 1, (opt.batch_size, opt.latent_dim))
         # convert to tensor
-        z = Variable(Tensor(z), requires_grad=False)
 
         if not imgs is None:
-            z /= norm2(z)
             z_imgs = encoder(imgs)
-            z_imgs /= norm2(z_imgs)
-            z = (1-rho) * z_imgs + rho * z
-            z /= norm2(z)
-        return z
+            if do_slerp:
+                z_shuffle = z[torch.randperm(opt.batch_size), :]
+                z = slerp(rho, z, z_shuffle)
+            else:
+                z /= norm2(z)
+                z_imgs /= norm2(z_imgs)
+                z = (1-rho) * z_imgs + rho * z
+                z /= norm2(z)
+        return Variable(Tensor(z), requires_grad=False)
 
     def gen_noise(imgs):
         """
         Generate noise in the image space
 
+        outputs an image
         """
         v_noise = np.random.normal(0, 1, imgs.shape) # one random image
         # one contrast value per image
