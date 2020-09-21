@@ -139,6 +139,21 @@ def do_learn(opt, run_dir="./runs"):
 
     stat_record = init_hist(opt.n_epochs, nb_batch)
 
+    # https://github.com/soumith/dcgan.torch/issues/14  dribnet commented on 21 Mar 2016
+    def slerp(val, low, high):
+        omega = np.arccos(np.dot(low/np.linalg.norm(low), high/np.linalg.norm(high)))
+        so = np.sin(omega)
+        return np.sin((1.0-val)*omega) / so * low + np.sin(val*omega)/so * high
+    
+    # https://arxiv.org/abs/1609.04468
+    # def slerp(val, low, high):
+    #     omega = np.arccos(np.clip(np.dot(low/np.linalg.norm(low), high/np.linalg.norm(high)), -1, 1))
+    #     so = np.sin(omega)
+    #     if so == 0:
+    #         return (1.0-val) * low + val * high # L'Hopital's rule/LERP
+    #     return np.sin((1.0-val)*omega) / so * low + np.sin(val*omega) / so * high
+
+
 
     def norm2(z):
         """
@@ -379,6 +394,8 @@ def do_learn(opt, run_dir="./runs"):
                 else:
                     print ('GAN_loss not defined', opt.GAN_loss)
 
+                # TODO: penalize low variance in a batch = mode collapse
+
                 # Backward
                 g_loss.backward()
                 # apply the gradients
@@ -440,11 +457,11 @@ def do_learn(opt, run_dir="./runs"):
                 Use generator model and noise vector to generate images.
                 Save them to tensorboard
                 """
-                # generator.eval()
+                generator.eval()
                 gen_imgs = generator(fixed_noise)
-                grid = torchvision.utils.make_grid(gen_imgs, normalize=True, nrow=8, range=(0, 1))
+                grid = torchvision.utils.make_grid(gen_imgs, normalize=True, nrow=16, range=(0, 1))
                 writer.add_image('Generated images', grid, epoch)
-                # generator.train()
+                generator.train()
 
                 """
                 Use auto-encoder model and original images to generate images.
@@ -454,15 +471,15 @@ def do_learn(opt, run_dir="./runs"):
                 # grid_imgs = torchvision.utils.make_grid(real_imgs_samples, normalize=True, nrow=8, range=(0, 1))
                 # writer.add_image('Images/original', grid_imgs, epoch)
 
-                # generator.eval()
-                # encoder.eval()
-                enc_imgs = encoder(real_imgs_samples)
+                generator.eval()
+                encoder.eval()
+                # enc_imgs = encoder(real_imgs_samples)
                 dec_imgs = generator(enc_imgs)
-                grid_dec = torchvision.utils.make_grid(dec_imgs, normalize=True, nrow=8, range=(0, 1))
+                grid_dec = torchvision.utils.make_grid(dec_imgs, normalize=True, nrow=16, range=(0, 1))
                 # writer.add_image('Images/auto-encoded', grid_dec, epoch)
                 writer.add_image('Auto-encoded', grid_dec, epoch)
-                # generator.train()
-                # encoder.train()
+                generator.train()
+                encoder.train()
 
 
         # if epoch % opt.sample_interval == 0 :
@@ -471,7 +488,7 @@ def do_learn(opt, run_dir="./runs"):
 
         print("[Epoch Time: ", time.time() - t_epoch, "s]")
 
-    sampling(fixed_noise, generator, path_data, epoch, tag)
+    sampling(fixed_noise, generator, path_data, epoch, tag, nrow=16)
 
     # for scheduler in schedulers: scheduler.step()
     t_final = time.gmtime(time.time() - t_total)
