@@ -7,10 +7,11 @@ import torch
 torch.autograd.set_detect_anomaly(True)
 from torch.autograd import Variable
 import torch.nn.functional as F
+import torch.nn as nn
 
 # from .init import init
 from .utils import print_network, sampling
-from .utils import init_hist, load_data, weights_init_normal
+from .utils import init_hist, load_data, weights_init_normal, save_hist_batch
 from .models import Generator, Discriminator, Encoder
 
 try:
@@ -407,24 +408,18 @@ def do_learn(opt, run_dir="./runs"):
             # -----------------
             #  Recording stats
             # -----------------
-            if opt.lrG > 0:
-                d_loss = real_loss + fake_loss
+            d_loss = real_loss + fake_loss
 
-                # Compensation pour le BCElogits
-                d_fake = sigmoid(logit_d_fake)
-                d_x = sigmoid(logit_d_x)
-                d_g_z = sigmoid(logit_d_g_z)
-                print(
-                    "%s [Epoch %d/%d] [Batch %d/%d] [E loss: %f] [D loss: %f] [G loss: %f] [D(x) %f] [D(G(z)) %f] [D(G(z')) %f] [Time: %fs]"
-                    % (opt.run_path, epoch, opt.n_epochs, iteration+1, len(dataloader), e_loss.item(), d_loss.item(), g_loss.item(), torch.mean(d_x), torch.mean(d_fake), torch.mean(d_g_z), time.time()-t_batch)
-                )
-                # Save Losses and scores for Tensorboard
-                save_hist_batch(stat_record, iteration, i_epoch, g_loss, d_loss, e_loss, d_x, d_g_z)
-            else:
-                print(
-                    "%s [Epoch %d/%d] [Batch %d/%d] [E loss: %f] [Time: %fs]"
-                    % (opt.run_path, epoch, opt.n_epochs, i+1, len(dataloader), e_loss.item(), time.time()-t_batch)
-                )
+            # Compensation pour le BCElogits
+            d_fake = sigmoid(logit_d_fake)
+            d_x = sigmoid(logit_d_x)
+            d_g_z = sigmoid(logit_d_g_z)
+            print(
+                "%s [Epoch %d/%d] [Batch %d/%d] [E loss: %f] [D loss: %f] [G loss: %f] [D(x) %f] [D(G(z)) %f] [D(G(z')) %f] [Time: %fs]"
+                % (opt.run_path, epoch, opt.n_epochs, iteration+1, len(dataloader), e_loss.item(), d_loss.item(), g_loss.item(), torch.mean(d_x), torch.mean(d_fake), torch.mean(d_g_z), time.time()-t_batch)
+            )
+            # Save Losses and scores for Tensorboard
+            save_hist_batch(stat_record, iteration, i_epoch, g_loss, d_loss, e_loss, d_x, d_g_z)
 
         if do_tensorboard:
             # Tensorboard save
@@ -461,7 +456,8 @@ def do_learn(opt, run_dir="./runs"):
                 """
                 generator.eval()
                 gen_imgs = generator(fixed_noise)
-                grid = torchvision.utils.make_grid(gen_imgs, normalize=True, nrow=16, range=(0, 1))
+                from torchvision.utils import make_grid
+                grid = make_grid(gen_imgs, normalize=True, nrow=16, range=(0, 1))
                 writer.add_image('Generated images', grid, epoch)
                 generator.train()
 
@@ -470,14 +466,14 @@ def do_learn(opt, run_dir="./runs"):
                 Save them to tensorboard
 
                 """
-                # grid_imgs = torchvision.utils.make_grid(real_imgs_samples, normalize=True, nrow=8, range=(0, 1))
+                # grid_imgs = make_grid(real_imgs_samples, normalize=True, nrow=8, range=(0, 1))
                 # writer.add_image('Images/original', grid_imgs, epoch)
 
                 generator.eval()
                 encoder.eval()
-                # enc_imgs = encoder(real_imgs_samples)
+                enc_imgs = encoder(real_imgs_samples)
                 dec_imgs = generator(enc_imgs)
-                grid_dec = torchvision.utils.make_grid(dec_imgs, normalize=True, nrow=16, range=(0, 1))
+                grid_dec = make_grid(dec_imgs, normalize=True, nrow=16, range=(0, 1))
                 # writer.add_image('Images/auto-encoded', grid_dec, epoch)
                 writer.add_image('Auto-encoded', grid_dec, epoch)
                 generator.train()
