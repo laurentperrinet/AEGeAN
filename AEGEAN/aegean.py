@@ -390,6 +390,7 @@ def do_learn(opt, run_dir="./runs"):
                 print ('GAN_loss not defined', opt.GAN_loss)
 
             # TODO: penalize low variance in a batch = mode collapse
+            # 
 
             # Backward
             g_loss.backward()
