@@ -75,14 +75,15 @@ class Encoder(nn.Module):
     def _name(self):
         return "Encoder"
 
-# TODO: use more blocks:
-norm_layer = nn.InstanceNorm2d
+# norm_layer = nn.InstanceNorm2d
 class ResBlock(nn.Module):
     def __init__(self, f):
         super(ResBlock, self).__init__()
-        self.conv = nn.Sequential(nn.Conv2d(f, f, 3, 1, 1), norm_layer(f), nn.ReLU(),
+        self.conv = nn.Sequential(nn.Conv2d(f, f, 3, 1, 1),
+                                  nn.BatchNorm2d(f), #norm_layer(f),
+                                  nn.ReLU(),
                                   nn.Conv2d(f, f, 3, 1, 1))
-        self.norm = norm_layer(f)
+        self.norm = nn.BatchNorm2d(f)
     def forward(self, x):
         return F.relu(self.norm(self.conv(x)+x))
 
