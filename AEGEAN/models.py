@@ -75,6 +75,8 @@ class Encoder(nn.Module):
     def _name(self):
         return "Encoder"
 
+# norm_layer = nn.BatchNorm2d
+# https://pytorch.org/docs/stable/generated/torch.nn.InstanceNorm2d.html#instancenorm2d
 norm_layer = nn.InstanceNorm2d
 class ResBlock(nn.Module):
     def __init__(self, f):
@@ -126,7 +128,7 @@ class Generator(nn.Module):
                         ]
             if opt.dropout >0: block.append(nn.Dropout2d(opt.dropout))
             if bn and (not opt.bn_eps == np.inf):
-                block.append(nn.BatchNorm2d(num_features=out_channels, eps=opt.bn_eps, momentum=opt.bn_momentum))
+                block.append(norm_layer(num_features=out_channels, eps=opt.bn_eps, momentum=opt.bn_momentum))
             block.append(NL)
             return block
 
