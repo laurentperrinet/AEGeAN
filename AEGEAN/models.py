@@ -3,7 +3,7 @@ import numpy as np
 
 import itertools
 import torch.nn as nn
-# import torch.nn.functional as F
+import torch.nn.functional as F
 import torch
 
 cuda = True if torch.cuda.is_available() else False
@@ -76,16 +76,16 @@ class Encoder(nn.Module):
         return "Encoder"
 
 # TODO: use more blocks:
-# norm_layer = nn.InstanceNorm2d
-# class ResBlock(nn.Module):
-#     def __init__(self, f):
-#         super(ResBlock, self).__init__()
-#         self.conv = nn.Sequential(nn.Conv2d(f, f, 3, 1, 1), norm_layer(f), nn.ReLU(),
-#                                   nn.Conv2d(f, f, 3, 1, 1))
-#         self.norm = norm_layer(f)
-#     def forward(self, x):
-#         return F.relu(self.norm(self.conv(x)+x))
-#
+norm_layer = nn.InstanceNorm2d
+class ResBlock(nn.Module):
+    def __init__(self, f):
+        super(ResBlock, self).__init__()
+        self.conv = nn.Sequential(nn.Conv2d(f, f, 3, 1, 1), norm_layer(f), nn.ReLU(),
+                                  nn.Conv2d(f, f, 3, 1, 1))
+        self.norm = norm_layer(f)
+    def forward(self, x):
+        return F.relu(self.norm(self.conv(x)+x))
+
 # class Generator(nn.Module):
 #     def __init__(self, f=64, blocks=6):
 #         super(Generator, self).__init__()
@@ -116,7 +116,8 @@ class Generator(nn.Module):
             if not opt.do_transpose:
                 block = [nn.Conv2d(in_channels, out_channels,
                                    padding=opt.padding, padding_mode=opt.padding_mode, **opts_conv),
-                         nn.Upsample(scale_factor=stride, mode='bilinear', align_corners=True),
+                         nn.PixelShuffle(stride),
+                         # nn.Upsample(scale_factor=stride, mode='bilinear', align_corners=True),
                         ]
             else:#
                 block = [nn.ConvTranspose2d(in_channels, out_channels, stride=stride,
@@ -139,7 +140,13 @@ class Generator(nn.Module):
                         NL,
                         )
 
-        self.conv1 = nn.Sequential(*generator_block(opt.channel3, opt.channel2, bn=False, stride=1),)
+        # resNet block
+        layers = generator_block(opt.channel3, opt.channel2, bn=False, stride=1)
+        for i in range(int(opt.resblocks)):
+            layers.append(ResBlock(opt.channel2))
+        self.conv1 = nn.Sequential(*layers)
+
+
         self.conv2 = nn.Sequential(*generator_block(opt.channel2, opt.channel1, stride=opt.stride),)
         self.conv3 = nn.Sequential(*generator_block(opt.channel1, opt.channel0, stride=opt.stride),)
 
