@@ -75,15 +75,15 @@ class Encoder(nn.Module):
     def _name(self):
         return "Encoder"
 
-# norm_layer = nn.InstanceNorm2d
+norm_layer = nn.InstanceNorm2d
 class ResBlock(nn.Module):
     def __init__(self, f):
         super(ResBlock, self).__init__()
         self.conv = nn.Sequential(nn.Conv2d(f, f, 3, 1, 1),
-                                  nn.BatchNorm2d(f), #norm_layer(f),
+                                  norm_layer(f),
                                   nn.ReLU(),
                                   nn.Conv2d(f, f, 3, 1, 1))
-        self.norm = nn.BatchNorm2d(f)
+        self.norm = norm_layer(f)
     def forward(self, x):
         return F.relu(self.norm(self.conv(x)+x))
 
@@ -117,8 +117,8 @@ class Generator(nn.Module):
             if not opt.do_transpose:
                 block = [nn.Conv2d(in_channels, out_channels,
                                    padding=opt.padding, padding_mode=opt.padding_mode, **opts_conv),
-                         nn.PixelShuffle(stride),
-                         # nn.Upsample(scale_factor=stride, mode='bilinear', align_corners=True),
+                         # TODO : use nn.PixelShuffle(stride),
+                         nn.Upsample(scale_factor=stride, mode='bilinear', align_corners=True),
                         ]
             else:#
                 block = [nn.ConvTranspose2d(in_channels, out_channels, stride=stride,
