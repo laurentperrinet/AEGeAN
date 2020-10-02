@@ -390,7 +390,7 @@ def do_learn(opt, run_dir="./runs"):
                 print ('GAN_loss not defined', opt.GAN_loss)
 
             # TODO: penalize low variance in a batch = mode collapse
-            # 
+            #
 
             # Backward
             g_loss.backward()
@@ -469,6 +469,10 @@ def do_learn(opt, run_dir="./runs"):
                 writer.add_image('Auto-encoded', grid_dec, epoch)
                 generator.train()
                 encoder.train()
+                writer.add_graph(encoder, real_imgs_samples)
+                writer.add_graph(generator, enc_imgs)
+                writer.add_graph(discriminator, real_imgs_samples)
+
 
 
         # if epoch % opt.sample_interval == 0 :
