@@ -392,7 +392,7 @@ def do_learn(opt, run_dir="./runs"):
             # penalize low variability in a batch, that is, mode collapse
             if opt.lambdaG > 0:
                 e_g_z = encoder(gen_imgs) # get normal vectors
-                Xcorr = torch.tensordot(e_g_z, e_g_z.T, 1)/opt.latent_dim
+                Xcorr = torch.tensordot(e_g_z, torch.transpose(e_g_z, 0, 1), 1)/opt.latent_dim
                 Xcorr *= 1 - torch.eye(opt.batch_size)
                 g_loss += opt.lambdaG * torch.sum(Xcorr.pow(2)).pow(.5)
 
