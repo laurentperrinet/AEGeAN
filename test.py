@@ -416,6 +416,16 @@ for expname in experiments.keys():
     opt.lambdaE *= base
     AG.learn(opt)
 
+    tag, opt = init()
+    opt.run_path = tag + 'small_lambdaG'
+    opt.lambdaG /= base
+    AG.learn(opt)
+
+    tag, opt = init()
+    opt.run_path = tag + 'big_lambdaG'
+    opt.lambdaG *= base
+    AG.learn(opt)
+
     if do_test:
 
         tag, opt = init()
