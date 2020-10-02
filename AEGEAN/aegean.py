@@ -72,6 +72,7 @@ def do_learn(opt, run_dir="./runs"):
         print_network(discriminator)
         print_network(encoder)
 
+    eye = 1 - torch.eye(opt.batch_size)
     use_cuda = True if torch.cuda.is_available() else False
     if use_cuda:
         #print("Nombre de GPU : ",torch.cuda.device_count())
@@ -84,6 +85,7 @@ def do_learn(opt, run_dir="./runs"):
         encoder.cuda()
         # MSE_loss.cuda()
         E_loss.cuda()
+        eye = eye.cuda()
 
         Tensor = torch.cuda.FloatTensor
     else:
@@ -393,7 +395,7 @@ def do_learn(opt, run_dir="./runs"):
             if opt.lambdaG > 0:
                 e_g_z = encoder(gen_imgs) # get normal vectors
                 Xcorr = torch.tensordot(e_g_z, torch.transpose(e_g_z, 0, 1), 1)/opt.latent_dim
-                Xcorr *= 1 - torch.eye(opt.batch_size)
+                Xcorr *= eye
                 g_loss += opt.lambdaG * torch.sum(Xcorr.pow(2)).pow(.5)
 
             # Backward
