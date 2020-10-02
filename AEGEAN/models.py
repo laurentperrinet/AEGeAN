@@ -38,7 +38,7 @@ class Encoder(nn.Module):
         )
         self.vector1 = nn.Sequential(
             nn.Linear(opt.channel4, opt.latent_dim),
-            NL,
+            # NL,
         )
 
         self.opt = opt
