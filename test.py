@@ -119,6 +119,7 @@ for expname in experiments.keys():
     opt.batch_size *= base
     AG.learn(opt)
 
+
     tag, opt = init()
     opt.run_path = tag + 'small_lrE'
     opt.lrE /= base
@@ -193,6 +194,15 @@ for expname in experiments.keys():
         AG.learn(opt)
 
         tag, opt = init()
+        opt.resblocks, opt.run_path = opt.resblocks//base, tag + 'small_resblocks'
+        AG.learn(opt)
+
+        tag, opt = init()
+        opt.resblocks, opt.run_path = opt.resblocks*base, tag + 'large_resblocks'
+        AG.learn(opt)
+
+
+        tag, opt = init()
         opt.run_path = tag + 'small_channel0'
         opt.channel0 //= base
         AG.learn(opt)
@@ -242,49 +252,88 @@ for expname in experiments.keys():
         opt.channel4 *= base
         AG.learn(opt)
 
-    tag, opt = init()
-    opt.run_path = tag + 'no_E_noise'
-    opt.E_noise = 0.
-    AG.learn(opt)
 
-    tag, opt = init()
-    opt.run_path = tag + 'low_E_noise'
-    opt.E_noise /= base
-    AG.learn(opt)
+    if opt.E_noise > 0. :
+        tag, opt = init()
+        opt.run_path = tag + 'no_E_noise'
+        opt.E_noise = 0.
+        AG.learn(opt)
 
-    tag, opt = init()
-    opt.run_path = tag + 'high_E_noise'
-    opt.E_noise *= base
-    AG.learn(opt)
+        tag, opt = init()
+        opt.run_path = tag + 'low_E_noise'
+        opt.E_noise /= base
+        AG.learn(opt)
 
-    tag, opt = init()
-    opt.run_path = tag + 'no_D_noise'
-    opt.D_noise = 0.
-    AG.learn(opt)
+        tag, opt = init()
+        opt.run_path = tag + 'high_E_noise'
+        opt.E_noise *= base
+        AG.learn(opt)
 
-    tag, opt = init()
-    opt.run_path = tag + 'low_D_noise'
-    opt.D_noise /= base
-    AG.learn(opt)
+    else:
+        tag, opt = init()
+        opt.run_path = tag + 'low_E_noise'
+        opt.E_noise = 0.001
+        AG.learn(opt)
 
-    tag, opt = init()
-    opt.run_path = tag + 'high_D_noise'
-    opt.D_noise *= base
-    AG.learn(opt)
-    tag, opt = init()
-    opt.run_path = tag + 'no_G_noise'
-    opt.G_noise = 0.
-    AG.learn(opt)
+        tag, opt = init()
+        opt.run_path = tag + 'high_E_noise'
+        opt.E_noise = 0.1
+        AG.learn(opt)
 
-    tag, opt = init()
-    opt.run_path = tag + 'low_G_noise'
-    opt.G_noise /= base
-    AG.learn(opt)
+    if opt.D_noise > 0. :
+        tag, opt = init()
+        opt.run_path = tag + 'no_D_noise'
+        opt.D_noise = 0.
+        AG.learn(opt)
 
-    tag, opt = init()
-    opt.run_path = tag + 'high_G_noise'
-    opt.G_noise *= base
-    AG.learn(opt)
+        tag, opt = init()
+        opt.run_path = tag + 'low_D_noise'
+        opt.D_noise /= base
+        AG.learn(opt)
+
+        tag, opt = init()
+        opt.run_path = tag + 'high_D_noise'
+        opt.D_noise *= base
+        AG.learn(opt)
+
+    else:
+        tag, opt = init()
+        opt.run_path = tag + 'low_D_noise'
+        opt.D_noise = 0.001
+        AG.learn(opt)
+
+        tag, opt = init()
+        opt.run_path = tag + 'high_D_noise'
+        opt.D_noise = 0.1
+        AG.learn(opt)
+
+    if opt.G_noise > 0. :
+
+        tag, opt = init()
+        opt.run_path = tag + 'no_G_noise'
+        opt.G_noise = 0.
+        AG.learn(opt)
+
+        tag, opt = init()
+        opt.run_path = tag + 'low_G_noise'
+        opt.G_noise /= base
+        AG.learn(opt)
+
+        tag, opt = init()
+        opt.run_path = tag + 'high_G_noise'
+        opt.G_noise *= base
+        AG.learn(opt)
+
+    else:
+        tag, opt = init()
+        opt.run_path = tag + 'low_G_noise'
+        opt.G_noise = 0.001
+        AG.learn(opt)
+
+        tag, opt = init()
+        opt.run_path = tag + 'high_G_noise'
+        opt.G_noise = 0.1
+        AG.learn(opt)
 
     tag, opt = init()
     opt.do_SSIM = not opt.do_SSIM
