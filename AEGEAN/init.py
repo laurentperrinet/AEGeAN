@@ -41,7 +41,7 @@ def init():
     parser.add_argument("--lrelu", type=float, default=0., help="LeakyReLU : alpha - zero for a standard ReLU")
     parser.add_argument("--do_joint", type=bool, default=True, help="Do a joint learning of E and G, dude.")
     parser.add_argument("--do_insight", type=bool, default=False, help="D looks at G_E_x instead of x.")
-    parser.add_argument("--do_transpose", type=bool, default=True, help="use of Conv2Dtranspose.")
+    parser.add_argument("--do_transpose", type=bool, default=False, help="use of Conv2Dtranspose.")
     parser.add_argument("--bn_eps", type=float, default=0.01, help="norm: espilon for numerical stability")
     parser.add_argument("--bn_momentum", type=float, default=.1,
                         help="batchnorm: momentum for numerical stability")
