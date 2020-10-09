@@ -142,7 +142,8 @@ def do_learn(opt, run_dir="./runs"):
         omega = np.arccos(np.clip(corr, -1, 1))[:, None]
         so = np.sin(omega)
         out =  np.sin((1.0-val)*omega) / so * low + np.sin(val*omega) / so * high
-        out[so[:, 0] == 0, :] = (1.0-val) * low[so[:, 0] == 0, :] + val * high[so[:, 0] == 0, :] # L'Hopital's rule/LERP
+        # L'Hopital's rule/LERP
+        out[so[:, 0] == 0, :] = (1.0-val) * low[so[:, 0] == 0, :] + val * high[so[:, 0] == 0, :]
         return out
 
     def norm2(z):
@@ -154,25 +155,26 @@ def do_learn(opt, run_dir="./runs"):
         # return torch.mean(z.pow(2)).pow(.5)
         return (z**2).sum().sqrt()
 
-    def gen_z(imgs=None, rho=.25, do_slerp=True):
+    def gen_z(imgs=None, rho=.25, do_slerp=opt.do_slerp):
         """
         Generate noise in the feature space.
 
         outputs a vector
         """
-        z = np.random.normal(0, 1, (opt.batch_size, opt.latent_dim))
-        # convert to tensor
-
         if not imgs is None:
-            z_imgs = encoder(imgs)
+            z_imgs = encoder(imgs).numpy()
             if do_slerp:
-                z_shuffle = z[torch.randperm(opt.batch_size), :]
-                z = slerp(rho, z, z_shuffle)
+                z_shuffle = z_imgs.copy()
+                z_shuffle = z_shuffle[torch.randperm(opt.batch_size), :]
+                z = slerp(rho, z_imgs, z_shuffle)
             else:
                 z /= norm2(z)
                 z_imgs /= norm2(z_imgs)
                 z = (1-rho) * z_imgs + rho * z
                 z /= norm2(z)
+        else:
+            z = np.random.normal(0, 1, (opt.batch_size, opt.latent_dim))
+        # convert to tensor
         return Variable(Tensor(z), requires_grad=False)
 
     def gen_noise(imgs):
