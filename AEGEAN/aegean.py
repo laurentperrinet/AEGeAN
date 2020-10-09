@@ -162,7 +162,7 @@ def do_learn(opt, run_dir="./runs"):
         outputs a vector
         """
         if not imgs is None:
-            z_imgs = encoder(imgs).numpy()
+            z_imgs = encoder(imgs).cpu().numpy()
             if do_slerp:
                 z_shuffle = z_imgs.copy()
                 z_shuffle = z_shuffle[torch.randperm(opt.batch_size), :]
