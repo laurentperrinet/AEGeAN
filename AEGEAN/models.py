@@ -61,8 +61,17 @@ class Encoder(nn.Module):
             return block
 
         self.conv1 = nn.Sequential(*encoder_block(opt.channels, opt.channel0, bn=False, bias=False),)
-        self.conv2 = nn.Sequential(*encoder_block(opt.channel0, opt.channel1, bias=opt.do_bias),)
-        self.conv3 = nn.Sequential(*encoder_block(opt.channel1, opt.channel2, bias=opt.do_bias),)
+
+        layers = encoder_block(opt.channel0, opt.channel1, bias=opt.do_bias)
+        for i in range(int(opt.resblocks)): layers.append(ResBlock(opt.channel1))
+        self.conv2 = nn.Sequential(*layers)
+        #self.conv2 = nn.Sequential(*encoder_block(opt.channel0, opt.channel1, bias=opt.do_bias),)
+
+        layers = encoder_block(opt.channel1, opt.channel2, bias=opt.do_bias)
+        for i in range(int(opt.resblocks)): layers.append(ResBlock(opt.channel2))
+        self.conv3 = nn.Sequential(*layers)
+        # self.conv3 = nn.Sequential(*encoder_block(opt.channel1, opt.channel2, bias=opt.do_bias),)
+
         self.conv4 = nn.Sequential(*encoder_block(opt.channel2, opt.channel3, bias=opt.do_bias),)
 
         self.init_size = opt.img_size // opt.stride**4
@@ -146,12 +155,13 @@ class Generator(nn.Module):
 
         # resNet block
         layers = generator_block(opt.channel3, opt.channel2, bn=False, stride=1)
-        for i in range(int(opt.resblocks)):
-            layers.append(ResBlock(opt.channel2))
+        for i in range(int(opt.resblocks)): layers.append(ResBlock(opt.channel2))
         self.conv1 = nn.Sequential(*layers)
 
+        layers = generator_block(opt.channel2, opt.channel1, stride=opt.stride)
+        for i in range(int(opt.resblocks)): layers.append(ResBlock(opt.channel1))
+        self.conv2 = nn.Sequential(*layers)
 
-        self.conv2 = nn.Sequential(*generator_block(opt.channel2, opt.channel1, stride=opt.stride),)
         self.conv3 = nn.Sequential(*generator_block(opt.channel1, opt.channel0, stride=opt.stride),)
 
         self.channel0_img = opt.channel0-opt.channel0_bg
