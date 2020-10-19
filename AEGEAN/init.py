@@ -14,10 +14,8 @@ else:
 
 def init():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--run_path", type=str, default='vanilla',
-                        help="TensorBoard folder to save samples data and statistics")
-    parser.add_argument("--n_epochs", type=int, default=2048,
-                        help="number of epochs of training")
+    parser.add_argument("--run_path", type=str, default='vanilla', help="TensorBoard folder to save samples data and statistics")
+    parser.add_argument("--n_epochs", type=int, default=2048, help="number of epochs of training")
     parser.add_argument("--batch_size", type=int, default=128, help="size of the batches")
     parser.add_argument("--rand_hflip", type=bool, default=True, help="data augmentation: horizontal flip")
     parser.add_argument("--rand_affine", type=float, default=2., help="data augmentation: angle in degrees")
@@ -43,12 +41,9 @@ def init():
     parser.add_argument("--do_insight", type=bool, default=False, help="D looks at G_E_x instead of x.")
     parser.add_argument("--do_transpose", type=bool, default=False, help="use of Conv2Dtranspose.")
     parser.add_argument("--bn_eps", type=float, default=0.01, help="norm: espilon for numerical stability")
-    parser.add_argument("--bn_momentum", type=float, default=.1,
-                        help="batchnorm: momentum for numerical stability")
-    parser.add_argument("--beta1", type=float, default=0.985,
-                        help="adam: decay of first order momentum of gradient")
-    parser.add_argument("--beta2", type=float, default=0.99,
-                        help="adam: decay of first order momentum of gradient")
+    parser.add_argument("--bn_momentum", type=float, default=.1, help="batchnorm: momentum for numerical stability")
+    parser.add_argument("--beta1", type=float, default=0.985, help="adam: decay of first order momentum of gradient")
+    parser.add_argument("--beta2", type=float, default=0.99, help="adam: decay of first order momentum of gradient")
     parser.add_argument("--resblocks", type=int, default=4, help="number of ResNet  block")
     parser.add_argument("--channel0_bg", type=int, default=2, help="size of the background mask channel")
     parser.add_argument("--channel0", type=int, default=8, help="size of channel 0")
