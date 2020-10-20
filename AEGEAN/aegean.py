@@ -55,10 +55,10 @@ def do_learn(opt, run_dir="./runs"):
 
 
     if opt.do_SSIM:
-        # from pytorch_msssim import NMSSSIM 
-        # E_loss = NMSSSIM(window_size=opt.window_size, val_range=1., size_average=True, channel=3, normalize=True)
-        from pytorch_msssim import NSSIM #as neg_SSIM
-        E_loss = NSSIM(window_size=opt.window_size, val_range=1., size_average=True)
+        from pytorch_msssim import NMSSSIM
+        E_loss = NMSSSIM(window_size=opt.window_size, val_range=1., size_average=True, channel=3, normalize=True)
+        # from pytorch_msssim import NSSIM #as neg_SSIM
+        # E_loss = NSSIM(window_size=opt.window_size, val_range=1., size_average=True)
     else:
         E_loss = torch.nn.MSELoss(reduction='sum')
 
