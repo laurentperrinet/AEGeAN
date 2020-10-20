@@ -395,10 +395,11 @@ def do_learn(opt, run_dir="./runs"):
                 print ('GAN_loss not defined', opt.GAN_loss)
 
             # penalize low variability in a batch, that is, mode collapse
+            # TODO maximize sum of the distances to the nearest neighbors
             if opt.lambdaG > 0:
                 e_g_z = encoder(gen_imgs) # get normal vectors
                 Xcorr = torch.tensordot(e_g_z, torch.transpose(e_g_z, 0, 1), 1)/opt.latent_dim
-                Xcorr *= eye
+                Xcorr *= eye # set the diagonal elements to zero
                 g_loss += opt.lambdaG * torch.sum(Xcorr.pow(2)).pow(.5)
 
             # Backward
