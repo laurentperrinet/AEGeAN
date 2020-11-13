@@ -8,10 +8,10 @@ import numpy as np
 
 experiments = {}
 # experiments['AEGEAN_64'] = [('img_size', 64)]# , ('n_epochs', 512)]
-experiments['AEGEAN_128'] = [('img_size', 128), ]
+# experiments['AEGEAN_128'] = [('img_size', 128), ]
 experiments['Simpsons_128'] = [('datapath', '../database/Simpsons-Face_clear/cp/'), ('img_size', 128)]#, ('n_epochs', 128), ('do_SSIM', False)]
 # experiments['Simpsons_64'] = [('datapath', '../database/Simpsons-Face_clear/cp/'), ('img_size', 64)]
-# experiments['AEGEAN_256'] = [('img_size', 256), ]
+experiments['AEGEAN_256'] = [('img_size', 256), ]
 # experiments['Simpsons_256'] = [('datapath', '../database/Simpsons-Face_clear/cp/'), ('img_size', 256)] #, ('do_SSIM', False)]
 # experiments['butterflies_256'] = [('datapath', '../database/swapnesh_butterflies/'), ('img_size', 256)]
 experiments['cats_64'] = [('datapath', '../database/cats/'), ('img_size', 64)]
