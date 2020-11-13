@@ -63,7 +63,7 @@ def do_learn(opt, run_dir="./runs"):
         #from pytorch_msssim import msssim, ssim
         from pytorch_msssim import ssim, ms_ssim, SSIM, MS_SSIM
         #E_loss = MS_SSIM(win_size=opt.window_size, data_range=1, size_average=False, channel=3)
-        E_loss = MS_SSIM(data_range=1., size_average=False, channel=3)
+        E_loss = MS_SSIM(data_range=1., size_average=True, channel=3)
 
     else:
         E_loss = torch.nn.MSELoss(reduction='sum')
