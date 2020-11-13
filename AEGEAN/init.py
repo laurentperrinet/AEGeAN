@@ -57,7 +57,7 @@ def init():
     parser.add_argument("--padding", type=int, default=2, help="padding")
     parser.add_argument("--padding_mode", type=str, default='reflect', help="Handling values outside the range.")
     parser.add_argument("--img_size", type=int, default=128//DEBUG, help="size of each image dimension")
-    parser.add_argument("--window_size", type=int, default=16, help="size of window_size for SSIM")
+    parser.add_argument("--window_size", type=int, default=11, help="size of window_size for SSIM")
     parser.add_argument("--channels", type=int, default=3, help="number of input image channels")
     parser.add_argument("--sample_interval", type=int, default=128, help="interval in epochs between image sampling")
     parser.add_argument("--N_samples", type=int, default=48, help="number of images each sampling")
