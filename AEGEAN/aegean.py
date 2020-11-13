@@ -62,7 +62,8 @@ def do_learn(opt, run_dir="./runs"):
         # NEW: we use https://github.com/VainF/pytorch-msssim instead of https://github.com/SpikeAI/pytorch-msssim
         #from pytorch_msssim import msssim, ssim
         from pytorch_msssim import ssim, ms_ssim, SSIM, MS_SSIM
-        E_loss = MS_SSIM(win_size=opt.window_size, data_range=1, size_average=False, channel=3)
+        #E_loss = MS_SSIM(win_size=opt.window_size, data_range=1, size_average=False, channel=3)
+        E_loss = MS_SSIM(data_range=1., size_average=False, channel=3)
 
     else:
         E_loss = torch.nn.MSELoss(reduction='sum')
@@ -240,7 +241,7 @@ def do_learn(opt, run_dir="./runs"):
             optimizer_E.zero_grad()
 
             # Loss measures Encoder's ability to generate vectors suitable with the generator
-            e_loss = E_loss(real_imgs, decoded_imgs)
+            e_loss = 1.-E_loss(real_imgs, decoded_imgs)
             # energy = 1. # E_loss(real_imgs, zero_target)  # normalize on the energy of imgs
             # if opt.do_joint:
             #     e_loss = E_loss(real_imgs, decoded_imgs) / energy
