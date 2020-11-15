@@ -216,7 +216,6 @@ def do_learn(opt, run_dir="./runs"):
             # ---------------------
             #  Train Encoder
             # ---------------------
-            optimizer_E.zero_grad()
             for p in generator.parameters():
                 p.requires_grad = opt.do_joint
             for p in encoder.parameters():
@@ -252,6 +251,7 @@ def do_learn(opt, run_dir="./runs"):
                 e_loss += opt.lambdaE * (torch.sum(z_imgs.pow(2))/opt.batch_size/opt.latent_dim-1).pow(2).pow(.5)
 
             # Backward
+            optimizer_E.zero_grad()
             e_loss.backward()
             optimizer_E.step()
 
@@ -263,7 +263,6 @@ def do_learn(opt, run_dir="./runs"):
             # ---------------------
             #  Train Discriminator
             # ---------------------
-            optimizer_D.zero_grad()
             # Discriminator Requires grad, Encoder + Generator requires_grad = False
             for p in discriminator.parameters():
                 p.requires_grad = True
@@ -294,7 +293,6 @@ def do_learn(opt, run_dir="./runs"):
                 for p in discriminator.parameters():
                     p.data.clamp_(-0.01, 0.01)
 
-
             # Measure discriminator's ability to classify real from generated samples
             if opt.GAN_loss == 'ian':
                 # eq. 14 in https://arxiv.org/pdf/1701.00160.pdf
@@ -316,9 +314,6 @@ def do_learn(opt, run_dir="./runs"):
             elif opt.GAN_loss == 'original':
                 real_loss = F.binary_cross_entropy(sigmoid(logit_d_x), valid_smooth)
             else: print ('GAN_loss not defined', opt.GAN_loss)
-
-            # Backward
-            real_loss.backward()
 
             # Generate a batch of fake images and learn the discriminator to treat them as such
             z = gen_z(imgs=real_imgs_)
@@ -348,6 +343,8 @@ def do_learn(opt, run_dir="./runs"):
                 print ('GAN_loss not defined', opt.GAN_loss)
 
             # Backward
+            optimizer_D.zero_grad()
+            real_loss.backward()
             fake_loss.backward()
             # apply the gradients
             optimizer_D.step()
@@ -355,7 +352,6 @@ def do_learn(opt, run_dir="./runs"):
             # -----------------
             #  Train Generator
             # -----------------
-            optimizer_G.zero_grad()
             for p in generator.parameters():
                 p.requires_grad = True
             for p in discriminator.parameters():
@@ -408,10 +404,10 @@ def do_learn(opt, run_dir="./runs"):
                 g_loss += opt.lambdaG * torch.sum(Xcorr.pow(2)).pow(.5)
 
             # Backward
+            optimizer_G.zero_grad()
             g_loss.backward()
             # apply the gradients
             optimizer_G.step()
-
 
             # -----------------
             #  Recording stats
