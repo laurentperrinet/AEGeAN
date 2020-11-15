@@ -10,7 +10,7 @@ cuda = True if torch.cuda.is_available() else False
 
 
 def hardsoft(img, rho=.9):
-    return rho * torch.hardtanh(img, min_val=0.0, max_val=1.0) + (1-rho) * torch.sigmoid(img-.5)
+    return rho * F.hardtanh(img, min_val=0.0, max_val=1.0) + (1-rho) * torch.sigmoid(img-.5)
 
 
 # norm_layer = nn.BatchNorm2d
