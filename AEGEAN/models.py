@@ -8,6 +8,11 @@ import torch
 
 cuda = True if torch.cuda.is_available() else False
 
+
+def hardsoft(img, rho=.9):
+    return rho * torch.hardtanh(img, min_val=0.0, max_val=1.0) + (1-rho) * torch.sigmoid(img-.5)
+
+
 # norm_layer = nn.BatchNorm2d
 # https://pytorch.org/docs/stable/generated/torch.nn.InstanceNorm2d.html#instancenorm2d
 norm_layer = nn.InstanceNorm2d
@@ -169,20 +174,20 @@ class Generator(nn.Module):
             self.img_block = nn.Sequential(
                 nn.Conv2d(self.channel0_img, opt.channels, stride=1, padding=opt.padding, padding_mode=opt.padding_mode, **opts_conv),
                     # nn.Sigmoid(),
-                nn.Hardtanh(min_val=0.0, max_val=1.0),
+                #nn.Hardtanh(min_val=0.0, max_val=1.0),
             )
         else:
             self.img_block = nn.Sequential(
                 nn.ConvTranspose2d(self.channel0_img, opt.channels, stride=1,
                                             padding_mode='zeros', padding=opt.padding, **opts_conv), #
-                nn.Hardtanh(min_val=0.0, max_val=1.0),
+                #nn.Hardtanh(min_val=0.0, max_val=1.0),
             )
 
         if opt.channel0_bg>0:
             self.bg_block = nn.Sequential(
                 nn.Conv2d(opt.channel0_bg, opt.channels, stride=1, padding=opt.padding, padding_mode=opt.padding_mode, **opts_conv),
                 # nn.Sigmoid(),
-                nn.Hardtanh(min_val=0.0, max_val=1.0),
+                #nn.Hardtanh(min_val=0.0, max_val=1.0),
             )
             self.mask_block = nn.Sequential(
                 #nn.MaxPool2d(kernel_size=opt.kernel_size, padding=opt.padding, stride=1), # https://pytorch.org/docs/stable/nn.html#torch.nn.MaxPool2d
@@ -190,7 +195,7 @@ class Generator(nn.Module):
                                  padding=opt.padding, padding_mode=opt.padding_mode),
                 # nn.Sigmoid(),
                 # nn.Hardtanh(min_val=0.0, max_val=1.0),
-                nn.Tanh(),
+                #nn.Tanh(),
             )
 
         self.opt = opt
@@ -236,9 +241,9 @@ class Generator(nn.Module):
                 print("bg shape : ", bg.shape)
 
             # the mask represents the alpha channel of the figure.
-            out = img * (mask) + bg * (1 - mask)
+            out = hardsoft(img) * torch.sigmoid(mask) + hardsoft(bg) * (1 - torch.sigmoid(mask))
         else:
-            out = self.img_block(out)
+            out = hardsoft(self.img_block(out))
             if self.opt.verbose: print("img shape : ", out.shape)
 
         # # https://en.wikipedia.org/wiki/Gamma_correction
