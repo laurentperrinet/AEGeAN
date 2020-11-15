@@ -63,7 +63,7 @@ def do_learn(opt, run_dir="./runs"):
         #from pytorch_msssim import msssim, ssim
         from pytorch_msssim import ssim, ms_ssim, SSIM, MS_SSIM
         E_loss = MS_SSIM(win_size=opt.window_size, data_range=1, size_average=True, channel=3)
-        
+
     else:
         E_loss = torch.nn.MSELoss(reduction='sum')
 
@@ -216,6 +216,7 @@ def do_learn(opt, run_dir="./runs"):
             # ---------------------
             #  Train Encoder
             # ---------------------
+            optimizer_E.zero_grad()
             for p in generator.parameters():
                 p.requires_grad = opt.do_joint
             for p in encoder.parameters():
@@ -236,8 +237,6 @@ def do_learn(opt, run_dir="./runs"):
 
             z_imgs = encoder(real_imgs_)
             decoded_imgs = generator(z_imgs)
-
-            optimizer_E.zero_grad()
 
             # Loss measures Encoder's ability to generate vectors suitable with the generator
             e_loss = 1.-E_loss(real_imgs, decoded_imgs)
@@ -264,6 +263,7 @@ def do_learn(opt, run_dir="./runs"):
             # ---------------------
             #  Train Discriminator
             # ---------------------
+            optimizer_D.zero_grad()
             # Discriminator Requires grad, Encoder + Generator requires_grad = False
             for p in discriminator.parameters():
                 p.requires_grad = True
@@ -294,7 +294,6 @@ def do_learn(opt, run_dir="./runs"):
                 for p in discriminator.parameters():
                     p.data.clamp_(-0.01, 0.01)
 
-            optimizer_D.zero_grad()
 
             # Measure discriminator's ability to classify real from generated samples
             if opt.GAN_loss == 'ian':
@@ -356,6 +355,7 @@ def do_learn(opt, run_dir="./runs"):
             # -----------------
             #  Train Generator
             # -----------------
+            optimizer_G.zero_grad()
             for p in generator.parameters():
                 p.requires_grad = True
             for p in discriminator.parameters():
@@ -371,7 +371,6 @@ def do_learn(opt, run_dir="./runs"):
             # New discriminator decision (since we just updated D)
             logit_d_g_z = discriminator(gen_imgs)
 
-            optimizer_G.zero_grad()
             # Loss functions
             # Loss measures generator's ability to fool the discriminator
             if opt.GAN_loss == 'ian':

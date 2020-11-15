@@ -159,27 +159,28 @@ class Generator(nn.Module):
                         )
 
         # resNet block
-        layers = generator_block(opt.channel3, opt.channel2, bn=False, stride=1)
-        for i in range(int(opt.resblocks)): layers.append(ResBlock(opt.channel2))
-        self.conv1 = nn.Sequential(*layers)
+        layers_1 = generator_block(opt.channel3, opt.channel2, bn=False, stride=1)
+        for i in range(int(opt.resblocks)): layers_1.append(ResBlock(opt.channel2))
+        self.conv1 = nn.Sequential(*layers_1)
 
-        layers = generator_block(opt.channel2, opt.channel1, stride=opt.stride)
-        for i in range(int(opt.resblocks)): layers.append(ResBlock(opt.channel1))
-        self.conv2 = nn.Sequential(*layers)
+        layers_2 = generator_block(opt.channel2, opt.channel1, stride=opt.stride)
+        for i in range(int(opt.resblocks)): layers_2.append(ResBlock(opt.channel1))
+        self.conv2 = nn.Sequential(*layers_2)
 
         self.conv3 = nn.Sequential(*generator_block(opt.channel1, opt.channel0, stride=opt.stride),)
 
         self.channel0_img = opt.channel0-opt.channel0_bg
         if not opt.do_transpose:
             self.img_block = nn.Sequential(
-                nn.Conv2d(self.channel0_img, opt.channels, stride=1, padding=opt.padding, padding_mode=opt.padding_mode, **opts_conv),
+                nn.Conv2d(self.channel0_img, opt.channels, stride=1,
+                          padding=opt.padding, padding_mode=opt.padding_mode, **opts_conv),
                     # nn.Sigmoid(),
                 #nn.Hardtanh(min_val=0.0, max_val=1.0),
             )
         else:
             self.img_block = nn.Sequential(
                 nn.ConvTranspose2d(self.channel0_img, opt.channels, stride=1,
-                                            padding_mode='zeros', padding=opt.padding, **opts_conv), #
+                                   padding_mode=opt.padding_mode, padding=opt.padding, **opts_conv), #
                 #nn.Hardtanh(min_val=0.0, max_val=1.0),
             )
 
