@@ -8,7 +8,7 @@ tensorflow
 tensorflow-estimator
 tensorboard
 # PyTorch
-torch==1.1.0
+torch==2.2.0
 torchvision==0.2.1
 -e git+https://github.com/SpikeAI/pytorch-msssim#egg=pytorch-msssim
 # progress bars in model download and training scripts
